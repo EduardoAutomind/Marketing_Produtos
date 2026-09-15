@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Análise do ambiente prd — AutoLoad V4</title>
+<style>
+  :root{
+    --bg:#1e2230;
+    --bg-soft:#272c3d;
+    --bg-card:#2b3146;
+    --border:#3a4159;
+    --text:#e6e9f2;
+    --text-soft:#b8bfd4;
+    --muted:#8a92ad;
+    --accent:#7aa2ff;
+    --accent-soft:#9db8ff;
+    --green:#5cd6a0;
+    --yellow:#f2c94c;
+    --red:#ff7b7b;
+    --blue:#69b7ff;
+    --code-bg:#1a1e2b;
+    --code-text:#ffd9a8;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.65;
+    font-size:16px;
+  }
+  .wrap{max-width:960px;margin:0 auto;padding:48px 28px 80px;}
+  h1{font-size:2rem;line-height:1.25;margin:0 0 8px;color:#fff;font-weight:700;letter-spacing:-.01em;}
+  .subtitle{color:var(--text-soft);font-size:1.05rem;margin:0 0 4px;}
+  h2{font-size:1.45rem;margin:48px 0 14px;padding-top:18px;border-top:1px solid var(--border);color:#fff;font-weight:650;}
+  h2:first-of-type{border-top:none;}
+  h3{font-size:1.05rem;margin:22px 0 6px;color:var(--accent-soft);font-weight:600;}
+  p{margin:10px 0;color:var(--text-soft);}
+  strong{color:var(--text);font-weight:650;}
+  a{color:var(--accent);}
+  code{background:var(--code-bg);color:var(--code-text);padding:.12em .4em;border-radius:5px;font-size:.86em;font-family:"Cascadia Code",Consolas,"Courier New",monospace;}
+  ul,ol{margin:10px 0;padding-left:22px;}
+  li{margin:6px 0;color:var(--text-soft);}
+  .intro{background:var(--bg-soft);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:10px;padding:18px 22px;margin:20px 0 8px;}
+  .intro p{margin:6px 0;color:var(--text-soft);}
+  .meta-table{width:100%;border-collapse:collapse;margin-top:10px;}
+  .meta-table td{padding:4px 10px 4px 0;vertical-align:top;border:none;color:var(--text-soft);}
+  .meta-table td:first-child{color:var(--muted);white-space:nowrap;width:180px;}
+  /* KPI cards */
+  .kpis{display:flex;flex-wrap:wrap;gap:14px;margin:22px 0 8px;}
+  .kpi{flex:1 1 150px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;}
+  .kpi .num{font-size:1.7rem;font-weight:700;color:#fff;line-height:1.1;}
+  .kpi .lbl{color:var(--muted);font-size:.82rem;margin-top:4px;}
+  table{width:100%;border-collapse:collapse;margin:18px 0;font-size:.92rem;}
+  th,td{border:1px solid var(--border);padding:9px 12px;text-align:left;vertical-align:top;}
+  th{background:var(--bg-soft);color:#fff;font-weight:600;}
+  tbody tr:nth-child(even){background:rgba(255,255,255,.02);}
+  td.num,th.num{text-align:right;white-space:nowrap;}
+  .hot{color:var(--red);font-weight:650;}
+  .ok{color:var(--green);font-weight:600;}
+  .callout{border-radius:10px;padding:14px 18px;margin:18px 0;border-left:4px solid var(--accent);background:var(--bg-soft);}
+  .callout.danger{border-left-color:var(--red);background:rgba(255,123,123,.07);}
+  .callout.warn{border-left-color:var(--yellow);background:rgba(242,201,76,.07);}
+  .callout p{margin:4px 0;}
+  blockquote{margin:18px 0;padding:12px 18px;border-left:4px solid var(--accent);background:var(--bg-soft);border-radius:0 8px 8px 0;color:var(--text-soft);}
+  hr{border:none;border-top:1px solid var(--border);margin:34px 0;}
+  .footer{margin-top:40px;font-size:.82rem;color:var(--muted);font-style:italic;border-top:1px solid var(--border);padding-top:18px;}
+  .tag{display:inline-block;padding:.1em .55em;border-radius:20px;font-size:.8em;font-weight:600;}
+  .t-red{background:rgba(255,123,123,.16);color:var(--red);}
+  .t-yellow{background:rgba(242,201,76,.16);color:var(--yellow);}
+  .t-green{background:rgba(92,214,160,.16);color:var(--green);}
+  .t-blue{background:rgba(105,183,255,.16);color:var(--blue);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Análise do ambiente <code>prd</code> — AutoLoad V4</h1>
+<p class="subtitle">Views, funções e páginas mais utilizadas em produção — com performance, erros, base de usuários e contexto de infraestrutura.</p>
+
+<div class="intro">
+<table class="meta-table"><tbody>
+<tr><td><strong>Data</strong></td><td>17/06/2026</td></tr>
+<tr><td><strong>Produto</strong></td><td>AutoLoad V4 (backend .NET 8 · frontend Next.js 14 · EdgeGateway .NET 8 Worker · portal-cliente)</td></tr>
+<tr><td><strong>Org Sentry</strong></td><td><code>automind-qd</code></td></tr>
+<tr><td><strong>Ambiente</strong></td><td><code>prd</code> (produção)</td></tr>
+<tr><td><strong>Janela</strong></td><td>Últimos 30 dias</td></tr>
+<tr><td><strong>Fonte</strong></td><td>Dados ao vivo do Sentry (<code>spans</code> e <code>errors</code>) cruzados com o código em <code>Produtos/Autoload&nbsp;V4/</code></td></tr>
+</tbody></table>
+</div>
+
+<div class="callout warn">
+<p><strong>⚠️ Premissa — só o frontend tem telemetria em produção.</strong> Dos 4 projetos Sentry do AutoLoad V4, apenas <code>autoloadv4-frontend</code> envia dados em <code>prd</code>. Backend, portal-cliente e edgegateway não enviam nada em produção (causa raiz na investigação <code>Investigacao_Sentry_Producao_AutoLoad_2026-06-17</code>).</p>
+<p><strong>Consequência:</strong> as funções/views de backend abaixo foram reconstruídas <em>indiretamente</em>, a partir das chamadas HTTP do frontend (spans <code>http.client</code>). Visão fiel do que a API atende, mas sem latência/erro server-side — esses só virão quando o <code>SENTRY_DSN</code> for injetado na release do backend.</p>
+</div>
+
+<h2>1. Retrato do ambiente <code>prd</code></h2>
+
+<div class="kpis">
+  <div class="kpi"><div class="num">84.800</div><div class="lbl">transações (30d)</div></div>
+  <div class="kpi"><div class="num">404</div><div class="lbl">usuários únicos</div></div>
+  <div class="kpi"><div class="num">autoload.cloud</div><div class="lbl">domínio de produção</div></div>
+  <div class="kpi"><div class="num">Cloudflare</div><div class="lbl">CDN / RUM beacon</div></div>
+  <div class="kpi"><div class="num">SignalR</div><div class="lbl">hubs messages + telemetry</div></div>
+</div>
+
+<p>Operação real com ~400 usuários — não é piloto. O "cliente" que opera essas telas é o <strong>operador/admin</strong> da unidade (não um motorista ou portal externo).</p>
+
+<h2>2. Telas mais usadas — navegação real do usuário</h2>
+<p>Visão mais fiel do uso: transações <code>op:navigation</code> = clique → tela renderizada, com a latência que o usuário <strong>de fato sente</strong> (client-side).</p>
+
+<table>
+<thead><tr><th>#</th><th>Tela</th><th class="num">Navegações</th><th class="num">p75</th><th class="num">p95</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><strong>Programações</strong> (lista)</td><td class="num">1.520</td><td class="num">1,53 s</td><td class="num hot">5,22 s</td></tr>
+<tr><td>2</td><td>Programação – detalhe <code>/programs/:modal/:id</code></td><td class="num">1.420</td><td class="num">1,07 s</td><td class="num">2,79 s</td></tr>
+<tr><td>3</td><td>Programação – operação <code>.../operation/:operationId</code></td><td class="num">660</td><td class="num">0,87 s</td><td class="num">3,25 s</td></tr>
+<tr><td>4</td><td>Home Admin <code>/admin</code></td><td class="num">640</td><td class="num ok">0,31 s</td><td class="num">2,33 s</td></tr>
+<tr><td>5</td><td>Dashboard</td><td class="num">570</td><td class="num">1,14 s</td><td class="num">3,67 s</td></tr>
+<tr><td>6</td><td>Estoque – Movimentações</td><td class="num">400</td><td class="num">1,18 s</td><td class="num">2,26 s</td></tr>
+<tr><td>7</td><td>Estoque – Cortes (cutoffs)</td><td class="num">330</td><td class="num">0,52 s</td><td class="num hot">4,20 s</td></tr>
+<tr><td>8</td><td>Login</td><td class="num">290</td><td class="num">0,73 s</td><td class="num">1,13 s</td></tr>
+<tr><td>9</td><td>Gateway</td><td class="num">250</td><td class="num">1,04 s</td><td class="num">2,92 s</td></tr>
+<tr><td>10</td><td>Corte – detalhe <code>/cutoffs/:id</code></td><td class="num hot">2,20 s</td><td class="num">—</td><td class="num">3,78 s</td></tr>
+<tr><td>11</td><td>Estoque – Volumes</td><td class="num">140</td><td class="num">1,20 s</td><td class="num">3,31 s</td></tr>
+</tbody>
+</table>
+
+<div class="callout">
+<p><strong>Leitura:</strong> o módulo <strong>Programações concentra ~50% da navegação</strong> (lista + detalhe + operação ≈ 3.600) e é também o mais pesado — a lista tem <span class="hot">p95 de 5,2 s</span>, a pior experiência das telas de alto tráfego.</p>
+</div>
+
+<h3>Nota técnica: os 3 "formatos" da mesma rota no Sentry</h3>
+<table>
+<thead><tr><th>Formato</th><th>O que é</th><th class="num">Latência típica</th></tr></thead>
+<tbody>
+<tr><td><code>GET /pt-BR/admin/...</code></td><td>Route handler server-side (rota localizada)</td><td class="num ok">2 ms</td></tr>
+<tr><td><code>GET /[locale]/admin/...</code></td><td>Route handler server-side (rota paramétrica)</td><td class="num">~80 ms</td></tr>
+<tr><td><code>/:locale/admin/...</code> (<code>navigation</code>/<code>pageload</code>)</td><td><strong>Client-side real (UX)</strong></td><td class="num hot">1–2 s</td></tr>
+</tbody>
+</table>
+<p>Para "o que o usuário sente", a referência é o terceiro formato.</p>
+
+<h2>3. Telas mais usadas — contagem por rota (server-side)</h2>
+<p>Volume bruto de requisições por rota (todos os formatos), consolidando variantes da mesma tela.</p>
+<table>
+<thead><tr><th>#</th><th>Página</th><th class="num">Acessos (prd)</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><strong>Programações</strong> (lista + detalhe + roadway)</td><td class="num">~15.600</td></tr>
+<tr><td>2</td><td>Dashboard</td><td class="num">~4.390</td></tr>
+<tr><td>3</td><td>Landing / Login (<code>/</code> + <code>/[locale]</code>)</td><td class="num">~4.010</td></tr>
+<tr><td>4</td><td>Estoque – Movimentações</td><td class="num">~3.240</td></tr>
+<tr><td>5</td><td>Configurações</td><td class="num">~3.010</td></tr>
+<tr><td>6</td><td>Home Admin</td><td class="num">~2.560</td></tr>
+<tr><td>7</td><td>Gateway</td><td class="num">~2.480</td></tr>
+<tr><td>8</td><td>Agendamentos</td><td class="num">~2.090</td></tr>
+<tr><td>9</td><td>Dispositivos</td><td class="num">~2.010</td></tr>
+<tr><td>10</td><td>Área Operacional</td><td class="num">~1.830</td></tr>
+<tr><td>11</td><td>IA</td><td class="num">~1.760</td></tr>
+<tr><td>12</td><td>Checklists</td><td class="num">~1.090+</td></tr>
+<tr><td>13</td><td>Auditoria</td><td class="num">~920</td></tr>
+<tr><td>14</td><td>Presets</td><td class="num">~890</td></tr>
+<tr><td>15</td><td>Circuitos</td><td class="num">~840</td></tr>
+</tbody>
+</table>
+
+<h2>4. Funções / views de backend exercitadas em <code>prd</code></h2>
+<p>Reconstruído a partir das chamadas <code>http.client</code> do frontend (domínio <code>autoload.cloud/api</code>).</p>
+<table>
+<thead><tr><th>#</th><th>Função / endpoint</th><th class="num">Chamadas</th><th>O que é</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><code>GET /api/v1/programs</code></td><td class="num">6.120</td><td>Alimenta a tela #1 (Programações)</td></tr>
+<tr><td>2</td><td><code>GET /api/v1/messages</code></td><td class="num">5.960</td><td>Mensageria / notificações</td></tr>
+<tr><td>3</td><td><code>POST /hubs/messages/negotiate</code></td><td class="num">5.630</td><td>Handshake SignalR (tempo real)</td></tr>
+<tr><td>4</td><td><code>GET /api/v1/users/{id}/preferences</code></td><td class="num">5.540 + 4.130 + …</td><td>Preferências por usuário (em quase toda tela)</td></tr>
+<tr><td>5</td><td><code>GET /api/v1/organizations</code></td><td class="num">4.070</td><td>Contexto multi-tenant</td></tr>
+<tr><td>6</td><td><code>POST /api/v1/users/{id}/preferences</code></td><td class="num">2.310 + 1.880</td><td><strong>Escrita</strong> frequente de preferências</td></tr>
+<tr><td>7</td><td><code>POST /hubs/telemetry/negotiate</code></td><td class="num">2.290</td><td>Hub de telemetria em tempo real</td></tr>
+<tr><td>8</td><td><code>GET /api/v1/products</code></td><td class="num">1.190</td><td>Cadastro de produtos</td></tr>
+<tr><td>9</td><td><code>GET /api/v1/storagetanks</code></td><td class="num">1.090</td><td>Tanques de armazenamento</td></tr>
+<tr><td>10</td><td><code>GET /api/v1/attachments</code></td><td class="num">920</td><td>Anexos / evidências</td></tr>
+<tr><td>—</td><td><code>GET /api/v1/auth/current_user</code></td><td class="num">740</td><td>Sessão</td></tr>
+<tr><td>—</td><td><code>GET /api/v1/parameters/{terms_of_use_url, tags, units}</code></td><td class="num">~2.000</td><td>Parâmetros de bootstrap</td></tr>
+<tr><td>—</td><td><code>GET /env.json</code>, <code>GET /version.json</code></td><td class="num">~1.450</td><td>Config / versão no load</td></tr>
+</tbody>
+</table>
+<div class="callout">
+<p><strong>Insight:</strong> <code>preferences</code> (GET + POST) somadas passam de <strong>14k chamadas</strong> — endpoint mais "quente" da API em produção, acima até de <code>programs</code>. Sugere leitura/escrita repetida por tela (candidato a cache / debounce).</p>
+</div>
+
+<h2>5. Erros reais em produção (<code>prd</code>)</h2>
+<table>
+<thead><tr><th>Erro</th><th class="num">Eventos</th><th class="num">Usuários</th><th>Avaliação</th></tr></thead>
+<tbody>
+<tr><td><code>Object.s</code></td><td class="num">322</td><td class="num">7</td><td><span class="tag t-red">crítico</span> Top erro, mas <strong>minificado</strong> — faltam source maps</td></tr>
+<tr><td><code>TypeError: Failed to fetch (autoload.cloud)</code></td><td class="num">133</td><td class="num">14</td><td>Falha de rede/API — <strong>maior dispersão de usuários</strong></td></tr>
+<tr><td><code>&lt;unknown&gt;</code></td><td class="num">32</td><td class="num">15</td><td>Sem stack útil</td></tr>
+<tr><td><code>Cannot read properties of null (reading 'digest')</code></td><td class="num">30</td><td class="num">13</td><td>Tratamento de erro do Next.js</td></tr>
+<tr><td><code>Unable to load shared library 'libwkhtmltox'</code></td><td class="num">9</td><td class="num">3</td><td><span class="tag t-red">crítico</span> <strong>Geração de PDF quebrada</strong> em prod</td></tr>
+<tr><td><code>AggregateError: No error message</code></td><td class="num">8</td><td class="num">1</td><td>Sem mensagem</td></tr>
+<tr><td><code>Handshake was canceled</code></td><td class="num">5</td><td class="num">2</td><td><span class="tag t-yellow">ruído</span> Reconexão SignalR</td></tr>
+<tr><td><code>DateTime '...?tags=terminal:...' não reconhecido</code></td><td class="num">1</td><td class="num">1</td><td>Query param malformado p/ backend</td></tr>
+<tr><td><code>Object Not Found Matching Id… MethodName:update</code></td><td class="num">2</td><td class="num">2</td><td><span class="tag t-yellow">ruído</span> WebSocket/SignalR</td></tr>
+</tbody>
+</table>
+
+<div class="callout danger">
+<p><strong>Source maps ausentes</strong> — o erro nº1 (<code>Object.s</code>) é nome minificado, inútil para debug. Subir source maps no build do frontend é quick win.</p>
+<p><strong>libwkhtmltox</strong> — feature de exportação/relatório em PDF <strong>quebrada em produção</strong> por dependência nativa faltando no container. Poucos usuários afetados só porque poucos usam PDF, mas a feature está 100% inoperante.</p>
+<p><strong>Failed to fetch</strong> (14 usuários) — maior dispersão; investigar correlação com as telas lentas (Programações p95 5 s pode estar estourando timeout).</p>
+</div>
+
+<h2>6. Síntese e recomendações</h2>
+<ol>
+<li><strong>Programações é o coração e o gargalo.</strong> Tela mais usada (~50% da navegação) e a mais lenta (p95 5,2 s). Otimizar aqui tem o maior retorno de UX. Provável causa: <code>GET /api/v1/programs</code> (6,1k chamadas) sem paginação/cache eficiente.</li>
+<li><strong>Preferências de usuário super-chamadas</strong> (14k+). Investigar leitura/escrita repetida por tela → cachear / consolidar.</li>
+<li><strong>Subir source maps</strong> do frontend — sem isso o erro nº1 de produção é cego.</li>
+<li><strong>Corrigir <code>libwkhtmltox</code></strong> no container de produção (feature de PDF morta).</li>
+<li><strong>Backend sem telemetria</strong> (item já levantado). Hoje a análise de API é indireta; com <code>SENTRY_DSN</code> na release do backend, veremos latência/erro server-side direto.</li>
+<li><strong>Higiene de ambiente:</strong> segue o <code>production</code> órfão (1,5k) convivendo com <code>prd</code>; backend tem <code>dev</code> E <code>Development</code>. Padronizar.</li>
+</ol>
+
+<div class="footer">
+Dados ao vivo do Sentry (org <code>automind-qd</code>, projeto <code>autoloadv4-frontend</code>, <code>environment:prd</code>, 30 dias). Latências p75/p95 em <code>span.duration</code>. Consulta feita projeto a projeto. Documento gerado em 17/06/2026.
+</div>
+
+</div>
+</body>
+</html>

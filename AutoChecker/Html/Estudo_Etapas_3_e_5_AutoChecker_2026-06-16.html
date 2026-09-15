@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Estudo — Etapas 3 e 5 · Observabilidade AutoChecker</title>
+<style>
+  :root{
+    --bg:#21262e; --panel:#272d37; --panel2:#2e3540; --ink:#e8ebf0; --muted:#aab2c0;
+    --line:#3a4250; --accent:#7c83ff; --accent2:#8b93a7;
+    --ok:#4ec9a4; --warn:#e8b765; --bad:#e8757d; --todo:#e8b765; --done:#4ec9a4;
+  }
+  *{box-sizing:border-box;}
+  html{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  body{
+    background:var(--bg); color:var(--ink); margin:0;
+    font:14px/1.55 "Segoe UI",Inter,-apple-system,system-ui,sans-serif;
+  }
+  .wrap{max-width:880px; margin:0 auto; padding:38px 44px 60px;}
+  header.cover{ border-bottom:2px solid var(--accent); padding-bottom:18px; margin-bottom:26px; }
+  .kicker{ color:var(--accent); font-weight:700; letter-spacing:.14em; text-transform:uppercase; font-size:11px; }
+  h1{ font-size:25px; margin:6px 0 4px; line-height:1.2; }
+  .sub{ color:var(--muted); font-size:13px; }
+  h2{ font-size:18px; margin:30px 0 10px; padding-bottom:6px; border-bottom:1px solid var(--line); }
+  h3{ font-size:14.5px; margin:18px 0 6px; color:#cdd3de; }
+  p{margin:8px 0;}
+  code{ background:var(--panel2); padding:1px 5px; border-radius:4px; font-family:"Cascadia Code",Consolas,monospace; font-size:12.5px; color:#d9def0; }
+  pre{ background:#1a1f27; border:1px solid var(--line); border-radius:8px; padding:12px 14px; overflow:auto; font-size:12px; line-height:1.45; }
+  pre code{background:none; padding:0;}
+  table{ border-collapse:collapse; width:100%; margin:12px 0; font-size:12.8px; }
+  th,td{ border:1px solid var(--line); padding:7px 10px; text-align:left; vertical-align:top; }
+  th{ background:var(--panel2); color:#cdd3de; font-weight:600; }
+  tr:nth-child(even) td{ background:rgba(255,255,255,.018); }
+  ul,ol{ margin:8px 0; padding-left:22px; }
+  li{ margin:4px 0; }
+  .card{ background:var(--panel); border:1px solid var(--line); border-left:4px solid var(--accent); border-radius:8px; padding:14px 18px; margin:14px 0; }
+  .note{ border-left-color:var(--warn); background:#2c2a22; }
+  .note b{ color:var(--warn); }
+  .pill{ display:inline-block; padding:1px 9px; border-radius:20px; font-size:11px; font-weight:700; }
+  .p-todo{ background:rgba(232,183,101,.16); color:var(--todo); border:1px solid rgba(232,183,101,.4); }
+  .p-done{ background:rgba(78,201,164,.14); color:var(--done); border:1px solid rgba(78,201,164,.4); }
+  .ok{color:var(--ok);} .warn{color:var(--warn);} .bad{color:var(--bad);}
+  footer{ margin-top:40px; padding-top:14px; border-top:1px solid var(--line); color:var(--accent2); font-size:11px; }
+  h2{ page-break-after:avoid; }
+  table,pre,.card{ page-break-inside:avoid; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="cover">
+  <div class="kicker">Observabilidade · AutoChecker</div>
+  <h1>Estudo das Etapas 3 e 5 do Cronograma</h1>
+  <div class="sub">
+    Cruzamento do código ao vivo (Azure Repos, branch <code>main</code>) com os work items do Azure Boards ·
+    org <code>automindautomacao</code> / projeto <code>AutoChecker</code><br>
+    Data: 16/06/2026 · Fonte: MCP Azure DevOps + código-fonte verificado
+  </div>
+</header>
+
+<h2>1. Visão geral</h2>
+<table>
+  <tr><th></th><th>Etapa 3 (item #3)</th><th>Etapa 5 (item #5)</th></tr>
+  <tr><td><b>Título</b></td>
+      <td>Limpar <code>PeriodicTask</code> órfã do Beat (<code>KeyError process_scheduled_notifications</code>)</td>
+      <td>Consolidar init do Sentry no helper <code>init_sentry</code> (+ <code>CeleryIntegration</code> no backend)</td></tr>
+  <tr><td><b>Onda / Camada / Esforço</b></td><td>Onda 0 · Backend/Worker · P</td><td>Onda 0 · Backend/Worker · P</td></tr>
+  <tr><td><b>Natureza</b></td><td>Código já limpo → falta <b>runtime/ops</b></td><td>Pura <b>configuração de SDK</b> (código)</td></tr>
+  <tr><td><b>Work item no Azure</b></td>
+      <td>#53659 <span class="pill p-done">Done</span>, #53660 / #53707 <span class="pill p-todo">To Do</span></td>
+      <td><b>#55421</b> <span class="pill p-todo">To Do</span></td></tr>
+</table>
+<p>O board do Azure <b>já tem tickets que batem exatamente com as duas etapas</b> — não é trabalho do zero, é fechar o que já está aberto. Feature-pai: <b>#40531 “Observabilidade”</b>.</p>
+
+<h2>2. Etapa 3 — <code>PeriodicTask</code> órfã do Beat</h2>
+
+<h3>O que é</h3>
+<p>A task <code>process_scheduled_notifications</code> foi <b>comentada</b> no código, mas o agendador persiste o schedule <b>fora do código</b>. Sobra uma entrada órfã apontando para uma task que não existe mais → <code>KeyError</code> no dispatch do Beat. Era o <b>maior ruído do produto</b> (~1.640 ev — clusters BACKEND-1H / WORKER-1F).</p>
+
+<h3>Estado atual no repositório (confirmado ao vivo)</h3>
+<ul>
+  <li><code>worker/apps/notifications/tasks/notification_tasks.py</code> — <code>process_scheduled_notifications</code> e <code>cleanup_old_notification_logs</code> estão <b>comentadas</b>. <span class="ok">✓</span> (foi o que <i>criou</i> a órfã)</li>
+  <li><code>worker/config/celery.py</code> — <code>beat_schedule</code> tem 8 entradas e <b>nenhuma</b> é a task removida. <span class="ok">✓</span></li>
+  <li><code>backend/config/celery.py</code> — <b>não define</b> <code>beat_schedule</code> e agora tem comentário explícito explicando o porquê (resultado do bug #53659). <span class="ok">✓</span></li>
+  <li><b>Onde a órfã realmente vive:</b> o Beat roda com <code>PersistentScheduler</code> → arquivo <code>/tmp/celerybeat-schedule</code> (shelve), persistido pelo volume <code>/tmp</code>. <b>Não</b> é o DB.</li>
+</ul>
+<div class="card note"><b>⚠ Correção ao xlsx:</b> o cronograma assumia a órfã no <b>DB</b> (<code>django_celery_beat.PeriodicTask</code>). O código mostra que <code>django_celery_beat</code> está em <code>INSTALLED_APPS</code> mas <b>não é o scheduler em uso</b> — a órfã está no <b>arquivo shelve</b>. Verificar os dois por garantia.</div>
+
+<h3>Work items que tratam disso</h3>
+<table>
+  <tr><th>ID</th><th>Tipo</th><th>Estado</th><th>O que cobre</th></tr>
+  <tr><td>#53659</td><td>Bug</td><td><span class="pill p-done">Done</span></td><td>Limpar beat_schedule do backend + resetar celerybeat-schedule (lado-código, já feito)</td></tr>
+  <tr><td>#53707</td><td>Task</td><td><span class="pill p-todo">To Do</span></td><td><b>Coração da etapa:</b> limpeza preventiva do celerybeat-schedule no deploy (expurgo runtime)</td></tr>
+  <tr><td>#53660</td><td>Task</td><td><span class="pill p-todo">To Do</span></td><td>Duplicata da #53659</td></tr>
+  <tr><td>#40384</td><td>Task</td><td><span class="pill p-done">Done</span></td><td>“Ajustar tasks do Celery BEAT” (histórico)</td></tr>
+</table>
+
+<h3>Meios para resolver</h3>
+<ol>
+  <li><b>Diagnosticar onde a órfã está</b> — inspecionar <code>/tmp/celerybeat-schedule*</code> no container do beat <b>e</b> checar <code>PeriodicTask.objects.filter(task__icontains='process_scheduled_notifications')</code> no DB.</li>
+  <li><b>Expurgar</b> (entrega real, #53707):
+    <ul>
+      <li>Se for o arquivo shelve (mais provável): parar o beat, <code>rm -f /tmp/celerybeat-schedule*</code>, subir de novo — recria a partir do <code>beat_schedule</code> do código.</li>
+      <li>Se houver linha no DB: <b>data migration idempotente</b> (<code>PeriodicTask…filter(task__endswith='process_scheduled_notifications').delete()</code>), versionada.</li>
+    </ul>
+  </li>
+  <li><b>Travar a fonte de verdade</b> — manter o file scheduler; <b>não</b> misturar com <code>DatabaseScheduler</code> (a mistura é o que gera órfãs).</li>
+  <li><b>Validar</b> — sem mais <code>KeyError</code> no dispatch; queda dos clusters BACKEND-1H / WORKER-1F no Sentry (~1.640 → ~0). Teste de guarda: cada task do <code>beat_schedule</code> registrada em <code>app.tasks</code>.</li>
+</ol>
+<div class="card note"><b>⚠ Runtime:</b> o passo 2 não versiona em código. Apagar arquivo de ambiente / rodar migration de delete deve ser <b>confirmado antes</b> de executar.</div>
+
+<h2>3. Etapa 5 — Consolidar o init do Sentry no <code>init_sentry</code></h2>
+
+<h3>O que é</h3>
+<p>Backend e worker fazem <code>sentry_sdk.init</code> <b>inline</b> e <b>divergem</b>. O helper <code>shared/observability/sentry.py::init_sentry()</code> existe mas <b>ninguém chama em produção</b> (só nos testes). A entrega é migrar os dois para o helper — <b>com cuidado</b>, porque cada init tem hoje coisas que o outro não tem.</p>
+
+<h3>Estado atual no repositório (confirmado ao vivo)</h3>
+<table>
+  <tr><th>Local</th><th>Integrations</th><th><code>before_send</code></th></tr>
+  <tr><td><b>Backend</b> <code>settings/base.py</code></td><td>Django, Redis <span class="bad">(sem Celery)</span></td><td><code>_sentry_before_send</code>: <code>/health/</code> <b>+ filtro de Redis transiente</b> (<code>_is_redis_transient_event</code>)</td></tr>
+  <tr><td><b>Worker</b> <code>config/celery.py:20-32</code></td><td>Django, <b>Celery</b>, Redis</td><td>lambda: <b>só</b> <code>/health/</code> <span class="bad">(sem scrubbing de breadcrumb)</span></td></tr>
+  <tr><td><b>Helper</b> <code>shared/observability/sentry.py</code></td><td>Django, Redis; <b>Celery só se <code>service=="worker"</code></b></td><td><code>before_send_filter</code>: <code>/health/</code> <b>+ scrubbing de query nos breadcrumbs</b></td></tr>
+</table>
+<div class="card note"><b>⚠ Ponto crítico (REV 10/06, confirmado):</b> trocar só a chamada <b>não dá <code>CeleryIntegration</code> ao backend</b>, e o helper <b>não tem</b> o filtro de Redis transiente do backend. Migração ingênua = <b>regressão</b>.</div>
+
+<h3>Work items que tratam disso</h3>
+<table>
+  <tr><th>ID</th><th>Tipo</th><th>Estado</th><th>O que cobre</th></tr>
+  <tr><td><b>#55421</b></td><td>Task</td><td><span class="pill p-todo">To Do</span></td><td><b>É a Etapa 5:</b> “[Obs. Onda 0 / E5] Consolidar init do Sentry no helper init_sentry (backend + worker)”</td></tr>
+  <tr><td>#40531</td><td>Feature</td><td><span class="pill p-todo">New</span></td><td>Épico-pai “Observabilidade”</td></tr>
+  <tr><td>#48859 / #48860</td><td>PBI / Task</td><td><span class="pill p-done">Done</span></td><td>Setup inicial do Sentry (histórico)</td></tr>
+</table>
+
+<h3>Meios para resolver</h3>
+<ol>
+  <li><b>Alterar o helper primeiro</b> para não perder nada:
+    <ul>
+      <li>Dar <code>CeleryIntegration</code> ao backend também, ou parametrizar as integrations por serviço.</li>
+      <li>Levar o <code>_is_redis_transient_event</code> (hoje só no backend) para dentro do <code>before_send_filter</code> do helper.</li>
+    </ul>
+  </li>
+  <li><b>Migrar as duas chamadas</b> para <code>init_sentry("backend")</code> / <code>init_sentry("worker")</code>. Ganho de brinde: o worker passa a ter o scrubbing de breadcrumb que hoje não tem.</li>
+  <li><b>Fixar <code>send_default_pii=False</code></b> explicitamente (cruza com o item 7 — PII/LGPD).</li>
+  <li><b>Teste de guarda</b> afirmando o conjunto de integrations esperado por serviço (pega regressão em CI).</li>
+</ol>
+
+<h2>4. Bug colateral (atravessa a Etapa 3)</h2>
+<p>No <code>worker/apps/notifications/tasks/notification_tasks.py</code>, a versão <b>local</b> de <code>retry_failed_notifications</code> chama <code>process_notification_task.delay(notification.id)</code> com <b>1 argumento</b>. A assinatura canônica em <code>shared/tasks/notification_tasks.py</code> exige <b>3</b>: <code>(notification_log_id, tenant_schema_name, tenant_id)</code> → <code>TypeError</code> em runtime se invocada. A versão do <code>shared</code> já foi reescrita multi-tenant (correta).</p>
+<ul>
+  <li>#53657 <span class="pill p-done">Done</span> — refatoração multi-tenant no <code>shared</code> (3 args, feito).</li>
+  <li>#53705 <span class="pill p-todo">To Do</span> — <b>fix do colateral:</b> “Remover retry_failed_notifications antiga do worker (continuação de 53657)”. Remover a versão local e reexportar a do <code>shared</code> (como o backend já faz).</li>
+</ul>
+<p class="sub">De passagem: o <code>include</code> do <code>worker/config/celery.py</code> lista <code>shared.tasks.notification_tasks</code> duas vezes — limpeza trivial.</p>
+
+<h2>5. Resumo — o que falta fechar no board</h2>
+<table>
+  <tr><th>Etapa</th><th>Ticket aberto</th><th>O que ainda falta</th></tr>
+  <tr><td><b>3</b></td><td>#53707 <span class="pill p-todo">To Do</span></td><td>Expurgo runtime do <code>/tmp/celerybeat-schedule</code> + prevenção no deploy + teste de guarda</td></tr>
+  <tr><td><b>3 (colateral)</b></td><td>#53705 <span class="pill p-todo">To Do</span></td><td>Remover <code>retry_failed_notifications</code> bugada do worker</td></tr>
+  <tr><td><b>5</b></td><td>#55421 <span class="pill p-todo">To Do</span></td><td>Alterar helper (Celery no backend + filtro Redis) → migrar os 2 inits → teste de integrations</td></tr>
+</table>
+<p>A <b>Etapa 3</b> é majoritariamente <b>ops</b> (rodar no ambiente, confirmar antes); a <b>Etapa 5</b> é <b>100% código</b> e de baixo risco se o helper for ajustado antes da migração.</p>
+
+<footer>
+  Gerado em 16/06/2026 · dados ao vivo via MCP Azure DevOps (Repos + Boards) · branch <code>main</code> ·
+  org automindautomacao / projeto AutoChecker. Wiki do projeto: sem acesso (401).
+</footer>
+
+</div>
+</body>
+</html>

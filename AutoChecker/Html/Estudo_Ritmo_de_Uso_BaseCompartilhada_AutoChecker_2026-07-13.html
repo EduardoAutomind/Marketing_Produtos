@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ritmo de Uso — Base Compartilhada · AutoChecker</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700;900&display=swap');
+:root{
+  --am-rosa:#FA094E; --am-magenta:#940755; --am-roxo:#44055A; --am-navy:#03045E;
+  --am-preto:#100F0F; --am-offwhite:#F3F3F0;
+  --am-grad:linear-gradient(45deg,#03045E 0%,#FA094E 100%);
+  --am-grad-h:linear-gradient(90deg,#FA094E 0%,#03045E 100%);
+  --card:#ffffff; --line:#e5e3dd; --muted:#5c5a57;
+  --fonte:"Red Hat Display",system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--fonte);color:var(--am-preto);background:var(--am-offwhite);line-height:1.55;font-size:16px}
+.wrap{max-width:1040px;margin:0 auto;padding:0 22px 80px}
+header.hero{background:var(--am-roxo);color:var(--am-offwhite);border-radius:0 0 22px 22px;padding:38px 34px 30px;position:relative;overflow:hidden}
+header.hero::after{content:"";position:absolute;inset:0;background:var(--am-grad);opacity:.16}
+.hero-top{position:relative;z-index:1;display:flex;align-items:center;gap:14px;margin-bottom:20px}
+.mark{height:32px;width:auto;flex:none;display:block}
+.wordmark{font-weight:700;letter-spacing:.20em;text-transform:uppercase;font-size:15px}
+.tagline{font-size:10.5px;letter-spacing:.28em;text-transform:uppercase;opacity:.75;margin-top:2px}
+.hero h1{position:relative;z-index:1;margin:0;font-size:31px;font-weight:900;letter-spacing:.01em;line-height:1.14}
+.hero .sub{position:relative;z-index:1;margin-top:12px;font-size:14.5px;opacity:.92;max-width:74ch}
+.hero .meta{position:relative;z-index:1;margin-top:16px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:5px 13px;font-size:12px}
+section{margin-top:34px}
+h2{font-size:22px;color:var(--am-roxo);font-weight:800;margin:0 0 6px;padding-top:8px;border-top:3px solid transparent;border-image:var(--am-grad-h) 1;display:inline-block}
+h2 .n{color:var(--am-rosa);font-weight:900;margin-right:8px}
+h3{font-size:16px;color:var(--am-navy);font-weight:700;margin:20px 0 6px}
+p{margin:10px 0}
+.lead{font-size:15.5px}
+.muted{color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:14px 0;box-shadow:0 1px 2px rgba(16,15,15,.04)}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(2,1fr)} .g4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:720px){.g2,.g4{grid-template-columns:1fr}}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.kpi .v{font-size:28px;font-weight:900;color:var(--am-roxo);line-height:1}
+.kpi .v small{font-size:14px;font-weight:700;color:var(--muted)}
+.kpi .l{font-size:12.5px;color:var(--muted);margin-top:6px}
+.callout{border-left:4px solid var(--am-rosa);background:#fff;border-radius:0 12px 12px 0;padding:14px 18px;margin:14px 0}
+.callout.warn{border-left-color:#c9821a;background:#fff9f0}
+.callout.ok{border-left-color:#1c6b3b;background:#f1f9f3}
+.callout b{color:var(--am-roxo)}
+.mono{font-family:ui-monospace,"Cascadia Code",Consolas,monospace;font-size:12px;color:var(--am-navy)}
+/* heatmap */
+.scroll{overflow-x:auto}
+.heat{display:grid;grid-template-columns:112px repeat(15,minmax(30px,1fr));gap:3px;margin:12px 0;min-width:640px}
+.hcell{padding:5px 2px;text-align:center;border-radius:4px;font-variant-numeric:tabular-nums;font-weight:600;font-size:11px;min-height:26px;display:flex;align-items:center;justify-content:center}
+.hcell.hhdr{background:transparent;color:var(--muted);font-weight:700}
+.hcell.hrow{background:transparent;color:var(--am-navy);font-weight:700;justify-content:flex-start;text-align:left;font-size:11px}
+.hcell.hrow .note{color:#c9821a;font-weight:700;margin-left:3px;font-size:10px}
+.strip{margin:14px 0}
+.striplbl{font-size:13.5px;font-weight:700;color:var(--am-navy);margin-bottom:5px}
+.stripcells{display:grid;grid-template-columns:repeat(24,1fr);gap:2px;min-width:560px}
+.scell{height:46px;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:3px 0;font-weight:700;overflow:hidden}
+.scell .sv{font-size:9px;line-height:1.05}
+.scell .sh{font-size:8.5px;opacity:.72;font-weight:600}
+.scale{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-top:6px}
+.scale .bar{height:12px;width:180px;border-radius:6px;background:linear-gradient(90deg,#f3f3f0,#FA094E,#44055A)}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+th,td{padding:8px 13px;text-align:left;border-bottom:1px solid var(--line)}
+th{background:var(--am-roxo);color:#fff;font-weight:600;font-size:12.5px;text-transform:uppercase}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+tr:last-child td{border-bottom:none}
+ul.rec{list-style:none;padding:0;counter-reset:r}
+ul.rec li{position:relative;padding:8px 8px 8px 40px;margin:6px 0;background:var(--card);border:1px solid var(--line);border-radius:10px;counter-increment:r}
+ul.rec li::before{content:counter(r);position:absolute;left:10px;top:50%;transform:translateY(-50%);width:22px;height:22px;border-radius:50%;background:var(--am-grad);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center}
+footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+@media print{
+  @page{margin:12mm 10mm;size:A4}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{background:#fff;font-size:11.5px}
+  section{margin-top:20px;break-inside:avoid}
+  .card,.callout,.heat,.strip,.kpi,table{break-inside:avoid}
+  .scroll{overflow:visible}
+  h2{break-after:avoid}
+}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="hero-top">
+    <svg class="mark" viewBox="0 0 100 100" aria-hidden="true">
+      <defs><linearGradient id="mg" x1="0" y1="100" x2="100" y2="0">
+        <stop offset="0" stop-color="#03045E"/><stop offset="1" stop-color="#FA094E"/>
+      </linearGradient></defs>
+      <path d="M8 88 L34 12 L50 44 L66 12 L92 88 L70 88 L58 52 L50 68 L42 52 L30 88 Z" fill="url(#mg)"/>
+    </svg>
+    <div>
+      <div class="wordmark">AutoMind</div>
+      <div class="tagline">Simple · Smart · Reliable</div>
+    </div>
+  </div>
+  <h1>Ritmo de Uso — Quando os clientes usam o AutoChecker</h1>
+  <div class="sub">Heatmap de hora × dia do tenant Base Compartilhada, a partir dos logs de produção (Grafana Loki), em horário de Brasília. Mostra o horário comercial real dos clientes, a janela segura de manutenção e como diferentes clientes têm ritmos distintos.</div>
+  <div class="meta">
+    <span class="chip">Tenant: Base Compartilhada</span>
+    <span class="chip">Loki (prod) · 06–13/07/2026</span>
+    <span class="chip">Fuso: BRT (UTC−3)</span>
+    <span class="chip">Gerado: 13/07/2026</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+<section id="resumo">
+  <h2><span class="n">0</span>Resumo executivo</h2>
+  <div class="grid g4">
+    <div class="kpi"><div class="v">12–13<small>h</small></div><div class="l">horário de <b>pico</b> (BRT) — meio do expediente</div></div>
+    <div class="kpi"><div class="v">08–20<small>h</small></div><div class="l">janela ativa; fora disso o uso é ~zero</div></div>
+    <div class="kpi"><div class="v">~4×</div><div class="l">o pico é ~4× o vale do dia — dita o dimensionamento</div></div>
+    <div class="kpi"><div class="v">SP</div><div class="l">feriado estadual paulista <b>zerou</b> o tenant em 09/07</div></div>
+  </div>
+  <div class="callout ok">
+    <p style="margin:.2em 0"><b>O AutoChecker não é um sistema 24/7 — é um sistema de horário comercial.</b> O uso segue o expediente dos clientes: sobe às 8h, pica ao meio‑dia, cai após 18h e silencia à noite e no domingo. Isso abre uma <b>janela de manutenção/deploy segura entre 22h e 06h (ou aos domingos)</b> e permite calibrar alertas de volume por hora, sem falso positivo toda madrugada.</p>
+  </div>
+</section>
+
+<section id="heat">
+  <h2><span class="n">1</span>Heatmap — a semana observada (hora × dia)</h2>
+  <p class="lead">Cada célula = requests de clientes reais naquela hora (BRT). Cor mais forte = mais uso. Janela de 7 dias, então cada dia da semana aparece uma vez — leia como <b>a semana de 06–13/07</b>, não como "semana típica".</p>
+  <div class="scroll">
+<div class="heat">
+<div class="hcell hhdr"></div>
+<div class="hcell hhdr">06</div>
+<div class="hcell hhdr">07</div>
+<div class="hcell hhdr">08</div>
+<div class="hcell hhdr">09</div>
+<div class="hcell hhdr">10</div>
+<div class="hcell hhdr">11</div>
+<div class="hcell hhdr">12</div>
+<div class="hcell hhdr">13</div>
+<div class="hcell hhdr">14</div>
+<div class="hcell hhdr">15</div>
+<div class="hcell hhdr">16</div>
+<div class="hcell hhdr">17</div>
+<div class="hcell hhdr">18</div>
+<div class="hcell hhdr">19</div>
+<div class="hcell hhdr">20</div>
+<div class="hcell hrow">Seg 06/07<span class="note"></span></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-06 06h: 0 req"></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-06 07h: 0 req"></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-06 08h: 0 req"></div>
+<div class="hcell" style="background:#f5c1cd;color:#100F0F" title="2026-07-06 09h: 142 req">142</div>
+<div class="hcell" style="background:#f694ae;color:#100F0F" title="2026-07-06 10h: 267 req">267</div>
+<div class="hcell" style="background:#cf0851;color:#fff" title="2026-07-06 11h: 815 req">815</div>
+<div class="hcell" style="background:#44055a;color:#fff" title="2026-07-06 12h: 1317 req">1317</div>
+<div class="hcell" style="background:#6e0657;color:#fff" title="2026-07-06 13h: 1165 req">1165</div>
+<div class="hcell" style="background:#b70852;color:#fff" title="2026-07-06 14h: 902 req">902</div>
+<div class="hcell" style="background:#f91d5c;color:#fff" title="2026-07-06 15h: 601 req">601</div>
+<div class="hcell" style="background:#f84a7b;color:#100F0F" title="2026-07-06 16h: 476 req">476</div>
+<div class="hcell" style="background:#f9356d;color:#100F0F" title="2026-07-06 17h: 534 req">534</div>
+<div class="hcell" style="background:#f91b5a;color:#fff" title="2026-07-06 18h: 609 req">609</div>
+<div class="hcell" style="background:#f92f68;color:#100F0F" title="2026-07-06 19h: 551 req">551</div>
+<div class="hcell" style="background:#f77599;color:#100F0F" title="2026-07-06 20h: 355 req">355</div>
+<div class="hcell hrow">Ter 07/07<span class="note"></span></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-07 06h: 0 req"></div>
+<div class="hcell" style="background:#f4c8d2;color:#100F0F" title="2026-07-07 07h: 121 req">121</div>
+<div class="hcell" style="background:#f689a7;color:#100F0F" title="2026-07-07 08h: 297 req">297</div>
+<div class="hcell" style="background:#f84e7e;color:#100F0F" title="2026-07-07 09h: 463 req">463</div>
+<div class="hcell" style="background:#f92a65;color:#100F0F" title="2026-07-07 10h: 565 req">565</div>
+<div class="hcell" style="background:#f85180;color:#100F0F" title="2026-07-07 11h: 456 req">456</div>
+<div class="hcell" style="background:#db0850;color:#fff" title="2026-07-07 12h: 771 req">771</div>
+<div class="hcell" style="background:#f91a5a;color:#fff" title="2026-07-07 13h: 610 req">610</div>
+<div class="hcell" style="background:#f92461;color:#100F0F" title="2026-07-07 14h: 582 req">582</div>
+<div class="hcell" style="background:#f85b87;color:#100F0F" title="2026-07-07 15h: 427 req">427</div>
+<div class="hcell" style="background:#f686a5;color:#100F0F" title="2026-07-07 16h: 306 req">306</div>
+<div class="hcell" style="background:#f7658e;color:#100F0F" title="2026-07-07 17h: 400 req">400</div>
+<div class="hcell" style="background:#f5a8bc;color:#100F0F" title="2026-07-07 18h: 211 req">211</div>
+<div class="hcell" style="background:#f4e2e4;color:#100F0F" title="2026-07-07 19h: 48 req">48</div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-07 20h: 0 req"></div>
+<div class="hcell hrow">Qua 08/07<span class="note"></span></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-08 06h: 0 req"></div>
+<div class="hcell" style="background:#f3f2f0;color:#100F0F" title="2026-07-08 07h: 2 req">2</div>
+<div class="hcell" style="background:#f4c3cf;color:#100F0F" title="2026-07-08 08h: 135 req">135</div>
+<div class="hcell" style="background:#f77095;color:#100F0F" title="2026-07-08 09h: 368 req">368</div>
+<div class="hcell" style="background:#f83f73;color:#100F0F" title="2026-07-08 10h: 507 req">507</div>
+<div class="hcell" style="background:#f9336b;color:#100F0F" title="2026-07-08 11h: 539 req">539</div>
+<div class="hcell" style="background:#fa1556;color:#fff" title="2026-07-08 12h: 624 req">624</div>
+<div class="hcell" style="background:#f85583;color:#100F0F" title="2026-07-08 13h: 444 req">444</div>
+<div class="hcell" style="background:#f91e5c;color:#fff" title="2026-07-08 14h: 600 req">600</div>
+<div class="hcell" style="background:#da0850;color:#fff" title="2026-07-08 15h: 775 req">775</div>
+<div class="hcell" style="background:#fa094e;color:#fff" title="2026-07-08 16h: 659 req">659</div>
+<div class="hcell" style="background:#f68ca8;color:#100F0F" title="2026-07-08 17h: 291 req">291</div>
+<div class="hcell" style="background:#f5c0cd;color:#100F0F" title="2026-07-08 18h: 144 req">144</div>
+<div class="hcell" style="background:#f4d7dd;color:#100F0F" title="2026-07-08 19h: 79 req">79</div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-08 20h: 0 req"></div>
+<div class="hcell hrow">Qui 09/07<span class="note"> • feriado SP</span></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-09 06h: 0 req"></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-09 07h: 0 req"></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-09 08h: 0 req"></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-09 09h: 0 req"></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-09 10h: 0 req"></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-09 11h: 0 req"></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-09 12h: 0 req"></div>
+<div class="hcell" style="background:#f4c8d2;color:#100F0F" title="2026-07-09 13h: 121 req">121</div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-09 14h: 0 req"></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-09 15h: 0 req"></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-09 16h: 0 req"></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-09 17h: 0 req"></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-09 18h: 0 req"></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-09 19h: 0 req"></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-09 20h: 0 req"></div>
+<div class="hcell hrow">Sex 10/07<span class="note"></span></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-10 06h: 0 req"></div>
+<div class="hcell" style="background:#f3eceb;color:#100F0F" title="2026-07-10 07h: 19 req">19</div>
+<div class="hcell" style="background:#f83d72;color:#100F0F" title="2026-07-10 08h: 512 req">512</div>
+<div class="hcell" style="background:#720657;color:#fff" title="2026-07-10 09h: 1150 req">1150</div>
+<div class="hcell" style="background:#600658;color:#fff" title="2026-07-10 10h: 1214 req">1214</div>
+<div class="hcell" style="background:#f9346c;color:#100F0F" title="2026-07-10 11h: 538 req">538</div>
+<div class="hcell" style="background:#c90851;color:#fff" title="2026-07-10 12h: 836 req">836</div>
+<div class="hcell" style="background:#be0852;color:#fff" title="2026-07-10 13h: 874 req">874</div>
+<div class="hcell" style="background:#f8094e;color:#fff" title="2026-07-10 14h: 664 req">664</div>
+<div class="hcell" style="background:#bc0852;color:#fff" title="2026-07-10 15h: 882 req">882</div>
+<div class="hcell" style="background:#e20850;color:#fff" title="2026-07-10 16h: 745 req">745</div>
+<div class="hcell" style="background:#f92e68;color:#100F0F" title="2026-07-10 17h: 553 req">553</div>
+<div class="hcell" style="background:#f84074;color:#100F0F" title="2026-07-10 18h: 505 req">505</div>
+<div class="hcell" style="background:#f5a8bc;color:#100F0F" title="2026-07-10 19h: 211 req">211</div>
+<div class="hcell" style="background:#f4c7d1;color:#100F0F" title="2026-07-10 20h: 125 req">125</div>
+<div class="hcell hrow">Sáb 11/07<span class="note"></span></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-11 06h: 0 req"></div>
+<div class="hcell" style="background:#f3e3e5;color:#100F0F" title="2026-07-11 07h: 45 req">45</div>
+<div class="hcell" style="background:#f75e89;color:#100F0F" title="2026-07-11 08h: 420 req">420</div>
+<div class="hcell" style="background:#f9316a;color:#100F0F" title="2026-07-11 09h: 546 req">546</div>
+<div class="hcell" style="background:#f84477;color:#100F0F" title="2026-07-11 10h: 492 req">492</div>
+<div class="hcell" style="background:#f85a86;color:#100F0F" title="2026-07-11 11h: 431 req">431</div>
+<div class="hcell" style="background:#f77b9d;color:#100F0F" title="2026-07-11 12h: 337 req">337</div>
+<div class="hcell" style="background:#f7658e;color:#100F0F" title="2026-07-11 13h: 400 req">400</div>
+<div class="hcell" style="background:#f69eb5;color:#100F0F" title="2026-07-11 14h: 239 req">239</div>
+<div class="hcell" style="background:#f5becc;color:#100F0F" title="2026-07-11 15h: 148 req">148</div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-11 16h: 0 req"></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-11 17h: 0 req"></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-11 18h: 0 req"></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-11 19h: 0 req"></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-11 20h: 0 req"></div>
+<div class="hcell hrow">Seg 13/07<span class="note"></span></div>
+<div class="hcell" style="background:#f3f2ef;color:#100F0F" title="2026-07-13 06h: 4 req">4</div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-13 07h: 0 req"></div>
+<div class="hcell" style="background:#f4dde1;color:#100F0F" title="2026-07-13 08h: 61 req">61</div>
+<div class="hcell" style="background:#f5bbc9;color:#100F0F" title="2026-07-13 09h: 158 req">158</div>
+<div class="hcell" style="background:#f4cfd7;color:#100F0F" title="2026-07-13 10h: 100 req">100</div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-13 11h: 0 req"></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-13 12h: 0 req"></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-13 13h: 0 req"></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-13 14h: 0 req"></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-13 15h: 0 req"></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-13 16h: 0 req"></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-13 17h: 0 req"></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-13 18h: 0 req"></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-13 19h: 0 req"></div>
+<div class="hcell" style="background:#f3f3f0;color:#100F0F" title="2026-07-13 20h: 0 req"></div>
+</div>
+  </div>
+  <div class="scale"><span>menos</span><span class="bar"></span><span>mais uso</span></div>
+  <div class="callout warn">
+    <p style="margin:.2em 0"><b>Quinta 09/07 aparece zerada — e isso é um achado, não um erro.</b> É <b>feriado estadual em São Paulo</b> (Revolução Constitucionalista). Confirmamos que <b>não foi falha de log</b>: nesse dia o Loki ingeriu 1.825 linhas no total, mas só ~140 do Base Compartilhada, enquanto outros tenants seguiram com ~1.685. Ou seja, <b>a base de clientes é majoritariamente paulista</b> e o produto respira no calendário deles. O domingo 12/07 também zerou; o sábado 11/07, porém, teve movimento (parte dos clientes opera aos sábados).</p>
+  </div>
+</section>
+
+<section id="hora">
+  <h2><span class="n">2</span>Perfil por hora do dia</h2>
+  <p class="lead">Somando os 7 dias, a curva de expediente fica nítida: silêncio de madrugada, rampa às 8h, pico ao meio‑dia, queda após 18h.</p>
+  <div class="scroll">
+<div class="strip"><div class="striplbl">Tenant — todos os clientes</div><div class="stripcells">
+<div class="scell" style="background:#f3f3f0;color:#100F0F" title="00h: 0 req"><span class="sv"></span><span class="sh">00</span></div>
+<div class="scell" style="background:#f3f3f0;color:#100F0F" title="01h: 0 req"><span class="sv"></span><span class="sh">01</span></div>
+<div class="scell" style="background:#f3f3f0;color:#100F0F" title="02h: 0 req"><span class="sv"></span><span class="sh">02</span></div>
+<div class="scell" style="background:#f3f3f0;color:#100F0F" title="03h: 0 req"><span class="sv"></span><span class="sh">03</span></div>
+<div class="scell" style="background:#f3f3f0;color:#100F0F" title="04h: 0 req"><span class="sv"></span><span class="sh">04</span></div>
+<div class="scell" style="background:#f3eaea;color:#100F0F" title="05h: 76 req"><span class="sv"></span><span class="sh">05</span></div>
+<div class="scell" style="background:#f3f3f0;color:#100F0F" title="06h: 4 req"><span class="sv"></span><span class="sh">06</span></div>
+<div class="scell" style="background:#f4dce0;color:#100F0F" title="07h: 187 req"><span class="sv"></span><span class="sh">07</span></div>
+<div class="scell" style="background:#f84779;color:#100F0F" title="08h: 1425 req"><span class="sv">1425</span><span class="sh">08</span></div>
+<div class="scell" style="background:#a70753;color:#fff" title="09h: 2827 req"><span class="sv">2827</span><span class="sh">09</span></div>
+<div class="scell" style="background:#890755;color:#fff" title="10h: 3145 req"><span class="sv">3145</span><span class="sh">10</span></div>
+<div class="scell" style="background:#ac0753;color:#fff" title="11h: 2779 req"><span class="sv">2779</span><span class="sh">11</span></div>
+<div class="scell" style="background:#44055a;color:#fff" title="12h: 3885 req"><span class="sv">3885</span><span class="sh">12</span></div>
+<div class="scell" style="background:#5d0658;color:#fff" title="13h: 3614 req"><span class="sv">3614</span><span class="sh">13</span></div>
+<div class="scell" style="background:#980754;color:#fff" title="14h: 2987 req"><span class="sv">2987</span><span class="sh">14</span></div>
+<div class="scell" style="background:#a70754;color:#fff" title="15h: 2833 req"><span class="sv">2833</span><span class="sh">15</span></div>
+<div class="scell" style="background:#e30850;color:#fff" title="16h: 2186 req"><span class="sv">2186</span><span class="sh">16</span></div>
+<div class="scell" style="background:#f91d5c;color:#fff" title="17h: 1778 req"><span class="sv">1778</span><span class="sh">17</span></div>
+<div class="scell" style="background:#f84275;color:#100F0F" title="18h: 1469 req"><span class="sv">1469</span><span class="sh">18</span></div>
+<div class="scell" style="background:#f688a6;color:#100F0F" title="19h: 889 req"><span class="sv">889</span><span class="sh">19</span></div>
+<div class="scell" style="background:#f5b9c8;color:#100F0F" title="20h: 480 req"><span class="sv"></span><span class="sh">20</span></div>
+<div class="scell" style="background:#f3f0ee;color:#100F0F" title="21h: 25 req"><span class="sv"></span><span class="sh">21</span></div>
+<div class="scell" style="background:#f3f3f0;color:#100F0F" title="22h: 0 req"><span class="sv"></span><span class="sh">22</span></div>
+<div class="scell" style="background:#f3f0ee;color:#100F0F" title="23h: 26 req"><span class="sv"></span><span class="sh">23</span></div>
+</div></div><div class="strip"><div class="striplbl">Copercana</div><div class="stripcells">
+<div class="scell" style="background:#f3f3f0;color:#100F0F" title="00h: 0 req"><span class="sv"></span><span class="sh">00</span></div>
+<div class="scell" style="background:#f3f3f0;color:#100F0F" title="01h: 0 req"><span class="sv"></span><span class="sh">01</span></div>
+<div class="scell" style="background:#f3f3f0;color:#100F0F" title="02h: 0 req"><span class="sv"></span><span class="sh">02</span></div>
+<div class="scell" style="background:#f3f3f0;color:#100F0F" title="03h: 0 req"><span class="sv"></span><span class="sh">03</span></div>
+<div class="scell" style="background:#f3f3f0;color:#100F0F" title="04h: 0 req"><span class="sv"></span><span class="sh">04</span></div>
+<div class="scell" style="background:#f3f3f0;color:#100F0F" title="05h: 0 req"><span class="sv"></span><span class="sh">05</span></div>
+<div class="scell" style="background:#f3f3f0;color:#100F0F" title="06h: 0 req"><span class="sv"></span><span class="sh">06</span></div>
+<div class="scell" style="background:#f4d7dd;color:#100F0F" title="07h: 64 req"><span class="sv"></span><span class="sh">07</span></div>
+<div class="scell" style="background:#990754;color:#fff" title="08h: 825 req"><span class="sv">825</span><span class="sh">08</span></div>
+<div class="scell" style="background:#7b0656;color:#fff" title="09h: 912 req"><span class="sv">912</span><span class="sh">09</span></div>
+<div class="scell" style="background:#4a055a;color:#fff" title="10h: 1057 req"><span class="sv">1057</span><span class="sh">10</span></div>
+<div class="scell" style="background:#780657;color:#fff" title="11h: 922 req"><span class="sv">922</span><span class="sh">11</span></div>
+<div class="scell" style="background:#44055a;color:#fff" title="12h: 1075 req"><span class="sv">1075</span><span class="sh">12</span></div>
+<div class="scell" style="background:#b20753;color:#fff" title="13h: 750 req"><span class="sv">750</span><span class="sh">13</span></div>
+<div class="scell" style="background:#d30851;color:#fff" title="14h: 653 req"><span class="sv">653</span><span class="sh">14</span></div>
+<div class="scell" style="background:#c00852;color:#fff" title="15h: 708 req"><span class="sv">708</span><span class="sh">15</span></div>
+<div class="scell" style="background:#be0852;color:#fff" title="16h: 714 req"><span class="sv">714</span><span class="sh">16</span></div>
+<div class="scell" style="background:#f84c7d;color:#100F0F" title="17h: 383 req"><span class="sv">383</span><span class="sh">17</span></div>
+<div class="scell" style="background:#f4cfd7;color:#100F0F" title="18h: 82 req"><span class="sv"></span><span class="sh">18</span></div>
+<div class="scell" style="background:#f5c0cd;color:#100F0F" title="19h: 117 req"><span class="sv"></span><span class="sh">19</span></div>
+<div class="scell" style="background:#f5bdcb;color:#100F0F" title="20h: 123 req"><span class="sv"></span><span class="sh">20</span></div>
+<div class="scell" style="background:#f3ebea;color:#100F0F" title="21h: 19 req"><span class="sv"></span><span class="sh">21</span></div>
+<div class="scell" style="background:#f3f3f0;color:#100F0F" title="22h: 0 req"><span class="sv"></span><span class="sh">22</span></div>
+<div class="scell" style="background:#f3e8e8;color:#100F0F" title="23h: 26 req"><span class="sv"></span><span class="sh">23</span></div>
+</div></div><div class="strip"><div class="striplbl">Rede Petro</div><div class="stripcells">
+<div class="scell" style="background:#f3f3f0;color:#100F0F" title="00h: 0 req"><span class="sv"></span><span class="sh">00</span></div>
+<div class="scell" style="background:#f3f3f0;color:#100F0F" title="01h: 0 req"><span class="sv"></span><span class="sh">01</span></div>
+<div class="scell" style="background:#f3f3f0;color:#100F0F" title="02h: 0 req"><span class="sv"></span><span class="sh">02</span></div>
+<div class="scell" style="background:#f3f3f0;color:#100F0F" title="03h: 0 req"><span class="sv"></span><span class="sh">03</span></div>
+<div class="scell" style="background:#f3f3f0;color:#100F0F" title="04h: 0 req"><span class="sv"></span><span class="sh">04</span></div>
+<div class="scell" style="background:#f3f3f0;color:#100F0F" title="05h: 0 req"><span class="sv"></span><span class="sh">05</span></div>
+<div class="scell" style="background:#f3f3f0;color:#100F0F" title="06h: 0 req"><span class="sv"></span><span class="sh">06</span></div>
+<div class="scell" style="background:#f4dadf;color:#100F0F" title="07h: 47 req"><span class="sv"></span><span class="sh">07</span></div>
+<div class="scell" style="background:#f77498;color:#100F0F" title="08h: 240 req"><span class="sv">240</span><span class="sh">08</span></div>
+<div class="scell" style="background:#db0850;color:#fff" title="09h: 517 req"><span class="sv">517</span><span class="sh">09</span></div>
+<div class="scell" style="background:#e20850;color:#fff" title="10h: 501 req"><span class="sv">501</span><span class="sh">10</span></div>
+<div class="scell" style="background:#c70851;color:#fff" title="11h: 565 req"><span class="sv">565</span><span class="sh">11</span></div>
+<div class="scell" style="background:#a40754;color:#fff" title="12h: 652 req"><span class="sv">652</span><span class="sh">12</span></div>
+<div class="scell" style="background:#6c0657;color:#fff" title="13h: 788 req"><span class="sv">788</span><span class="sh">13</span></div>
+<div class="scell" style="background:#44055a;color:#fff" title="14h: 884 req"><span class="sv">884</span><span class="sh">14</span></div>
+<div class="scell" style="background:#46055a;color:#fff" title="15h: 880 req"><span class="sv">880</span><span class="sh">15</span></div>
+<div class="scell" style="background:#ac0753;color:#fff" title="16h: 632 req"><span class="sv">632</span><span class="sh">16</span></div>
+<div class="scell" style="background:#e00850;color:#fff" title="17h: 505 req"><span class="sv">505</span><span class="sh">17</span></div>
+<div class="scell" style="background:#c20852;color:#fff" title="18h: 578 req"><span class="sv">578</span><span class="sh">18</span></div>
+<div class="scell" style="background:#f68eaa;color:#100F0F" title="19h: 191 req"><span class="sv">191</span><span class="sh">19</span></div>
+<div class="scell" style="background:#f3f2f0;color:#100F0F" title="20h: 1 req"><span class="sv"></span><span class="sh">20</span></div>
+<div class="scell" style="background:#f3f3f0;color:#100F0F" title="21h: 0 req"><span class="sv"></span><span class="sh">21</span></div>
+<div class="scell" style="background:#f3f3f0;color:#100F0F" title="22h: 0 req"><span class="sv"></span><span class="sh">22</span></div>
+<div class="scell" style="background:#f3f3f0;color:#100F0F" title="23h: 0 req"><span class="sv"></span><span class="sh">23</span></div>
+</div></div>
+  </div>
+  <div class="callout">
+    <p style="margin:.2em 0"><b>Cada cliente tem seu próprio relógio.</b> A <b>Copercana</b> é uma operação de <b>manhã</b> (pico 10–12h, some depois das 17h) e <b>trabalha aos sábados</b>. A <b>Rede Petro</b> é de <b>tarde</b> (pico 13–15h, ativa até 18–19h) e <b>não opera no sábado</b>. Saber isso muda quando avisar cada cliente sobre manutenção e como interpretar uma queda de uso.</p>
+  </div>
+</section>
+
+<section id="perfil">
+  <h2><span class="n">3</span>Comparativo dos maiores clientes</h2>
+  <table>
+    <thead><tr><th>Cliente</th><th class="num">Pico (BRT)</th><th>Janela</th><th>Perfil</th><th>Sábado?</th></tr></thead>
+    <tbody>
+      <tr><td><b>Tenant (todos)</b></td><td class="num">12–13h</td><td>08–20h</td><td>Expediente comercial clássico</td><td>parcial</td></tr>
+      <tr><td>Copercana</td><td class="num">10–12h</td><td>08–17h</td><td>Operação de manhã, encerra cedo</td><td><b>sim</b></td></tr>
+      <tr><td>Rede Petro</td><td class="num">13–15h</td><td>08–19h</td><td>Operação de tarde, vai até mais tarde</td><td>não</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="uso">
+  <h2><span class="n">4</span>Por que isso importa (uso operacional)</h2>
+  <div class="grid g2">
+    <div class="card"><h3 style="margin-top:0">🛠️ Janela de manutenção &amp; deploy</h3><p class="muted" style="font-size:13.5px;margin:.3em 0">Uso ~zero entre <b>22h e 06h</b> e aos <b>domingos</b>. É a janela natural para deploy, migração (inclusive a do Quick Metrics) e reinício de serviços com impacto mínimo — hoje comprovado por dado, não por achismo.</p></div>
+    <div class="card"><h3 style="margin-top:0">📟 Alertas com baseline por hora</h3><p class="muted" style="font-size:13.5px;margin:.3em 0">Um volume caindo a zero às <b>14h de um dia útil</b> é incidente; a <b>mesma queda às 3h ou no domingo</b> é normal. Sem esse perfil, um alerta de "queda de tráfego" dispararia falso positivo toda noite e todo fim de semana.</p></div>
+    <div class="card"><h3 style="margin-top:0">👥 Suporte &amp; plantão</h3><p class="muted" style="font-size:13.5px;margin:.3em 0">A demanda vive em <b>08–19h</b>. Não é preciso plantão 24/7; concentrar equipe e capacidade de atendimento no expediente cobre praticamente todo o uso real.</p></div>
+    <div class="card"><h3 style="margin-top:0">📈 Capacidade / custo</h3><p class="muted" style="font-size:13.5px;margin:.3em 0">O <b>pico do meio‑dia é ~4× o vale</b>. É o pico que dimensiona a infraestrutura — e há folga enorme à noite, oportunidade para jobs pesados (reprocessamento, relatórios) sem competir com o cliente.</p></div>
+  </div>
+</section>
+
+<section id="metodo">
+  <h2><span class="n">5</span>Método &amp; limitações</h2>
+  <p class="muted" style="font-size:13.5px">
+    Fonte: <span class="mono">{job="autochecker-backend", environment="prod"}</span> filtrado por <span class="mono">tenant_schema="base_compartilhada"</span> e <span class="mono">user_email!=""</span> (só clientes reais, sem bots). Série horária via <span class="mono">count_over_time([1h])</span>, timestamps UTC convertidos para <b>BRT (UTC−3)</b>. Clientes por domínio de e‑mail (<span class="mono">|= "redepetro"</span>, <span class="mono">|= "copercana"</span>).
+  </p>
+  <p class="muted" style="font-size:13.5px">
+    <b>Limitações:</b> a retenção do Loki é de ~7 dias, então este é o retrato de <b>uma semana</b> (06–13/07) — o dia‑da‑semana coincide com uma data específica (por isso a quinta = feriado distorce o "perfil de quinta"). Para um padrão semanal estável, seria preciso acumular semanas num dashboard fixo. O volume é dominado por polling de fundo (ver estudo de uso de telas), mas como o polling só ocorre com o app aberto, ele é um bom marcador de <b>presença</b> — que é exatamente o que este estudo mede.
+  </p>
+</section>
+
+<section id="rec">
+  <h2><span class="n">6</span>Próximos passos</h2>
+  <ul class="rec">
+    <li><b>Fixar este heatmap num painel do Grafana</b> acumulando semanas — supera a retenção de 7 dias e vira um padrão semanal confiável.</li>
+    <li><b>Definir a janela de deploy/manutenção oficial</b> (22h–06h ou domingo) com base neste dado.</li>
+    <li><b>Configurar alertas de volume com baseline por hora/dia</b> — elimina falso positivo noturno e de fim de semana.</li>
+    <li><b>Cruzar com o calendário de feriados estaduais (SP)</b> ao interpretar quedas — a base é paulista.</li>
+  </ul>
+</section>
+
+<footer>
+  Dados ao vivo em 13/07/2026 · Grafana Loki <span class="mono">monitor.autochecker.cloud</span>, janela 06–13/07/2026, horário de Brasília. Parte da série de estudos de uso do AutoChecker (ver "Uso de Telas e Funções — Base Compartilhada"). · AutoMind — Simple · Smart · Reliable
+</footer>
+
+</div>
+</body>
+</html>

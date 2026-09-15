@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Explicação da Onda 0 — AutoChecker</title>
+<style>
+  :root{
+    --bg:#1e2230;            /* dark, mas não tão escuro */
+    --bg-soft:#272c3d;
+    --bg-card:#2b3146;
+    --border:#3a4159;
+    --text:#e6e9f2;
+    --text-soft:#b8bfd4;
+    --muted:#8a92ad;
+    --accent:#7aa2ff;
+    --accent-soft:#9db8ff;
+    --green:#5cd6a0;
+    --yellow:#f2c94c;
+    --red:#ff7b7b;
+    --blue:#69b7ff;
+    --code-bg:#1a1e2b;
+    --code-text:#ffd9a8;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.65;
+    font-size:16px;
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:48px 28px 80px;}
+  h1{
+    font-size:2rem;line-height:1.25;margin:0 0 8px;
+    color:#fff;font-weight:700;letter-spacing:-.01em;
+  }
+  h2{
+    font-size:1.45rem;margin:48px 0 14px;padding-top:18px;
+    border-top:1px solid var(--border);color:#fff;font-weight:650;
+  }
+  h2:first-of-type{border-top:none;}
+  h3{font-size:1.05rem;margin:20px 0 6px;color:var(--accent-soft);font-weight:600;}
+  p{margin:10px 0;color:var(--text-soft);}
+  strong{color:var(--text);font-weight:650;}
+  a{color:var(--accent);}
+  code{
+    background:var(--code-bg);color:var(--code-text);
+    padding:.12em .4em;border-radius:5px;font-size:.86em;
+    font-family:"Cascadia Code",Consolas,"Courier New",monospace;
+  }
+  ul{margin:10px 0;padding-left:22px;}
+  li{margin:6px 0;color:var(--text-soft);}
+  /* intro box */
+  .intro{
+    background:var(--bg-soft);border:1px solid var(--border);
+    border-left:4px solid var(--accent);border-radius:10px;
+    padding:18px 22px;margin:20px 0 8px;
+  }
+  .intro p{margin:6px 0;color:var(--text-soft);}
+  .meta-table{width:100%;border-collapse:collapse;margin-top:10px;}
+  .meta-table td{padding:4px 10px 4px 0;vertical-align:top;border:none;color:var(--text-soft);}
+  .meta-table td:first-child{color:var(--muted);white-space:nowrap;width:200px;}
+  /* etapa card */
+  .etapa{
+    background:var(--bg-card);border:1px solid var(--border);
+    border-radius:12px;padding:6px 26px 22px;margin:18px 0;
+  }
+  /* tables */
+  table{width:100%;border-collapse:collapse;margin:18px 0;font-size:.92rem;}
+  th,td{border:1px solid var(--border);padding:9px 12px;text-align:left;vertical-align:top;}
+  th{background:var(--bg-soft);color:#fff;font-weight:600;}
+  tbody tr:nth-child(even){background:rgba(255,255,255,.02);}
+  /* status badges */
+  .badge{display:inline-block;padding:.12em .55em;border-radius:20px;font-size:.82em;font-weight:600;white-space:nowrap;}
+  .b-done{background:rgba(92,214,160,.16);color:var(--green);}
+  .b-prog{background:rgba(105,183,255,.16);color:var(--blue);}
+  .b-warn{background:rgba(242,201,76,.16);color:var(--yellow);}
+  .b-none{background:rgba(255,123,123,.16);color:var(--red);}
+  .b-conf{background:rgba(154,184,255,.16);color:var(--accent-soft);}
+  /* callouts */
+  .callout{
+    border-radius:10px;padding:14px 18px;margin:18px 0;
+    border-left:4px solid var(--accent);background:var(--bg-soft);
+  }
+  .callout.danger{border-left-color:var(--red);background:rgba(255,123,123,.07);}
+  .callout.warn{border-left-color:var(--yellow);background:rgba(242,201,76,.07);}
+  .callout p{margin:4px 0;}
+  blockquote{
+    margin:18px 0;padding:12px 18px;border-left:4px solid var(--accent);
+    background:var(--bg-soft);border-radius:0 8px 8px 0;color:var(--text-soft);
+  }
+  .verdict{
+    font-size:1.12rem;font-weight:650;color:#fff;
+    background:rgba(255,123,123,.1);border:1px solid rgba(255,123,123,.35);
+    border-radius:10px;padding:16px 20px;margin:18px 0;
+  }
+  hr{border:none;border-top:1px solid var(--border);margin:34px 0;}
+  .footer{margin-top:40px;font-size:.82rem;color:var(--muted);font-style:italic;border-top:1px solid var(--border);padding-top:18px;}
+  .section-label{color:var(--green);font-weight:600;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Explicação da Onda 0 — AutoChecker</h1>
+
+  <div class="intro">
+    <p><strong>Para quem é este documento:</strong> alguém que está começando na área de tecnologia e quer entender, sem jargão, o que é a "Onda 0" do plano de observabilidade do AutoChecker, o que cada etapa faz e em que pé ela está.</p>
+    <table class="meta-table">
+      <tr><td>Data</td><td>16/06/2026</td></tr>
+      <tr><td>Produto</td><td>AutoChecker (backend Django · worker Celery · frontend Next.js)</td></tr>
+      <tr><td>Ferramenta de monitoramento</td><td>Sentry (org <code>automind-qd</code>)</td></tr>
+      <tr><td>Fonte de verdade do status</td><td>Azure DevOps — org <code>automindautomacao</code>, projeto <code>AutoChecker</code></td></tr>
+      <tr><td>Fontes lidas</td><td>Cronograma (Excel 03/06), Auditoria Onda 0 (15/06), Azure DevOps ao vivo (16/06)</td></tr>
+    </table>
+  </div>
+
+  <h2>O que é a Onda 0?</h2>
+  <p>Imagine que você vai construir uma casa de vários andares. Antes de levantar qualquer parede, você precisa de uma <strong>fundação firme e de um terreno limpo</strong>. A Onda 0 é exatamente isso para o plano de observabilidade do AutoChecker: é a <strong>fase de saneamento da base</strong>.</p>
+  <p>"Observabilidade" é a capacidade de <strong>enxergar o que está acontecendo dentro do sistema</strong> — saber quando algo quebra, onde quebrou e por quê. A ferramenta que faz isso aqui é o <strong>Sentry</strong>, que funciona como uma "central de alarmes" que captura os erros do programa.</p>
+  <p>O problema é que, hoje, essa central está com os alarmes <strong>mal regulados</strong>: dispara para coisas que não importam, mistura erros de teste com erros de produção (clientes reais) e até deixa passar informações pessoais que não deveriam aparecer. A Onda 0 conserta tudo isso <strong>antes</strong> de seguir em frente.</p>
+  <p>Por isso ela é chamada de <strong>"gate"</strong> (portão): enquanto a Onda 0 não estiver concluída, as próximas ondas (1 a 6) <strong>não devem começar</strong>. Não adianta construir andares novos sobre uma fundação torta.</p>
+  <p>A Onda 0 tem <strong>8 etapas</strong>. Abaixo, cada uma é explicada em linguagem do dia a dia.</p>
+
+  <!-- ETAPA 1 -->
+  <div class="etapa">
+  <h2>Etapa 1 — Padronizar a etiqueta <code>environment</code> e separar testes de produção</h2>
+  <h3>O que é essa etapa?</h3>
+  <p>Todo erro que chega ao Sentry vem com uma <strong>etiqueta</strong> dizendo de onde ele veio: do ambiente de <strong>produção</strong> (onde estão os clientes reais), de <strong>teste</strong> ou da <strong>máquina do próprio desenvolvedor</strong>. Hoje essas etiquetas estão bagunçadas — em especial no frontend (a tela que o usuário vê), onde a maioria dos erros aparece marcada como "development" mesmo vindo de produção. É como receber uma encomenda sem saber se o endereço é da loja ou da sua casa. Esta etapa garante que cada erro venha com o ambiente certo.</p>
+  <h3>Onde ela atua no código?</h3>
+  <p>Nos três "motores" do sistema, no ponto em que cada um liga o Sentry:</p>
+  <ul>
+    <li><strong>Backend</strong> (servidor Django): <code>backend/config/settings/base.py:730</code></li>
+    <li><strong>Worker</strong> (Celery — as tarefas automáticas em segundo plano): <code>worker/config/celery.py:24</code></li>
+    <li><strong>Frontend</strong> (Next.js — o que o usuário vê): <code>instrumentation-client.ts:9</code>, <code>sentry.server.config.ts:9</code>, <code>sentry.edge.config.ts:10</code></li>
+  </ul>
+  <h3>O que ela afeta na prática?</h3>
+  <p>Afeta a <strong>confiança em tudo que vem depois</strong>. Se erros de teste e de produção ficam misturados, ninguém sabe se um alarme é grave (cliente afetado) ou inofensivo (alguém testando). Arrumar isso é o que permite confiar nos números e nos alertas mais tarde.</p>
+  <h3>Status no Azure DevOps</h3>
+  <p><span class="badge b-conf">🔍 Pendente de confirmação</span> Existem tarefas genéricas de "implementar método de observabilidade" já concluídas (IDs <code>44192</code>, <code>44193</code>, <code>46787</code> — todas <em>Done</em>) e a inclusão do Sentry nos serviços (<code>48860</code>, <em>Done</em>). Mas <strong>nenhum item trata especificamente</strong> da etiqueta <code>environment</code> ou da configuração que falta no frontend. Não há como confirmar pelo Azure que esta etapa específica foi feita.</p>
+  <h3>Observação extra</h3>
+  <p>O cronograma marca esta etapa como <strong>"Concluído"</strong>, mas isso se refere ao <strong>código</strong>, que de fato já lê a etiqueta. O que ainda não está garantido é que o <strong>deploy</strong> (a publicação em produção) preencha sempre a etiqueta certa. Quando a configuração falta, o sistema "chuta" o valor <code>development</code> — e é justamente esse chute que polui o Sentry. Por isso a auditoria não considera a etapa fechada.</p>
+  </div>
+
+  <!-- ETAPA 2 -->
+  <div class="etapa">
+  <h2>Etapa 2 — Padronizar a "versão" (release) e apontar o commit culpado</h2>
+  <h3>O que é essa etapa?</h3>
+  <p>Sempre que o sistema é publicado, ele ganha um número de <strong>versão</strong> (chamado de <em>release</em>). Quando um erro acontece, é muito útil saber <strong>em qual versão</strong> ele surgiu — e, melhor ainda, <strong>qual alteração de código</strong> provavelmente o causou (isso se chama <em>suspect commits</em>, o "commit suspeito"). Hoje isso não está configurado, e pior: o frontend está mandando seus dados para um <strong>projeto de teste errado</strong> no Sentry. É como enviar o relatório de vendas para o e-mail errado.</p>
+  <h3>Onde ela atua no código?</h3>
+  <p>No frontend, no arquivo de configuração <code>next.config.js</code> (existem <strong>duas cópias</strong> dele: <code>AutoChecker_Frontend/next.config.js</code> e <code>AutoChecker/frontend/next.config.js</code>). Em ambos, o destino aponta para <code>org: "automind-teste"</code> e <code>project: "javascript-nextjs"</code> — endereços de teste, não os de produção. Também envolve as <strong>pipelines do Azure</strong> (as esteiras automáticas de publicação).</p>
+  <h3>O que ela afeta na prática?</h3>
+  <p>Afeta a <strong>velocidade para achar a causa de um problema</strong>. Com a versão e o commit suspeito configurados, quando algo quebra o time descobre em minutos qual mudança causou. Sem isso, vira investigação no escuro. E os dados indo para o projeto errado significam que parte da informação simplesmente <strong>se perde</strong>.</p>
+  <h3>Status no Azure DevOps</h3>
+  <p><span class="badge b-warn">⚠️ Parcial / Ambígua</span> Existe apenas um item relacionado: a Task <code>36445</code> ("Configuração do pipeline de releases no Azure DevOps"), em <strong>"To Do"</strong> (não iniciada) desde <strong>maio de 2025</strong> e <strong>sem responsável</strong> — confirmado ao vivo em 16/06. Não há item sobre o commit suspeito (<code>set-commits</code>) nem sobre o projeto errado do frontend.</p>
+  <h3>Observação extra</h3>
+  <p>O cronograma marca esta etapa como <strong>"Em andamento"</strong>, mas no Azure ela aparece praticamente parada há mais de um ano. Ter <strong>duas cópias</strong> do mesmo arquivo de configuração é um risco por si só: dá para publicar a partir da pasta errada sem perceber.</p>
+  </div>
+
+  <!-- ETAPA 3 -->
+  <div class="etapa">
+  <h2>Etapa 3 — Remover a tarefa "fantasma" do agendador</h2>
+  <h3>O que é essa etapa?</h3>
+  <p>O sistema tem um <strong>agendador de tarefas</strong> (o "Celery Beat"), que é como um despertador que dispara rotinas automáticas em horários certos. Existe uma tarefa que foi <strong>removida do código</strong>, mas o despertador ainda guardou a "lembrança" dela e tenta executá-la. Como ela não existe mais, dá erro toda vez — gerava por volta de <strong>1.500 erros</strong> repetidos. Esta etapa apaga essa "tarefa fantasma".</p>
+  <h3>Onde ela atua no código?</h3>
+  <p>No worker (Celery): a lista oficial de tarefas agendadas fica em <code>worker/config/celery.py:69</code> e já está correta. O problema está na <strong>memória persistida do agendador</strong>, num arquivo (<code>/tmp/celerybeat-schedule</code>) que guarda a lembrança antiga. A tarefa em si (<code>process_scheduled_notifications</code>) já está comentada/desativada no código.</p>
+  <h3>O que ela afeta na prática?</h3>
+  <p>Afeta a <strong>limpeza do painel</strong>. Esse era um dos maiores geradores de "barulho" no Sentry: milhares de erros repetidos que não significavam nada de novo, mas escondiam os problemas de verdade no meio da poluição.</p>
+  <h3>Status no Azure DevOps</h3>
+  <p><span class="badge b-warn">⚠️ Parcial / Ambígua</span> O núcleo do problema foi tratado: a Bug <code>53659</code> ("Limpar beat_schedule e resetar celerybeat-schedule em prod") está <strong>"Done"</strong> (confirmado ao vivo). Porém ainda há pontas soltas: a Task <code>53660</code> (uma duplicata da mesma coisa) ficou em <strong>"To Do"</strong>, e a <code>53707</code> ("Limpeza preventiva no deploy") também está <strong>"To Do"</strong>.</p>
+  <h3>Observação extra</h3>
+  <p>Sem a parte preventiva (<code>53707</code>), a "tarefa fantasma" pode <strong>voltar a aparecer</strong> num próximo deploy, porque a limpeza foi feita à mão durante um incidente, e não automatizada. É como varrer o chão sem consertar o vazamento que suja de novo.</p>
+  </div>
+
+  <!-- ETAPA 4 -->
+  <div class="etapa">
+  <h2>Etapa 4 — Corrigir as atualizações de banco que faltam para alguns clientes</h2>
+  <h3>O que é essa etapa?</h3>
+  <p>O AutoChecker atende vários clientes, e cada um tem seu próprio "compartimento" no banco de dados (isso se chama <em>multi-tenant</em> — vários inquilinos no mesmo prédio). Quando o sistema é atualizado, ele precisa aplicar as mudanças do banco <strong>em todos os compartimentos</strong>. Hoje a publicação aplica só no "compartimento principal" e <strong>esquece os dos clientes já existentes</strong>. Resultado: o sistema procura uma "gaveta" (tabela) que nunca foi criada para aquele cliente e dá erro do tipo <em>"relation does not exist"</em>.</p>
+  <h3>Onde ela atua no código?</h3>
+  <p>No processo de publicação (deploy) do worker: <code>backend/scripts/deploy.sh:97</code> e <code>backend.azure-pipelines.yml:148/157</code> rodam só o comando <code>migrate</code> simples. O comando que aplica em todos os compartimentos (<code>migrate_schemas</code>) só é usado quando um cliente <strong>novo</strong> é criado (<code>backend/apps/tenants/signals.py:12</code>), nunca na atualização geral.</p>
+  <h3>O que ela afeta na prática?</h3>
+  <p>Afeta <strong>diretamente o cliente</strong>: funções podem quebrar para quem está com o banco desatualizado. E gera um volume grande de erros (no Sentry ao vivo, um único caso tinha mais de <strong>540 ocorrências</strong>). São falhas reais, não barulho.</p>
+  <h3>Status no Azure DevOps</h3>
+  <p><span class="badge b-warn">⚠️ Parcial / Ambígua</span> Existe a Task <code>51820</code> registrando o <strong>sintoma</strong> exato (<code>relation "upload_document" does not exist</code>), em <strong>"To Do"</strong> (confirmado ao vivo). Há também tarefas antigas de 2025 sobre migração de schema (<code>35848</code> em <em>To Do</em>; <code>35829</code> foi <strong>removida</strong>). Mas <strong>não existe item para a correção de fundo</strong> — adicionar o <code>migrate_schemas</code> ao deploy. Só os sintomas foram anotados, não a causa.</p>
+  <h3>Observação extra</h3>
+  <p>Enquanto a causa-raiz não tiver um item e uma correção, esses erros vão <strong>continuar reaparecendo</strong> a cada nova atualização. Tratar sintoma sem tratar a causa é enxugar gelo.</p>
+  </div>
+
+  <!-- ETAPA 5 -->
+  <div class="etapa">
+  <h2>Etapa 5 — Unificar a "ligação" do Sentry e ativar a captura das tarefas automáticas</h2>
+  <h3>O que é essa etapa?</h3>
+  <p>Cada motor do sistema "liga" o Sentry de um jeito próprio, e essas formas estão <strong>diferentes umas das outras</strong>. Existe um "manual padrão" pronto (uma função chamada <code>init_sentry</code>) que deixaria todos iguais, mas <strong>ninguém o usa</strong>. Além disso, o backend não está capturando direito os erros das <strong>tarefas automáticas</strong> (Celery), porque falta ativar um pedaço chamado <code>CeleryIntegration</code>. Esta etapa padroniza a ligação e garante que esses erros sejam capturados.</p>
+  <h3>Onde ela atua no código?</h3>
+  <ul>
+    <li>Backend liga "na mão" em <code>backend/config/settings/base.py:728-736</code> (sem a integração do Celery).</li>
+    <li>Worker liga "na mão" em <code>worker/config/celery.py:22-32</code>.</li>
+    <li>O manual padrão pronto está em <code>shared/observability/sentry.py</code> — e é <strong>chamado apenas nos testes</strong>, nunca em produção.</li>
+  </ul>
+  <h3>O que ela afeta na prática?</h3>
+  <p>Afeta a <strong>cobertura do monitoramento</strong>. Sem a integração do Celery no backend, certos erros das tarefas automáticas podem <strong>passar despercebidos</strong> ou aparecer mal agrupados — ou seja, problemas acontecendo sem que ninguém veja.</p>
+  <h3>Status no Azure DevOps</h3>
+  <p><span class="badge b-none">❌ Não mapeada</span> A busca por <code>init_sentry</code> e <code>CeleryIntegration</code> (no título e na descrição dos itens) retornou <strong>zero</strong> resultados. Não existe nenhum work item para esta etapa.</p>
+  <h3>Observação extra</h3>
+  <p>É uma das duas etapas <strong>sem nenhum rastreamento</strong> no Azure. O esforço é considerado <strong>pequeno (P)</strong>, ou seja, é uma correção relativamente barata — mas que hoje nem sequer existe como tarefa registrada. Atenção a um detalhe técnico: só mudar quem chama o manual <strong>não basta</strong>; o próprio manual precisa ser ajustado para dar a integração do Celery ao backend.</p>
+  </div>
+
+  <!-- ETAPA 6 -->
+  <div class="etapa">
+  <h2>Etapa 6 — Filtrar o "barulho" e consertar o filtro de health quebrado</h2>
+  <h3>O que é essa etapa?</h3>
+  <p>Boa parte dos erros no Sentry não são problemas de verdade. São <strong>robôs de varredura</strong> da internet batendo na porta do sistema (<code>DisallowedHost</code>), tentativas de acesso esperadas que falham (login, token) e um filtro <strong>quebrado</strong> que deveria ignorar as verificações de saúde do sistema, mas aponta para o endereço errado. Esta etapa silencia o que é barulho — <strong>sem</strong> silenciar o que é incidente real.</p>
+  <h3>Onde ela atua no código?</h3>
+  <p>No backend, no ponto que decide o que mandar (ou não) para o Sentry: <code>backend/config/settings/base.py:716</code>. Ali o filtro procura pelo endereço <code>/health/</code>, mas o endereço real da verificação de saúde é <code>/api/core/healthcheck/</code> (definido em <code>apps/core/urls.py:12</code>). Como os textos não batem, o <strong>filtro nunca funciona</strong> — está "morto".</p>
+  <h3>O que ela afeta na prática?</h3>
+  <p>Afeta a <strong>capacidade de enxergar o que importa</strong>. Com o painel cheio de barulho, os problemas reais ficam escondidos e o time perde tempo (e confiança nos alertas). Atenção: a parte de login/token <strong>não</strong> deve ser silenciada em bloco — ali existem incidentes verdadeiros que precisam ser classificados caso a caso.</p>
+  <h3>Status no Azure DevOps</h3>
+  <p><span class="badge b-warn">⚠️ Parcial / Ambígua</span> Uma fatia do barulho foi atacada na origem: a Bug <code>53661</code> (validar dados no middleware) está <strong>"Done"</strong>. Mas <strong>não há item</strong> para configurar o filtro de barulho (<code>before_send</code>), nem para o <code>DisallowedHost</code>, nem para corrigir o filtro de health quebrado. Os itens de healthcheck encontrados (<code>53684</code>, <code>53997</code>) <strong>criam endpoints novos</strong> — não consertam o filtro do Sentry.</p>
+  <h3>Observação extra</h3>
+  <p>Mesmo com a <code>53661</code> concluída, o <strong>barulho dominante continua</strong>, porque o cerne da etapa (os filtros) segue sem tarefa. Esta etapa cruza com a Etapa 8 (triagem): limpar o barulho aqui facilita muito a triagem lá.</p>
+  </div>
+
+  <!-- ETAPA 7 -->
+  <div class="etapa">
+  <h2>Etapa 7 — Proteger dados pessoais (LGPD) no frontend</h2>
+  <h3>O que é essa etapa?</h3>
+  <p>Quando um erro acontece, o Sentry pode capturar um "retrato" do que estava na tela e dados do usuário. Hoje o frontend está configurado para <strong>enviar dados pessoais</strong> (a opção <code>sendDefaultPii</code> está ligada), manda o <strong>e-mail do usuário</strong> junto com os erros, e grava <strong>vídeos da sessão</strong> (Session Replay) <strong>sem borrar</strong> telas sensíveis — como <strong>CNH, ASO e CPF</strong>. Esta etapa desliga esse vazamento e aplica mascaramento.</p>
+  <h3>Onde ela atua no código?</h3>
+  <p>No frontend: a opção <code>sendDefaultPii: true</code> aparece em <code>instrumentation-client.ts:21</code>, <code>sentry.server.config.ts:16</code> e <code>sentry.edge.config.ts:17</code>. O envio do e-mail está em <code>modules/auth/hooks/useAuth.tsx:175</code>. A gravação de sessão sem mascaramento está em <code>instrumentation-client.ts:18-19</code>.</p>
+  <h3>O que ela afeta na prática?</h3>
+  <p>Afeta <strong>conformidade legal (LGPD) e privacidade dos clientes</strong>. Documentos pessoais e e-mails podem estar sendo gravados e guardados num sistema externo. Este é um <strong>risco jurídico real</strong>, não apenas técnico.</p>
+  <h3>Status no Azure DevOps</h3>
+  <p><span class="badge b-none">❌ Não mapeada</span> A busca por termos de proteção de dados (<code>sendDefaultPii</code>, <code>scrubbing</code>, <code>PII</code>) ligados ao Sentry retornou <strong>nenhum item</strong>. Os itens de LGPD que existem (<code>55050</code>, <code>55088</code>) são de <strong>produto</strong> (aceite de termos, central de ajuda do cliente) e <strong>não</strong> tratam de mascarar dados no Sentry.</p>
+  <div class="callout danger">
+    <p><strong>É a etapa mais sensível da Onda 0.</strong> Tem risco legal e está <strong>completamente sem rastreamento</strong>. A recomendação da auditoria é tratá-la com <strong>urgência</strong>: desligar o envio de dados pessoais, parar de mandar o e-mail e borrar as telas sensíveis nas gravações.</p>
+  </div>
+  </div>
+
+  <!-- ETAPA 8 -->
+  <div class="etapa">
+  <h2>Etapa 8 — Fazer a faxina (triagem) do backlog de erros</h2>
+  <h3>O que é essa etapa?</h3>
+  <p>"Triagem" é como a fila de emergência de um hospital: olhar cada caso e classificar — <strong>resolvido</strong>, <strong>ignorar</strong> (com prazo), <strong>em andamento</strong> ou <strong>aguardando</strong>. Hoje há por volta de <strong>152 erros em aberto</strong> no Sentry e <strong>zero foram resolvidos nos últimos 30 dias</strong>. É uma caixa de entrada que ninguém está esvaziando. Esta etapa coloca a casa em ordem.</p>
+  <h3>Onde ela atua no código?</h3>
+  <p>Esta etapa <strong>não mexe no código</strong> — é trabalho de organização feito <strong>dentro do painel do Sentry</strong> (classificar issues, definir critérios, atribuir donos). Cruza com várias outras etapas, porque resolver as causas (Etapas 3, 4, 6) é o que faz a fila diminuir.</p>
+  <h3>O que ela afeta na prática?</h3>
+  <p>Afeta a <strong>rotina de cuidado com o sistema</strong>. Sem triagem, o painel só cresce e perde utilidade. Com triagem, o time passa a tratar os erros de forma contínua, em vez de só apagar incêndios.</p>
+  <h3>Status no Azure DevOps</h3>
+  <p><span class="badge b-prog">🔄 Em andamento</span> Existe esforço ativo: dois itens "guarda-chuva" — a Bug <code>53700</code> ("Estabilização de Issues Sentry — Maio/2026") e a Bug <code>51817</code> ("Sentry Erros"). Mas ambos estão em <strong>"New"</strong> (confirmado ao vivo), poucos filhos foram concluídos (ex.: <code>51818</code>, <em>Done</em>) e a maioria segue em <strong>"To Do"</strong>. É uma triagem <strong>parcial e reativa</strong>, não a faxina completa que a etapa pede.</p>
+  <h3>Observação extra</h3>
+  <p>O fato mais importante foi confirmado ao vivo: <strong>nenhuma issue do AutoChecker foi resolvida</strong> (as poucas resolvidas na organização são de outro produto). A triagem, na prática, ainda não começou de verdade.</p>
+  </div>
+
+  <h2>Resumo geral da Onda 0</h2>
+  <table>
+    <thead>
+      <tr><th>#</th><th>Nome da etapa</th><th>Status no Azure DevOps</th><th>Risco principal</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>Etiqueta <code>environment</code> + separar teste/produção</td><td><span class="badge b-conf">🔍 Pendente de confirmação</span></td><td>Frontend reportando como "development" em produção</td></tr>
+      <tr><td>2</td><td>Release + commit suspeito + pipelines</td><td><span class="badge b-warn">⚠️ Parcial</span> (<code>36445</code> <em>To Do</em> desde 2025, sem dono)</td><td>Dados indo para o projeto de teste errado</td></tr>
+      <tr><td>3</td><td>Remover tarefa fantasma do agendador</td><td><span class="badge b-warn">⚠️ Parcial</span> (<code>53659</code> <em>Done</em>; <code>53660</code>/<code>53707</code> <em>To Do</em>)</td><td>A tarefa fantasma pode voltar num próximo deploy</td></tr>
+      <tr><td>4</td><td>Atualizações de banco que faltam (clientes)</td><td><span class="badge b-warn">⚠️ Parcial</span> (só sintoma <code>51820</code> <em>To Do</em>)</td><td>Erros reais para clientes continuarão surgindo</td></tr>
+      <tr><td>5</td><td>Unificar ligação do Sentry + Celery</td><td><span class="badge b-none">❌ Não mapeada</span> (zero itens)</td><td>Erros de tarefas automáticas não capturados</td></tr>
+      <tr><td>6</td><td>Filtrar barulho + consertar filtro de health</td><td><span class="badge b-warn">⚠️ Parcial</span> (<code>53661</code> <em>Done</em>; filtros sem item)</td><td>Barulho dominante continua escondendo o que importa</td></tr>
+      <tr><td>7</td><td>Proteger dados pessoais (LGPD) no frontend</td><td><span class="badge b-none">❌ Não mapeada</span> (zero itens)</td><td><strong>Risco legal:</strong> CNH/ASO/CPF e e-mail expostos</td></tr>
+      <tr><td>8</td><td>Faxina (triagem) do backlog de erros</td><td><span class="badge b-prog">🔄 Em andamento</span> (guarda-chuvas <em>New</em>)</td><td>Triagem não fechada; 0 erros resolvidos</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <p><strong>Contagem por situação</strong> (segundo o Azure DevOps, validado em 16/06):</p>
+    <ul>
+      <li><span class="badge b-done">✅ Concluídas</span> (item <em>Done</em> cobrindo a etapa): <strong>0</strong></li>
+      <li><span class="badge b-prog">🔄 Em andamento</span>: <strong>1</strong> (Etapa 8)</li>
+      <li><span class="badge b-warn">⚠️ Parciais / ambíguas</span>: <strong>4</strong> (Etapas 2, 3, 4, 6)</li>
+      <li><span class="badge b-conf">🔍 Pendente de confirmação</span>: <strong>1</strong> (Etapa 1)</li>
+      <li><span class="badge b-none">❌ Sem nenhum rastreamento</span>: <strong>2</strong> (Etapas 5 e 7)</li>
+    </ul>
+  </div>
+
+  <h2>Conclusão</h2>
+  <div class="verdict">A Onda 0 NÃO pode ser considerada concluída, e o gate deve permanecer FECHADO.</div>
+  <p>A regra é clara: uma etapa só conta como pronta quando existe um item no Azure DevOps em estado <strong>"Done"</strong> cobrindo o que ela pede. Pelo que o Azure mostra hoje (16/06/2026, validado ao vivo), <strong>nenhuma das 8 etapas atende a essa condição</strong>. Existem itens <em>Done</em> avulsos (como <code>53659</code>, <code>53661</code> e <code>51818</code>), mas eles resolvem pedaços, não o escopo inteiro de nenhuma etapa.</p>
+  <p>Mais do que "faltar concluir", o problema de fundo é de <strong>rastreabilidade</strong>: as 8 etapas da Onda 0 praticamente <strong>não existem como tarefas dedicadas</strong> no Azure Boards. O que há é trabalho genérico de observabilidade e correções pontuais e reativas de erros. Sem itens claros, etapa por etapa, não há como provar conclusão — e duas etapas críticas (a <strong>5</strong>, técnica, e a <strong>7</strong>, de risco legal/LGPD) não têm absolutamente nenhum item.</p>
+  <div class="callout warn">
+    <p><strong>Recomendação:</strong> antes de tentar avançar, criar no Azure os 8 itens rastreáveis (quebrando a Feature <code>40531</code> "Observabilidade"), tratar com urgência a Etapa 7 (dados pessoais) e fechar de fato a triagem da Etapa 8.</p>
+  </div>
+
+  <h2>Balanço final</h2>
+  <ul>
+    <li><strong>Etapas com algum work item relacionado no Azure DevOps:</strong> <strong>6</strong> (Etapas 1, 2, 3, 4, 6 e 8) — mas nenhuma com item <em>Done</em> cobrindo todo o escopo, e a Etapa 1 só tem itens genéricos.</li>
+    <li><strong>Etapas sem nenhum rastreamento:</strong> <strong>2</strong> (Etapas 5 e 7).</li>
+    <li><strong>Etapas efetivamente concluídas (item <em>Done</em> de escopo compatível):</strong> <strong>0</strong>.</li>
+    <li><strong>O gate da Onda 0 pode ser liberado?</strong> <strong>NÃO.</strong> O portão permanece fechado.</li>
+  </ul>
+
+  <div class="footer">
+    Documento explicativo gerado em 16/06/2026. Fontes: Cronograma (<code>Cronograma_Observabilidade_AutoChecker_2026-06-03.xlsx</code>), Auditoria (<code>Auditoria_Onda0_AutoChecker_2026-06-15.md</code>) e consulta ao vivo ao Azure DevOps (org <code>automindautomacao</code>, projeto <code>AutoChecker</code>) em 16/06/2026. Todos os status de conclusão vêm do Azure DevOps; onde não há item, está registrado explicitamente.
+  </div>
+
+</div>
+</body>
+</html>

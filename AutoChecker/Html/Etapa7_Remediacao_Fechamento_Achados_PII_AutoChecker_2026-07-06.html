@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Etapa 7 — Remediação dos Achados de PII · AutoMind</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,400;0,500;0,700;0,900;1,400&display=swap');
+  :root{
+    --am-rosa:#FA094E; --am-magenta:#940755; --am-roxo:#44055A;
+    --am-navy:#03045E; --am-preto:#100F0F; --am-offwhite:#F3F3F0;
+    --am-gradiente-h:linear-gradient(90deg,#FA094E 0%,#03045E 100%);
+    --card:#ffffff; --line:#e4e2dd;
+    --ok:#1f8a4c; --warn:#b8860b; --crit:#FA094E;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{font-family:"Red Hat Display",system-ui,sans-serif;color:var(--am-preto);
+    background:var(--am-offwhite); margin:0; line-height:1.6; font-size:16px;}
+  .topbar{height:8px; background:var(--am-gradiente-h);}
+  header{padding:34px 7vw 22px; border-bottom:1px solid var(--line);}
+  .wordmark{font-weight:900; text-transform:uppercase; letter-spacing:.20em;
+    color:var(--am-roxo); font-size:15px;}
+  .wordmark .dot{color:var(--am-rosa);}
+  .tagline{font-size:11px; letter-spacing:.32em; text-transform:uppercase;
+    color:var(--am-navy); opacity:.7; margin-top:2px;}
+  h1{font-weight:900; color:var(--am-roxo); font-size:30px; line-height:1.2;
+    margin:18px 0 6px; letter-spacing:.01em;}
+  .sub{color:var(--am-navy); font-size:14px; opacity:.85;}
+  .pill{display:inline-block; background:var(--am-roxo); color:#fff; font-size:11px;
+    font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    padding:4px 11px; border-radius:999px; margin:8px 6px 0 0;}
+  .pill.alt{background:var(--am-rosa);}
+  main{padding:14px 7vw 60px; max-width:1080px;}
+  h2{font-weight:700; color:var(--am-roxo); font-size:21px; margin:38px 0 10px;
+    padding-top:14px; border-top:2px solid var(--am-rosa); display:inline-block;}
+  h3{font-weight:700; color:var(--am-navy); font-size:16px; margin:22px 0 6px;}
+  p{margin:10px 0;}
+  a{color:var(--am-rosa); text-decoration:none;} a:hover{text-decoration:underline;}
+  ul,ol{margin:10px 0; padding-left:22px;} li{margin:5px 0;}
+  code{font-family:"SFMono-Regular",Consolas,monospace; background:#efeeea;
+    padding:1px 6px; border-radius:5px; font-size:.88em; color:var(--am-magenta);}
+  pre{background:var(--am-preto); color:#f3f3f0; padding:14px 16px; border-radius:12px;
+    overflow:auto; font-size:13px; line-height:1.5;}
+  pre code{background:none; color:inherit; padding:0;}
+  /* realce leve de linhas diff dentro de <pre> */
+  hr{border:none; border-top:1px solid var(--line); margin:26px 0;}
+  blockquote{border-left:4px solid var(--am-rosa); background:#fff; border-radius:0 12px 12px 0;
+    padding:8px 18px; margin:14px 0; color:var(--am-navy); font-size:14.5px;}
+  table{border-collapse:collapse; width:100%; margin:14px 0; font-size:14px;}
+  th,td{text-align:left; padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top;}
+  th{background:#efeeea; color:var(--am-roxo); font-weight:700; font-size:12px;
+    text-transform:uppercase; letter-spacing:.05em;}
+  tr:last-child td{border-bottom:none;}
+  .flag{font-weight:700; font-size:12px; padding:1px 7px; border-radius:6px; white-space:nowrap;}
+  .f-sei{background:#e3f3e9; color:var(--ok);}
+  .f-parc{background:#fbf2da; color:var(--warn);}
+  .f-nao{background:#fde4ea; color:var(--crit);}
+  footer{padding:24px 7vw 50px; color:var(--am-navy); opacity:.7; font-size:12.5px;
+    border-top:1px solid var(--line);}
+</style>
+</head>
+<body>
+<div class="topbar"></div>
+<header>
+  <div class="wordmark">AUTOMIND<span class="dot">.</span></div>
+  <div class="tagline">Simple · Smart · Reliable</div>
+  <h1>Fechamento dos achados de <span style='color:var(--am-rosa)'>PII</span><br>na telemetria do AutoChecker</h1>
+  <div class="sub">Etapa 7 · Onda 0 (GATE) · patch exato + verificação + tickets prontos · gerado 2026-07-06</div>
+  <span class="pill">Remediação executável</span>
+  <span class="pill alt">3 achados abertos</span>
+  <span class="pill">Etapa 7 · LGPD</span>
+</header>
+<main>
+<blockquote>
+<p><strong>Cronograma de Observabilidade · AutoChecker · Onda 0 (Saneamento da Base — GATE)</strong>
+<code>Objeto: sair do diagnóstico e ENTREGAR a correção exata de cada achado de PII já mapeado — patch pronto, quem executa, como verificar.</code>
+<code>Gerado: 2026-07-06 · Confiança: <span class="flag f-sei">Sei</span> (citações revalidadas contra o código de hoje) · Sucessor operacional do Estudo de Soluções de 30/06</code></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Produto</strong></td>
+<td>AutoChecker (frontend <code>AutoChecker_Frontend</code>, serviço <code>AutoChecker_Custos</code>, backend/worker <code>AutoChecker</code>)</td>
+</tr>
+<tr>
+<td><strong>Pergunta</strong></td>
+<td>Os achados de PII da Etapa 7 estão diagnosticados à exaustão. <strong>Como fechá-los?</strong> Qual o patch exato, quem aplica e como confirmar que fechou?</td>
+</tr>
+<tr>
+<td><strong>Fontes</strong></td>
+<td>Código real em <code>Produtos/Autochecker/**</code> (<code>arquivo:linha</code>, lido 06/07/2026) · Estudo de Soluções 30/06 (camadas A–F) · Playbook de Data Scrubbing (painel) · <code>Lgpd.md</code> (Lei nº 13.709/2018)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>Em uma frase</h2>
+<p>Restam <strong>3 achados de PII abertos</strong> (revalidados hoje, zero progresso no código): (1) <code>sendDefaultPii: true</code>, (2) e-mail no <code>Sentry.setUser</code>, (3) <code>IntegrationLog</code> com payload cru sem retenção exposto na UI. Abaixo cada um vem com o <strong>patch literal</strong>, a <strong>verificação</strong> e o <strong>ticket pronto para abrir</strong> — separando o que <strong>você faz sozinho hoje</strong> (painel Sentry + abrir tickets) do que <strong>depende do dev</strong> (os 3 patches de código).</p>
+<hr />
+<h2>Placar dos achados (06/07/2026)</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Achado</th>
+<th>Local (revalidado hoje)</th>
+<th>Vetor legal</th>
+<th>Quem corrige</th>
+<th>Esforço</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1</strong></td>
+<td><code>sendDefaultPii: true</code> — <strong>causa-raiz</strong></td>
+<td><code>AutoChecker_Frontend/instrumentation-client.ts:21</code>, <code>sentry.server.config.ts:16</code>, <code>sentry.edge.config.ts:17</code> + <code>AutoChecker_Custos/src/instrument.ts:12</code></td>
+<td>art. 6º III (minimização), art. 11, art. 33</td>
+<td>👨‍💻 dev</td>
+<td><strong>P</strong> (trivial)</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>E-mail identificável no <code>setUser</code></td>
+<td><code>AutoChecker_Frontend/modules/auth/hooks/useAuth.tsx:175</code> (login) e <code>:388</code> (selectTenant)</td>
+<td>art. 6º III (minimização)</td>
+<td>👨‍💻 dev</td>
+<td><strong>P</strong> (trivial)</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td><code>IntegrationLog</code> — payload cru, sem TTL, exposto na UI</td>
+<td><code>shared/models/integrations.py:778,794</code> · <code>backend/apps/integrations/serializers.py:401</code> · <code>worker/config/celery.py:69</code> (sem expurgo)</td>
+<td>art. 6º III, art. 15/16 (retenção), art. 46 §2º</td>
+<td>👨‍💻 dev + ⚖️ DPO</td>
+<td><strong>M</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Nota de escopo resolvida:</strong> o achado antigo <em>"qual frontend é o de produção?"</em> (#7) fechou por si — o monorepo <code>AutoChecker/frontend/</code> foi <strong>deletado do repo real em 29/06</strong> (a cópia local é resíduo); o canônico é <code>AutoChecker_Frontend</code>. Por isso os "5 pontos" de <code>sendDefaultPii</code> viraram <strong>4 pontos vivos</strong> (3 no front + 1 no Custos). Não corrija a pasta legada.</p>
+</blockquote>
+<hr />
+<h2>Achado 1 — <code>sendDefaultPii: true</code> (causa-raiz) · 👨‍💻 dev</h2>
+<p><strong>Por que é o nº 1:</strong> com <code>true</code>, o SDK anexa <strong>IP, cookies, headers e corpos de request/response</strong> a cada evento — é por esse canal que CPF/CNH/ASO <strong>em trânsito</strong> chega ao Sentry (SaaS no exterior). Desligar corta o vetor dominante. O Session Replay já mascara texto e bloqueia mídia por default no <code>@sentry/nextjs ^10.43.0</code> — <strong>não</strong> é a manchete; o <code>sendDefaultPii</code> é.</p>
+<h3>Patch (4 arquivos, 1 linha cada)</h3>
+<p><strong><code>AutoChecker_Frontend/instrumentation-client.ts:21</code></strong></p>
+<pre><code class="language-diff">-  sendDefaultPii: true,
++  sendDefaultPii: false,
+</code></pre>
+<p><strong><code>AutoChecker_Frontend/sentry.server.config.ts:16</code></strong> — <em>runtime que mais processa documento; prioridade máxima</em></p>
+<pre><code class="language-diff">-  sendDefaultPii: true,
++  sendDefaultPii: false,
+</code></pre>
+<p><strong><code>AutoChecker_Frontend/sentry.edge.config.ts:17</code></strong></p>
+<pre><code class="language-diff">-  sendDefaultPii: true,
++  sendDefaultPii: false,
+</code></pre>
+<p><strong><code>AutoChecker_Custos/src/instrument.ts:12</code></strong></p>
+<pre><code class="language-diff">-  sendDefaultPii: true,
++  sendDefaultPii: false,
+</code></pre>
+<h3>Rede de segurança na origem (recomendado junto — A3 do estudo)</h3>
+<p>Mesmo com <code>sendDefaultPii: false</code>, adicionar um <code>beforeSend</code> que remove campos sensíveis do que sobrar (ex.: erro que carrega body no <code>extra</code>). No <code>Sentry.init</code> dos 3 configs do front:</p>
+<pre><code class="language-ts">  beforeSend(event) {
+    // Remove corpos/headers que possam carregar PII de negócio
+    if (event.request) {
+      delete event.request.cookies;
+      delete event.request.data;      // request body
+      if (event.request.headers) {
+        delete event.request.headers[&quot;authorization&quot;];
+        delete event.request.headers[&quot;cookie&quot;];
+      }
+    }
+    return event;
+  },
+</code></pre>
+<h3>Como verificar que fechou</h3>
+<ol>
+<li>Rodar em staging, disparar um erro numa rota que processa documento.</li>
+<li>No Sentry, abrir o evento → aba <strong>Request</strong>: não deve haver <code>cookies</code>, <code>headers</code> de auth nem <code>data</code> (body). O contexto <code>user</code> não deve trazer IP.</li>
+<li>Confirmar que a versão que <strong>builda em produção</strong> é a com o patch (não um lockfile/cache antigo).</li>
+</ol>
+<hr />
+<h2>Achado 2 — E-mail no <code>Sentry.setUser</code> · 👨‍💻 dev</h2>
+<p><strong>Problema:</strong> <code>Sentry.setUser({ id, email })</code> carimba o e-mail (PII identificável) em <strong>todo</strong> evento do usuário. O <code>id</code> já basta para correlação. Fere minimização (art. 6º III).</p>
+<h3>Patch (2 linhas, mesmo arquivo)</h3>
+<p><strong><code>AutoChecker_Frontend/modules/auth/hooks/useAuth.tsx:175</code></strong> (pós-login)</p>
+<pre><code class="language-diff">-        Sentry.setUser({ id: String(response.user.id), email: response.user.email });
++        Sentry.setUser({ id: String(response.user.id) });
+</code></pre>
+<p><strong><code>AutoChecker_Frontend/modules/auth/hooks/useAuth.tsx:388</code></strong> (pós-selectTenant)</p>
+<pre><code class="language-diff">-        Sentry.setUser({ id: String(userResponse.data.id), email: userResponse.data.email });
++        Sentry.setUser({ id: String(userResponse.data.id) });
+</code></pre>
+<blockquote>
+<p>As tags <code>schema_name</code>/<code>tenant_name</code> (<code>:389–390</code>) e o <code>Sentry.setUser(null)</code> do logout (<code>:224</code>) permanecem — não são PII de titular.</p>
+</blockquote>
+<h3>Como verificar</h3>
+<p>No Sentry, abrir um evento de usuário logado → seção <strong>User</strong>: deve aparecer só <code>id</code>, sem <code>email</code>.</p>
+<hr />
+<h2>Achado 3 — <code>IntegrationLog</code>: payload cru, sem retenção, exposto na UI · 👨‍💻 dev + ⚖️ DPO</h2>
+<p>Três problemas distintos no mesmo modelo — e uma <strong>armadilha</strong>: a ação <code>retry</code> (<code>views.py:375</code>) <strong>re-despacha usando <code>log.request_payload</code> cru</strong> (<code>entity_data=log.request_payload</code>). <strong>Logo NÃO se pode mascarar/apagar o payload no banco</strong> sem quebrar o retry. A correção correta ataca cada camada no lugar certo:</p>
+<h3>3a — Parar de EXPOR o payload/response cru na UI (P0, não quebra retry)</h3>
+<p>Mascarar na <strong>saída do serializer</strong> (a UI deixa de mostrar CPF/CNH/token; o dado no banco continua íntegro para o retry).</p>
+<p><strong><code>backend/apps/integrations/serializers.py</code></strong> — trocar os campos crus por versões mascaradas no <code>IntegrationLogDetailSerializer</code>:</p>
+<pre><code class="language-python">import re
+
+# Chaves cujo VALOR deve ser mascarado (superset do api_logging: inclui cnh, rg, aso, email, nome...)
+_PII_KEYS = re.compile(
+    r&quot;password|token|secret|cpf|cnpj|cnh|rg|aso|email|nome|name|phone|telefone|&quot;
+    r&quot;endereco|address|birth|nascimento|senha|auth&quot;,
+    re.IGNORECASE,
+)
+
+def _scrub(value):
+    &quot;&quot;&quot;Mascara valores de chaves sensíveis, recursivamente. Não muta o original.&quot;&quot;&quot;
+    if isinstance(value, dict):
+        return {k: (&quot;***&quot; if _PII_KEYS.search(k) else _scrub(v)) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_scrub(v) for v in value]
+    return value
+
+
+class IntegrationLogDetailSerializer(serializers.ModelSerializer):
+    provider_display_name = serializers.CharField(
+        source=&quot;provider.display_name&quot;, read_only=True
+    )
+    request_payload = serializers.SerializerMethodField()
+    response_body = serializers.SerializerMethodField()
+
+    def get_request_payload(self, obj):
+        return _scrub(obj.request_payload)
+
+    def get_response_body(self, obj):
+        # response_body é TextField (str); mascarar por regex de valor conhecido (CPF/e-mail)
+        text = obj.response_body or &quot;&quot;
+        text = re.sub(r&quot;\b\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b&quot;, &quot;***CPF***&quot;, text)
+        text = re.sub(r&quot;[\w.+-]+@[\w-]+\.[\w.-]+&quot;, &quot;***EMAIL***&quot;, text)
+        return text
+
+    class Meta:
+        model = IntegrationLog
+        fields = [ ... ]   # inalterado
+</code></pre>
+<blockquote>
+<p>Restringir também <strong>quem</strong> vê o detalhe: hoje o <code>IntegrationLogViewSet</code> exige só <code>IsAuthenticated, IsSubscriber</code>. Avaliar limitar o <em>detail</em>/<code>retry</code> a admin do tenant (permissão dedicada).</p>
+</blockquote>
+<h3>3b — Definir RETENÇÃO / expurgo (fecha art. 15/16) · dev</h3>
+<p>Não há <strong>nenhuma</strong> task de limpeza no <code>beat_schedule</code>. Adicionar uma:</p>
+<p><strong><code>shared/tasks/integration_tasks.py</code></strong> (nova task):</p>
+<pre><code class="language-python">@shared_task
+def purge_old_integration_logs(days: int = 90):
+    &quot;&quot;&quot;Expurga IntegrationLog além da janela de retenção (LGPD art. 15/16).&quot;&quot;&quot;
+    from django.utils import timezone
+    from datetime import timedelta
+    from shared.models.integrations import IntegrationLog
+    cutoff = timezone.now() - timedelta(days=days)
+    deleted, _ = IntegrationLog.objects.filter(created_at__lt=cutoff).delete()
+    return {&quot;deleted&quot;: deleted, &quot;cutoff&quot;: cutoff.isoformat()}
+</code></pre>
+<p><strong><code>worker/config/celery.py</code></strong> — registrar no <code>beat_schedule</code> (junto das demais, ~linha 105):</p>
+<pre><code class="language-python">    &quot;purge-old-integration-logs-daily&quot;: {
+        &quot;task&quot;: &quot;shared.tasks.integration_tasks.purge_old_integration_logs&quot;,
+        &quot;schedule&quot;: crontab(hour=1, minute=0),
+        &quot;options&quot;: {&quot;queue&quot;: &quot;admin_tasks&quot;},
+    },
+</code></pre>
+<blockquote>
+<p>A janela (90 dias) é sugestão — <strong>o DPO define</strong> com base na finalidade real (troubleshooting de integração). Documentar a decisão.</p>
+</blockquote>
+<h3>3c — Minimizar/cifrar o payload EM REPOUSO (decisão estrutural) · dev + DPO</h3>
+<p>Como o <code>retry</code> precisa do payload, as opções (escolher com o DPO):
+- <strong>Cifra em repouso</strong> do <code>request_payload</code>/<code>response_body</code> (ex.: <code>django-cryptography</code> / <code>EncryptedJSONField</code>) → retry decifra, UI mostra mascarado, banco fica ilegível a quem acessar o dump. <strong>Recomendado.</strong>
+- <strong>Minimizar no persist</strong>: gravar só os campos necessários ao retry (remover documentos/imagens embutidos), mantendo referência por ID. Menor esforço, protege menos.
+- <strong>TTL curto (3a+3b)</strong> como mitigação temporal enquanto a cifra não entra.</p>
+<h3>Como verificar</h3>
+<ol>
+<li><strong>3a:</strong> <code>GET</code> no detail de um log com CPF no payload → resposta traz <code>***</code>, não o valor.</li>
+<li><strong>3b:</strong> rodar <code>purge_old_integration_logs(days=0)</code> em staging com um log antigo → conta como deletado; confirmar entrada no beat.</li>
+<li>Retry de um log <code>failed</code> continua funcionando (usa o valor cru do banco, não o mascarado da UI).</li>
+</ol>
+<hr />
+<h2>O que VOCÊ faz sozinho HOJE (sem depender do dev) · 🧍</h2>
+<p>Enquanto os 3 patches esperam o dev, a <strong>Camada 3 (painel Sentry)</strong> avança a Etapa 7 por conta própria — é rede de segurança na ingestão. Passo a passo detalhado no <strong>Playbook de Data Scrubbing</strong> (<code>Etapa7_Playbook_DataScrubbing_Painel_Sentry_8Projetos_2026-06-30.md</code>). Em resumo:</p>
+<ol>
+<li><strong>Advanced Data Scrubbing</strong> (Settings → Security &amp; Privacy) org-wide: regras para CPF/CNPJ/e-mail, <code>$message</code>, <code>extra.**</code>, <code>request.**</code>.</li>
+<li><strong>"Prevent Storing of IP Addresses"</strong> ligado + regra <code>$user.geo.**</code>.</li>
+<li><strong>Data retention</strong> no menor valor do plano (minimização temporal).</li>
+<li><strong>Purga do pretérito</strong> (eventos/replays já gravados em desconformidade) — <strong>com o DPO</strong> (art. 16 + 18 IV).</li>
+</ol>
+<blockquote>
+<p>⚠️ O token do Sentry MCP é <strong>read-only</strong> (<code>update_issue</code>/config dão 403), então esses passos são <strong>manuais no painel</strong> — não dá para automatizar via ferramenta. Comunicar honestamente ao gestor: <em>"camada server-side aplicada por mim; correção de origem (patches 1–3) pendente no código, depende do dev."</em></p>
+</blockquote>
+<hr />
+<h2>Tickets prontos para abrir (Azure Boards) · 🧍 você cria, dev/DPO recebem</h2>
+<blockquote>
+<p>Feature-pai da Etapa 7: <strong>#40531</strong>. Sugiro 3 filhos:</p>
+</blockquote>
+<p><strong>TICKET A — <code>[Etapa 7] Sentry: sendDefaultPii=false + setUser só id + beforeSend</code> (dev)</strong>
+- <strong>Tipo/Esforço:</strong> Task / 1–2 pts.
+- <strong>Descrição:</strong> Corrigir os 4 pontos de <code>sendDefaultPii: true</code> (<code>AutoChecker_Frontend</code> client/server/edge + <code>AutoChecker_Custos/src/instrument.ts:12</code>) para <code>false</code>; remover <code>email</code> dos 2 <code>Sentry.setUser</code> (<code>useAuth.tsx:175,388</code>); adicionar <code>beforeSend</code> de scrub nos 3 configs do front.
+- <strong>Critério de aceite:</strong> evento de erro em staging não traz cookies/headers-auth/body na aba Request; seção User traz só <code>id</code>; build de produção confirmado.</p>
+<p><strong>TICKET B — <code>[Etapa 7] IntegrationLog: mascarar UI + retenção + cifra em repouso</code> (dev + DPO)</strong>
+- <strong>Tipo/Esforço:</strong> Task / 3–5 pts.
+- <strong>Descrição:</strong> Mascarar <code>request_payload</code>/<code>response_body</code> no <code>IntegrationLogDetailSerializer</code>; criar <code>purge_old_integration_logs</code> + beat diário; avaliar cifra em repouso; restringir detail/retry a admin do tenant. <strong>Atenção:</strong> <code>retry</code> usa o payload cru — não mascarar no banco.
+- <strong>Critério de aceite:</strong> detail retorna <code>***</code> no payload; task de expurgo no beat; retry de log <code>failed</code> segue funcional; janela de retenção decidida com DPO e documentada.</p>
+<p><strong>TICKET C — <code>[Etapa 7] Governança: retenção, purga pretérita, DPA/SCC</code> (DPO)</strong>
+- <strong>Tipo/Esforço:</strong> Task / a definir.
+- <strong>Descrição:</strong> Definir janela de retenção do IntegrationLog e dos eventos Sentry; decidir purga do pretérito (art. 16/18 IV) e reporte de incidente (art. 48); confirmar DPA/SCC com o Sentry (art. 33); <strong>só depois</strong> atualizar Termo/Política (transparência do tratamento mínimo).</p>
+<hr />
+<h2>Ordem de execução</h2>
+<table>
+<thead>
+<tr>
+<th>Fase</th>
+<th>O quê</th>
+<th>Quem</th>
+<th>Depende de</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>P0 — hoje</strong></td>
+<td>Camada 3 no painel (scrubbing/IP/retention) + abrir Tickets A/B/C + alinhar purga pretérita c/ DPO</td>
+<td>🧍 você + ⚖️</td>
+<td>nada</td>
+</tr>
+<tr>
+<td><strong>P1 — dev, alto impacto/baixo esforço</strong></td>
+<td>Ticket A (achados 1+2) → depois 3a+3b do Ticket B</td>
+<td>👨‍💻</td>
+<td>PR aprovado</td>
+</tr>
+<tr>
+<td><strong>P2 — estrutural/jurídico</strong></td>
+<td>3c (cifra em repouso), Ticket C, e só então Termo/Política</td>
+<td>👨‍💻 + ⚖️</td>
+<td>decisão DPO</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Regra inegociável (já auditada):</strong> atualizar Termo/Política vem <strong>por último</strong>. Documento ajusta transparência; a minimização (patches 1–3 + painel) ajusta a <strong>legalidade</strong>. Reescrever a política não torna lícito coletar dado excessivo.</p>
+</blockquote>
+<hr />
+<h2>Flags de confiança</h2>
+<table>
+<thead>
+<tr>
+<th>Afirmação</th>
+<th>Flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Os 4 pontos de <code>sendDefaultPii:true</code> e as 2 linhas de <code>setUser</code> estão nos locais citados</td>
+<td><strong>Sei</strong> (lido 06/07)</td>
+</tr>
+<tr>
+<td><code>retry</code> usa <code>request_payload</code> cru → não mascarar no banco</td>
+<td><strong>Sei</strong> (<code>views.py:375</code>)</td>
+</tr>
+<tr>
+<td>Não há task de expurgo do IntegrationLog no beat</td>
+<td><strong>Sei</strong> (<code>celery.py:69–111</code>)</td>
+</tr>
+<tr>
+<td><code>api_logging._sanitize_payload</code> só cobre <code>password\|token\|secret\|cpf\|cnpj</code> por chave, e loga <code>user_email</code> cru</td>
+<td><strong>Sei</strong> (<code>api_logging.py:8,57,113</code>)</td>
+</tr>
+<tr>
+<td>Replay v10 mascara texto/bloqueia mídia por default (residual: canvas/unmask/build)</td>
+<td><strong>Sei / <span class="flag f-parc">Parcial</span></strong> (reverificar canvas)</td>
+</tr>
+<tr>
+<td>Cifra em repouso é a melhor opção para 3c</td>
+<td><strong><span class="flag f-parc">Parcial</span></strong> — validar liblib/esforço com o dev</td>
+</tr>
+<tr>
+<td>Existe DPA/SCC firmado com o Sentry</td>
+<td><strong><span class="flag f-nao">Não sei</span></strong> — DPO confirma</td>
+</tr>
+<tr>
+<td>Janela de retenção adequada (sugerido 90d)</td>
+<td><strong><span class="flag f-nao">Não sei</span></strong> — DPO define pela finalidade</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>Fontes</h2>
+<ol>
+<li>Código — <code>AutoChecker_Frontend/instrumentation-client.ts:21</code>, <code>sentry.server.config.ts:16</code>, <code>sentry.edge.config.ts:17</code>; <code>AutoChecker_Custos/src/instrument.ts:12</code>; <code>modules/auth/hooks/useAuth.tsx:175,388</code> — lidos 06/07/2026.</li>
+<li>Código — <code>shared/models/integrations.py:734–840</code> (IntegrationLog); <code>backend/apps/integrations/serializers.py:378–424</code>; <code>backend/apps/integrations/views.py:326–392</code> (retry usa payload cru); <code>worker/config/celery.py:69–111</code> (beat sem expurgo); <code>backend/config/middleware/api_logging.py:8,57,107–117</code> (scrub parcial por chave).</li>
+<li>Estudo de Soluções — <code>Etapa7_Estudo_Solucoes_Dados_Sensiveis_AutoChecker_2026-06-30.md</code> (camadas A–F, matriz, P0/P1/P2).</li>
+<li>Playbook — <code>Etapa7_Playbook_DataScrubbing_Painel_Sentry_8Projetos_2026-06-30.md</code> (execução da Camada 3).</li>
+<li>Auditoria LGPD — <code>Etapa7_Auditoria_Conformidade_LGPD_Consentimento_vs_Scrubbing_AutoChecker.md</code>; <code>Auditoria_LGPD_IntegrationLog_AutoChecker_2026-06-30.md</code>.</li>
+<li><code>Lgpd.md</code> — Lei nº 13.709/2018 (edição Senado, jun/2024): art. 6º I/III, art. 11, art. 15, art. 16, art. 18 IV, art. 33, art. 46 §2º, art. 48.</li>
+</ol>
+<hr />
+<h3>Referências cruzadas</h3>
+<ul>
+<li><strong>Estudo de Soluções (30/06)</strong> — este documento é o passo operacional das camadas A1/A2/A3/C1–C4/F.</li>
+<li><strong>Playbook Data Scrubbing</strong> — detalha o P0 que você executa sozinho.</li>
+<li><strong>Etapa 5</strong> (consolidar <code>init_sentry</code>) — onde fixar <code>send_default_pii=False</code> explícito no backend.</li>
+<li><strong>Memórias:</strong> <code>autochecker-etapa7-analise-lgpd</code>, <code>autochecker-integrationlog-observabilidade-lgpd</code>, <code>sentry-token-readonly</code>, <code>autochecker-trabalho-autonomo-vs-dev</code>.
+</content>
+</invoke></li>
+</ul>
+</main>
+<footer>Sucessor operacional do Estudo de Soluções de 30/06 · citações revalidadas contra o código em 06/07/2026 · flags Sei/Parcial/Não sei sem suposição · AutoMind · Observabilidade · 2026-07-06</footer>
+</body>
+</html>

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Uso de Telas e Funções — Base Compartilhada · AutoChecker</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700;900&display=swap');
+:root{
+  --am-rosa:#FA094E; --am-magenta:#940755; --am-roxo:#44055A; --am-navy:#03045E;
+  --am-preto:#100F0F; --am-offwhite:#F3F3F0;
+  --am-grad:linear-gradient(45deg,#03045E 0%,#FA094E 100%);
+  --am-grad-h:linear-gradient(90deg,#FA094E 0%,#03045E 100%);
+  --card:#ffffff; --line:#e5e3dd; --muted:#5c5a57;
+  --fonte:"Red Hat Display",system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:var(--fonte);color:var(--am-preto);background:var(--am-offwhite);line-height:1.55;font-size:16px}
+.wrap{max-width:1040px;margin:0 auto;padding:0 22px 80px}
+header.hero{background:var(--am-roxo);color:var(--am-offwhite);border-radius:0 0 22px 22px;padding:38px 34px 30px;position:relative;overflow:hidden}
+header.hero::after{content:"";position:absolute;inset:0;background:var(--am-grad);opacity:.16}
+.hero-top{position:relative;z-index:1;display:flex;align-items:center;gap:14px;margin-bottom:20px}
+.mark{height:32px;width:auto;flex:none;display:block}
+.wordmark{font-weight:700;letter-spacing:.20em;text-transform:uppercase;font-size:15px}
+.tagline{font-size:10.5px;letter-spacing:.28em;text-transform:uppercase;opacity:.75;margin-top:2px}
+.hero h1{position:relative;z-index:1;margin:0;font-size:31px;font-weight:900;letter-spacing:.01em;line-height:1.14}
+.hero .sub{position:relative;z-index:1;margin-top:12px;font-size:14.5px;opacity:.92;max-width:74ch}
+.hero .meta{position:relative;z-index:1;margin-top:16px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:5px 13px;font-size:12px;letter-spacing:.02em}
+section{margin-top:34px}
+h2{font-size:22px;color:var(--am-roxo);font-weight:800;letter-spacing:.01em;margin:0 0 6px;padding-top:8px;border-top:3px solid transparent;border-image:var(--am-grad-h) 1;display:inline-block}
+h2 .n{color:var(--am-rosa);font-weight:900;margin-right:8px}
+h3{font-size:16.5px;color:var(--am-navy);font-weight:700;margin:22px 0 8px}
+p{margin:10px 0}
+a{color:var(--am-magenta)}
+.lead{font-size:15.5px}
+.muted{color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:14px 0;box-shadow:0 1px 2px rgba(16,15,15,.04)}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(2,1fr)} .g3{grid-template-columns:repeat(3,1fr)} .g4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:720px){.g2,.g3,.g4{grid-template-columns:1fr}}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.kpi .v{font-size:29px;font-weight:900;color:var(--am-roxo);line-height:1}
+.kpi .v small{font-size:15px;font-weight:700;color:var(--muted)}
+.kpi .l{font-size:12.5px;color:var(--muted);margin-top:6px}
+.callout{border-left:4px solid var(--am-rosa);background:#fff;border-radius:0 12px 12px 0;padding:14px 18px;margin:14px 0}
+.callout.warn{border-left-color:#c9821a;background:#fff9f0}
+.callout.gap{border-left-color:var(--am-magenta);background:#fbf3f8}
+.callout b{color:var(--am-roxo)}
+.tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;padding:2px 8px;border-radius:6px;vertical-align:middle}
+.tag.poll{background:#eef0f7;color:#3a3f66} .tag.real{background:#e7f6ec;color:#1c6b3b} .tag.int{background:#f0ecef;color:#7a5270}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+th,td{padding:9px 13px;text-align:left;border-bottom:1px solid var(--line)}
+th{background:var(--am-roxo);color:#fff;font-weight:600;font-size:12.5px;letter-spacing:.03em;text-transform:uppercase}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:#faf9f6}
+.mono{font-family:ui-monospace,"Cascadia Code",Consolas,monospace;font-size:12px;color:var(--am-navy)}
+.bars{margin:14px 0}
+.bar-row{display:grid;grid-template-columns:170px 1fr 92px;align-items:center;gap:10px;margin:6px 0}
+.bar-row .name{font-size:13px;font-weight:600;color:var(--am-preto);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-row .track{background:#eceae4;border-radius:7px;height:20px;overflow:hidden}
+.bar-row .fill{height:100%;border-radius:7px;background:var(--am-grad-h);min-width:2px}
+.bar-row .val{font-size:12.5px;font-weight:700;color:var(--am-navy);text-align:right;font-variant-numeric:tabular-nums}
+.bar-row.alt .fill{background:linear-gradient(90deg,#940755,#44055A)}
+.legend{font-size:12px;color:var(--muted);margin-top:4px}
+footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+ul.rec{list-style:none;padding:0;counter-reset:r}
+ul.rec li{position:relative;padding:8px 8px 8px 40px;margin:6px 0;background:var(--card);border:1px solid var(--line);border-radius:10px;counter-increment:r}
+ul.rec li::before{content:counter(r);position:absolute;left:10px;top:50%;transform:translateY(-50%);width:22px;height:22px;border-radius:50%;background:var(--am-grad);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.pill-list{display:flex;flex-wrap:wrap;gap:7px;margin:8px 0}
+.pill{background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:12.5px}
+.pill b{color:var(--am-roxo)}
+code.k{background:#f0eef4;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:12px;color:var(--am-navy)}
+@media print{
+  @page{margin:12mm 10mm;size:A4}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{background:#fff;font-size:11.5px}
+  .wrap{padding-bottom:0}
+  header.hero{border-radius:0}
+  section{margin-top:20px;break-inside:avoid}
+  .card,.callout,table,.bars,.kpi{break-inside:avoid}
+  h2{break-after:avoid}
+}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="hero-top">
+    <img class="mark" src="data:image/png;base64,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" alt="AutoMind" width="45" height="32">
+    <div>
+      <div class="wordmark">AutoMind</div>
+      <div class="tagline">Simple · Smart · Reliable</div>
+    </div>
+  </div>
+  <h1>Uso de Telas e Funções — Tenant Base Compartilhada</h1>
+  <div class="sub">Quais telas, funções e clientes mais usam o AutoChecker, quem processa documentos e quanto tempo cada cliente passa no sistema — cruzando logs de produção (Grafana Loki) e Sentry (transações, Session Replay e erros), com o e‑mail como identificador de usuário.</div>
+  <div class="meta">
+    <span class="chip">Tenant: Base Compartilhada</span>
+    <span class="chip">Loki (prod) · 7 dias</span>
+    <span class="chip">Sentry · 30 dias</span>
+    <span class="chip">Gerado: 13/07/2026</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+<section id="resumo">
+  <h2><span class="n">0</span>Resumo executivo</h2>
+  <div class="grid g4">
+    <div class="kpi"><div class="v">30.572</div><div class="l">requests do tenant na semana (Loki, prod)</div></div>
+    <div class="kpi"><div class="v">~89<small>%</small></div><div class="l">é <b>polling de fundo</b> — notificação, permissão, cota — não uso de feature</div></div>
+    <div class="kpi"><div class="v">~2.200</div><div class="l">documentos <b>processados</b> na semana (worker)</div></div>
+    <div class="kpi"><div class="v">13</div><div class="l">clientes de negócio ativos dentro da Base Compartilhada</div></div>
+  </div>
+  <div class="callout">
+    <p style="margin:.2em 0"><b>O produto real é uma fração pequena do tráfego.</b> Só <b>Notificações</b> (o sininho fazendo polling) são <b>57%</b> de todas as chamadas web. O envio de documento — a ação que gera valor — é apenas <b>134 requests/semana</b>, mas dispara <b>~2.200 documentos</b> no processamento em segundo plano. O esforço do usuário é baixo; o trabalho pesado é do backend.</p>
+  </div>
+  <div class="callout warn">
+    <p style="margin:.2em 0"><b>Dois clientes concentram o uso.</b> <b>Rede Petro</b> (64 h de app aberto/semana) e <b>Copercana</b> (55,5 h) sozinhos respondem por mais da metade do tempo de uso e do volume do tenant.</p>
+  </div>
+</section>
+
+<section id="tenant">
+  <h2><span class="n">1</span>Identificação do tenant &amp; método</h2>
+  <div class="grid g2">
+    <div class="card">
+      <table style="margin:0">
+        <tr><td>Nome</td><td><b>Base Compartilhada</b></td></tr>
+        <tr><td>tenant_id</td><td><span class="mono">a9cdea0f-0b26-4b29-8f7c-65d231ecce1b</span></td></tr>
+        <tr><td>schema_name</td><td><span class="mono">base_compartilhada</span></td></tr>
+        <tr><td>Loki</td><td>06–13/07/2026 · 7 dias · prod</td></tr>
+        <tr><td>Sentry</td><td>13/06–13/07/2026 · 30 dias</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">Como o tenant foi isolado</h3>
+      <p class="muted" style="font-size:13.5px;margin:.3em 0">No Loki o tenant <b>não está em label</b> (o label <code class="k">tenant</code> é sempre <span class="mono">public</span>) — o valor real vem <b>dentro da linha</b> JSON. A linha tem prefixo <span class="mono">INFO&nbsp;</span> que quebra o parser, então é preciso:</p>
+      <p class="mono" style="background:#f7f6f2;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:11px;overflow-x:auto">{job="autochecker-backend", environment="prod"}<br>|= "base_compartilhada"<br>| pattern "&lt;lvl&gt; &lt;js&gt;" | line_format "{{.js}}" | json<br>| tenant_schema="base_compartilhada"</p>
+      <p class="muted" style="font-size:12.5px;margin:.3em 0">Novidade favorável: o <span class="mono">api.log</span> agora registra <code class="k">duration_ms</code> e <code class="k">user_email</code> por request — o que viabiliza tempo e usuário sem depender do Sentry.</p>
+    </div>
+  </div>
+</section>
+
+<section id="func">
+  <h2><span class="n">2</span>Funcionalidades mais utilizadas</h2>
+  <p class="lead">Volume de requests por funcionalidade (Loki, prod, 7d). Barras em escala relativa ao maior.</p>
+  <div class="bars">
+    <div class="bar-row"><div class="name">Notificações <span class="tag poll">polling</span></div><div class="track"><div class="fill" style="width:100%"></div></div><div class="val">17.300</div></div>
+    <div class="bar-row"><div class="name">Sessão / Permissões <span class="tag poll">polling</span></div><div class="track"><div class="fill" style="width:59%"></div></div><div class="val">10.224</div></div>
+    <div class="bar-row alt"><div class="name">Documentos — cota <span class="tag poll">polling</span></div><div class="track"><div class="fill" style="width:6%"></div></div><div class="val">1.029</div></div>
+    <div class="bar-row alt"><div class="name">Documentos — consulta <span class="tag real">real</span></div><div class="track"><div class="fill" style="width:5%"></div></div><div class="val">~845</div></div>
+    <div class="bar-row alt"><div class="name">Documentos — envio <span class="tag real">real</span></div><div class="track"><div class="fill" style="width:1%"></div></div><div class="val">134</div></div>
+    <div class="bar-row alt"><div class="name">Integrações <span class="tag real">real</span></div><div class="track"><div class="fill" style="width:1%"></div></div><div class="val">53</div></div>
+    <div class="bar-row alt"><div class="name">Validação / Monitor. <span class="tag real">real</span></div><div class="track"><div class="fill" style="width:1%"></div></div><div class="val">35</div></div>
+    <div class="bar-row alt"><div class="name">Admin. de usuários <span class="tag real">real</span></div><div class="track"><div class="fill" style="width:1%"></div></div><div class="val">29</div></div>
+  </div>
+  <div class="callout gap">
+    <p style="margin:.2em 0"><b>Notificações = 57% do tráfego</b>, quase tudo <span class="mono">unread_count</span> (16.092 chamadas/7d ≈ 1 a cada 37&nbsp;s por aba aberta). <b>Polling + "chrome" de sessão ≈ 84–89%.</b> O produto de fato (documentos) soma ~2.000 requests (~6,6%) — e metade é checagem de cota.</p>
+  </div>
+</section>
+
+<section id="usuarios">
+  <h2><span class="n">3</span>Usuários mais ativos (por e‑mail)</h2>
+  <p class="lead">Loki, prod, 7d. Contas internas (AutoMind / basecompartilhada) marcadas — não são clientes finais.</p>
+  <table>
+    <thead><tr><th>#</th><th>E‑mail</th><th>Cliente</th><th class="num">Requests 7d</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td class="mono">fmelo@basecompartilhada.com.br</td><td><span class="tag int">interno</span></td><td class="num">4.229</td></tr>
+      <tr><td>2</td><td class="mono">controladoriadist2@copercana.com.br</td><td>Copercana</td><td class="num">3.678</td></tr>
+      <tr><td>3</td><td class="mono">superadmin@autochecker.cloud</td><td><span class="tag int">interno</span></td><td class="num">2.839</td></tr>
+      <tr><td>4</td><td class="mono">flaviaminhuk@redepetro.com.br</td><td>Rede Petro</td><td class="num">2.730</td></tr>
+      <tr><td>5</td><td class="mono">rvandre@redepetro.com.br</td><td>Rede Petro</td><td class="num">2.657</td></tr>
+      <tr><td>6</td><td class="mono">janaina.cristina@small.com.br</td><td>Small</td><td class="num">2.134</td></tr>
+      <tr><td>7</td><td class="mono">faturamento@redepetro.com.br</td><td>Rede Petro</td><td class="num">1.516</td></tr>
+      <tr><td>8</td><td class="mono">administrativodist@copercana.com.br</td><td>Copercana</td><td class="num">1.475</td></tr>
+      <tr><td>9</td><td class="mono">faturamentodist2@copercana.com.br</td><td>Copercana</td><td class="num">1.310</td></tr>
+      <tr><td>10</td><td class="mono">faturamentodist@copercana.com.br</td><td>Copercana</td><td class="num">1.308</td></tr>
+      <tr><td>11</td><td class="mono">faturamento1@biopetro.com.br</td><td>Biopetro</td><td class="num">1.208</td></tr>
+      <tr><td>12</td><td class="mono">faturamentobio@biopetro.com.br</td><td>Biopetro</td><td class="num">985</td></tr>
+      <tr><td>13</td><td class="mono">marcia.galatte@settacombustiveis.com.br</td><td>Setta</td><td class="num">973</td></tr>
+      <tr><td>14</td><td class="mono">regivanio.souza@larcopetroleo.com.br</td><td>Larco</td><td class="num">796</td></tr>
+      <tr><td>15</td><td class="mono">faturamentoribeiraopreto@flexpetro.com</td><td>Flexpetro</td><td class="num">718</td></tr>
+    </tbody>
+  </table>
+  <p class="muted" style="font-size:13px">Clientes de negócio na Base Compartilhada (Loki 7d + Sentry 30d):</p>
+  <div class="pill-list">
+    <span class="pill"><b>Copercana</b></span><span class="pill"><b>Rede Petro</b></span><span class="pill"><b>Biopetro</b></span>
+    <span class="pill"><b>Small</b></span><span class="pill"><b>Setta</b></span><span class="pill"><b>Larco</b></span>
+    <span class="pill"><b>Flexpetro</b></span><span class="pill"><b>Petronac</b></span><span class="pill"><b>GP Combustíveis</b></span>
+    <span class="pill"><b>Midas</b></span><span class="pill"><b>Guterres</b></span><span class="pill"><b>Argemil</b></span><span class="pill"><b>BP</b></span>
+  </div>
+</section>
+
+<section id="tempo">
+  <h2><span class="n">4</span>Tempo de uso por cliente</h2>
+  <div class="callout warn">
+    <p style="margin:.2em 0"><b>Como ler.</b> Não há login/logout no produto — logo, tempo de sessão é <b>proxy</b>. Aqui: contagem de <b>janelas de 30 min com atividade</b> por usuário (o app faz polling enquanto a aba está aberta → janela ativa ≈ aba aberta). É <b>tempo com o app aberto</b>, não tempo de interação ativa. Validado independentemente pelo Session Replay do Sentry (§6).</p>
+  </div>
+  <h3>Tempo "app aberto" por cliente (Loki, 7d)</h3>
+  <div class="bars">
+    <div class="bar-row"><div class="name">Rede Petro</div><div class="track"><div class="fill" style="width:100%"></div></div><div class="val">64,0 h</div></div>
+    <div class="bar-row"><div class="name">Copercana</div><div class="track"><div class="fill" style="width:87%"></div></div><div class="val">55,5 h</div></div>
+    <div class="bar-row"><div class="name">Small</div><div class="track"><div class="fill" style="width:41%"></div></div><div class="val">26,0 h</div></div>
+    <div class="bar-row"><div class="name">Biopetro</div><div class="track"><div class="fill" style="width:22%"></div></div><div class="val">14,0 h</div></div>
+    <div class="bar-row"><div class="name">Setta</div><div class="track"><div class="fill" style="width:16%"></div></div><div class="val">10,0 h</div></div>
+    <div class="bar-row"><div class="name">Flexpetro</div><div class="track"><div class="fill" style="width:13%"></div></div><div class="val">8,0 h</div></div>
+    <div class="bar-row"><div class="name">Larco</div><div class="track"><div class="fill" style="width:6%"></div></div><div class="val">4,0 h</div></div>
+    <div class="bar-row"><div class="name">Petronac</div><div class="track"><div class="fill" style="width:5%"></div></div><div class="val">3,0 h</div></div>
+    <div class="bar-row"><div class="name">GP Combustíveis</div><div class="track"><div class="fill" style="width:3%"></div></div><div class="val">1,5 h</div></div>
+    <div class="bar-row"><div class="name">Midas</div><div class="track"><div class="fill" style="width:2%"></div></div><div class="val">1,0 h</div></div>
+  </div>
+  <h3>Top usuários por tempo (Loki, 7d)</h3>
+  <table>
+    <thead><tr><th>E‑mail</th><th>Cliente</th><th class="num">App aberto</th><th class="num">Requests</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">flaviaminhuk@redepetro.com.br</td><td>Rede Petro</td><td class="num">28,5 h</td><td class="num">2.626</td></tr>
+      <tr><td class="mono">janaina.cristina@small.com.br</td><td>Small</td><td class="num">26,0 h</td><td class="num">2.134</td></tr>
+      <tr><td class="mono">controladoriadist2@copercana.com.br</td><td>Copercana</td><td class="num">25,5 h</td><td class="num">3.678</td></tr>
+      <tr><td class="mono">rvandre@redepetro.com.br</td><td>Rede Petro</td><td class="num">21,0 h</td><td class="num">2.713</td></tr>
+      <tr><td class="mono">faturamento@redepetro.com.br</td><td>Rede Petro</td><td class="num">14,5 h</td><td class="num">1.516</td></tr>
+      <tr><td class="mono">administrativodist@copercana.com.br</td><td>Copercana</td><td class="num">11,5 h</td><td class="num">1.475</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="docs">
+  <h2><span class="n">5</span>Quem realmente opera documentos</h2>
+  <p class="lead">O tempo de servidor (<code class="k">duration_ms</code>) mede lentidão, não engajamento. O proxy honesto de "uso do produto" é a <b>contagem de ações reais</b>: envio e visualização de documentos (Loki, 7d).</p>
+  <div class="grid g2">
+    <div class="card">
+      <h3 style="margin-top:0">Envios de documento <span class="tag real">core</span></h3>
+      <table style="margin:.4em 0">
+        <thead><tr><th>E‑mail</th><th class="num">Uploads</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">controladoriadist2@copercana</td><td class="num"><b>29</b></td></tr>
+          <tr><td class="mono">rvandre@redepetro</td><td class="num">13</td></tr>
+          <tr><td class="mono">faturamentoribeiraopreto@flexpetro</td><td class="num">13</td></tr>
+          <tr><td class="mono">flaviaminhuk@redepetro</td><td class="num">13</td></tr>
+          <tr><td class="mono">faturamentodist4@copercana</td><td class="num">10</td></tr>
+        </tbody>
+      </table>
+      <p class="muted" style="font-size:12.5px">Total ≈ 134 uploads/semana no tenant.</p>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">Visualizações de documento</h3>
+      <table style="margin:.4em 0">
+        <thead><tr><th>E‑mail</th><th class="num">Views</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">faturamentobio@biopetro</td><td class="num"><b>74</b></td></tr>
+          <tr><td class="mono">faturamento1@biopetro</td><td class="num">32</td></tr>
+          <tr><td class="mono">rvandre@redepetro</td><td class="num">20</td></tr>
+          <tr><td class="mono">administrativodist@copercana</td><td class="num">18</td></tr>
+          <tr><td class="mono">controladoriadist2@copercana</td><td class="num">18</td></tr>
+        </tbody>
+      </table>
+      <p class="muted" style="font-size:12.5px">Perfis diferentes: Copercana <b>envia</b>; Biopetro <b>confere/lê</b>.</p>
+    </div>
+  </div>
+  <h3>Pipeline de processamento (worker <span class="mono">celery-tasks</span>, 7d)</h3>
+  <table>
+    <thead><tr><th>Etapa</th><th class="num">Tasks 7d</th><th class="num">Falhas</th></tr></thead>
+    <tbody>
+      <tr><td>Autenticação de documento</td><td class="num">5.917</td><td class="num">2</td></tr>
+      <tr><td>Classificação</td><td class="num">2.417</td><td class="num">72</td></tr>
+      <tr><td>Extração de dados</td><td class="num">2.269</td><td class="num">75</td></tr>
+      <tr><td>OCR (Textract)</td><td class="num">2.208</td><td class="num">4</td></tr>
+      <tr><td>Reprocessamento</td><td class="num">455</td><td class="num">57</td></tr>
+      <tr><td>Notificações</td><td class="num">30.423</td><td class="num">—</td></tr>
+    </tbody>
+  </table>
+  <p class="muted" style="font-size:13px">Tomando classificação/extração/OCR como ~1 por documento → <b>~2.200 documentos processados na semana</b>. Taxa de falha do pipeline documental ~3%. A maior carga do worker é <b>notificação</b> (o mesmo padrão de fundo).</p>
+</section>
+
+<section id="perf">
+  <h2><span class="n">6</span>Performance &amp; comportamento (Sentry)</h2>
+  <div class="grid g2">
+    <div class="card">
+      <h3 style="margin-top:0">Rotas lentas (tempo de servidor, Loki 7d)</h3>
+      <table style="margin:.4em 0">
+        <thead><tr><th>Rota</th><th class="num">Médio</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">documents/?page_size=1000</td><td class="num"><b>~22 s</b></td></tr>
+          <tr><td class="mono">upload/multi/</td><td class="num">805 ms</td></tr>
+          <tr><td class="mono">all-tenants-switcher/</td><td class="num">457 ms</td></tr>
+          <tr><td class="mono">documents/?page_size=10</td><td class="num">474 ms</td></tr>
+        </tbody>
+      </table>
+      <p class="muted" style="font-size:12.5px"><span class="mono">page_size=1000</span> puxa o histórico inteiro sem paginar — ofensor nº 1.</p>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">Tempo de carga de tela (Sentry 30d)</h3>
+      <table style="margin:.4em 0">
+        <thead><tr><th>Tela</th><th class="num">Carga</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">/tenant/home</td><td class="num">1,65 s</td></tr>
+          <tr><td class="mono">/tenant/documents</td><td class="num">1,45 s</td></tr>
+          <tr><td class="mono">/tenant/settings</td><td class="num">1,26 s</td></tr>
+          <tr><td class="mono">/tenant/upload</td><td class="num">1,11 s</td></tr>
+        </tbody>
+      </table>
+      <p class="muted" style="font-size:12.5px">Projeto inteiro (~85% Base) — tag de tenant não confiável no frontend.</p>
+    </div>
+  </div>
+  <div class="callout">
+    <p style="margin:.2em 0"><b>Session Replay (30d, amostra ~10%) valida o tempo de uso.</b> <span class="mono">rvandre@redepetro</span> é o power user: sessão contínua de <b>1h32min</b> (35+ páginas) e várias de 20–30 min — o maior tempo de tela do tenant, coerente com o Loki. <b>Uso mobile real existe</b> (<span class="mono">cadastro@tecab</span> via Samsung Internet; uploads via Mobile Safari). UX saudável: praticamente zero rage clicks.</p>
+  </div>
+</section>
+
+<section id="erros">
+  <h2><span class="n">7</span>Erros &amp; estabilidade</h2>
+  <div class="grid g2">
+    <div class="card">
+      <div class="kpi" style="border:none;padding:0"><div class="v">69</div><div class="l">eventos de erro em <b>30 dias</b> para o maior tenant do produto</div></div>
+      <p class="muted" style="font-size:13px;margin-top:12px">Tipos: sem tipo (60), <span class="mono">ImportError</span> (6), <span class="mono">User.DoesNotExist</span>/<span class="mono">IntegrityError</span> (3). O Base Compartilhada é <b>estável</b>.</p>
+    </div>
+    <div class="callout gap" style="margin:0">
+      <p style="margin:.2em 0"><b>Erro não é atribuível a cliente.</b> Nenhum evento de erro do backend traz <span class="mono">user.email</span> (o middleware não popula o usuário no Sentry). <span class="tag int">[CAMPO AUSENTE]</span></p>
+    </div>
+  </div>
+</section>
+
+<section id="lacunas">
+  <h2><span class="n">8</span>Lacunas de observabilidade</h2>
+  <div class="grid g2">
+    <div class="callout gap"><p style="margin:.2em 0"><b>[CAMPO AUSENTE — user no worker]</b> — o <span class="mono">celery-tasks</span> não loga e‑mail/user_id. <b>Documentos processados por usuário é impossível hoje.</b></p></div>
+    <div class="callout gap"><p style="margin:.2em 0"><b>[CAMPO AUSENTE — document_type]</b> — tipo de documento (CT‑e, NF‑e, MDF‑e) não é logado, só schema + UUID. "Tipos por cliente" segue impossível.</p></div>
+    <div class="callout gap"><p style="margin:.2em 0"><b>[CAMPO AUSENTE — sessão]</b> — sem login/logout; tempo de uso é proxy (janelas ativas + replay amostrado), não medição direta.</p></div>
+    <div class="callout gap"><p style="margin:.2em 0"><b>Frontend sem tenant confiável</b> — ~196 mil transações com <span class="mono">user.email = null</span>; performance do Sentry é do projeto todo, não do tenant.</p></div>
+    <div class="callout gap"><p style="margin:.2em 0"><b>Retenção Loki ≈ 7 dias</b> — sem comparação mês a mês pelos logs; séries longas só via Sentry ou dashboard fixo.</p></div>
+    <div class="callout gap"><p style="margin:.2em 0"><b>Ponto cego de integração/API</b> — quem opera por integração/mobile pode não gerar <span class="mono">user_email</span> no api.log; a web sub‑representa esses clientes.</p></div>
+  </div>
+</section>
+
+<section id="rec">
+  <h2><span class="n">9</span>Recomendações de instrumentação (para o dev)</h2>
+  <ul class="rec">
+    <li><b>Logar <span class="mono">user_email</span>/<span class="mono">user_id</span> no worker</b> — desbloqueia "documentos processados por cliente/usuário".</li>
+    <li><b>Logar <span class="mono">document_type</span></b> no pipeline de validação — desbloqueia "tipos de documento por cliente".</li>
+    <li><b>Emitir evento de sessão</b> (login/logout ou heartbeat de foco) — substitui os proxies por medição real de tempo.</li>
+    <li><b>Popular <span class="mono">Sentry.set_user</span> no backend</b> — permite atribuir erro a cliente.</li>
+    <li><b>Enviar tag <span class="mono">tenant</span> confiável no frontend</b> — recorte de performance/uso por cliente no Sentry.</li>
+    <li><b>Otimizar <span class="mono">documents/?page_size=1000</span></b> (~22 s) e reduzir a frequência do polling de <span class="mono">unread_count</span>/<span class="mono">permissions</span> (57%+ do tráfego).</li>
+    <li><b>Dashboard fixo no Grafana</b> (uso/cliente, tempo app‑aberto, uploads/views por usuário) para superar a retenção de 7 dias.</li>
+  </ul>
+</section>
+
+<footer>
+  Dados ao vivo em 13/07/2026 · Grafana Loki <span class="mono">monitor.autochecker.cloud</span> (7d) + Sentry <span class="mono">automind-qd</span> (30d). E‑mails são dado pessoal (LGPD) — uso interno restrito à observabilidade; ver auditoria LGPD dos logs (10/07/2026). Regras anti‑alucinação aplicadas: nenhum número sem consulta que o sustente; lacunas marcadas explicitamente. · AutoMind — Simple · Smart · Reliable
+</footer>
+
+</div>
+</body>
+</html>

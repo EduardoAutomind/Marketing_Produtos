@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Ranking de implementação — Onda 0 · Observabilidade AutoChecker</title>
+<style>
+  :root{
+    --bg:#21262e; --panel:#272d37; --panel2:#2e3540; --ink:#e8ebf0; --muted:#aab2c0;
+    --line:#3a4250; --accent:#7c83ff; --accent2:#8b93a7;
+    --ok:#4ec9a4; --warn:#e8b765; --bad:#e8757d;
+  }
+  *{box-sizing:border-box;}
+  html{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  body{
+    background:var(--bg); color:var(--ink); margin:0;
+    font:14px/1.55 "Segoe UI",Inter,-apple-system,system-ui,sans-serif;
+  }
+  .wrap{max-width:880px; margin:0 auto; padding:38px 44px 60px;}
+  header.cover{ border-bottom:2px solid var(--accent); padding-bottom:18px; margin-bottom:26px; }
+  .kicker{ color:var(--accent); font-weight:700; letter-spacing:.14em; text-transform:uppercase; font-size:11px; }
+  h1{ font-size:25px; margin:6px 0 4px; line-height:1.2; }
+  .sub{ color:var(--muted); font-size:13px; }
+  h2{ font-size:18px; margin:30px 0 10px; padding-bottom:6px; border-bottom:1px solid var(--line); }
+  p{margin:8px 0;}
+  code{ background:var(--panel2); padding:1px 5px; border-radius:4px; font-family:"Cascadia Code",Consolas,monospace; font-size:12.5px; color:#d9def0; }
+  table{ border-collapse:collapse; width:100%; margin:12px 0; font-size:12.8px; }
+  th,td{ border:1px solid var(--line); padding:7px 10px; text-align:left; vertical-align:middle; }
+  th{ background:var(--panel2); color:#cdd3de; font-weight:600; }
+  tr:nth-child(even) td{ background:rgba(255,255,255,.018); }
+  td.num{ text-align:center; font-weight:700; color:var(--accent); white-space:nowrap; }
+  td.pct{ text-align:right; font-weight:700; white-space:nowrap; }
+  /* Barra do gráfico */
+  .bar{ position:relative; height:16px; min-width:160px; background:#1a1f27; border:1px solid var(--line); border-radius:6px; overflow:hidden; }
+  .bar > span{ display:block; height:100%; border-radius:5px 0 0 5px;
+    background:linear-gradient(90deg, var(--accent) 0%, #9aa0ff 100%); }
+  .bar.lo  > span{ background:linear-gradient(90deg,#c8606a,#e8757d); }
+  .bar.mid > span{ background:linear-gradient(90deg,#c79a4e,#e8b765); }
+  .bar.hi  > span{ background:linear-gradient(90deg,#3fae8b,#4ec9a4); }
+  .item h3{ font-size:14.5px; margin:18px 0 4px; color:#cdd3de; }
+  .item h3 .pos{ color:var(--accent); }
+  .item h3 .badge{ font-size:11.5px; font-weight:700; padding:1px 8px; border-radius:20px; margin-left:6px; }
+  .b-lo{ background:rgba(232,117,125,.16); color:var(--bad); border:1px solid rgba(232,117,125,.4); }
+  .b-mid{ background:rgba(232,183,101,.16); color:var(--warn); border:1px solid rgba(232,183,101,.4); }
+  .b-hi{ background:rgba(78,201,164,.14); color:var(--ok); border:1px solid rgba(78,201,164,.4); }
+  .card{ background:var(--panel); border:1px solid var(--line); border-left:4px solid var(--accent); border-radius:8px; padding:14px 18px; margin:16px 0; }
+  .card ul{ margin:6px 0; }
+  ul{ margin:8px 0; padding-left:22px; } li{ margin:4px 0; }
+  .ok{color:var(--ok);} .warn{color:var(--warn);} .bad{color:var(--bad);}
+  footer{ margin-top:40px; padding-top:14px; border-top:1px solid var(--line); color:var(--accent2); font-size:11px; }
+  h2,.item h3{ page-break-after:avoid; } table,.card{ page-break-inside:avoid; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="cover">
+  <div class="kicker">Observabilidade · AutoChecker</div>
+  <h1>Ranking de implementação — Onda 0 (Saneamento da Base)</h1>
+  <div class="sub">
+    8 itens ordenados em <b>ordem crescente</b> (menos → mais implementada), por % de implementação considerando código + runtime/processo.<br>
+    Base: detalhamento de 15/06 verificado contra código · itens 3 e 5 reconfirmados ao vivo em 16/06/2026.
+  </div>
+</header>
+
+<h2>Ranking — ordem crescente de implementação</h2>
+<table>
+  <tr>
+    <th style="width:42px">#</th><th style="width:34px">Item</th><th>Etapa</th>
+    <th style="width:74px">Impl.</th><th style="width:190px">Gráfico</th>
+  </tr>
+  <tr>
+    <td class="num">1º</td><td class="num">7</td><td>PII/LGPD no Frontend</td>
+    <td class="pct bad">~5%</td><td><div class="bar lo"><span style="width:5%"></span></div></td>
+  </tr>
+  <tr>
+    <td class="num">2º</td><td class="num">8</td><td>Triagem ZERO do backlog (152 issues)</td>
+    <td class="pct bad">~8%</td><td><div class="bar lo"><span style="width:8%"></span></div></td>
+  </tr>
+  <tr>
+    <td class="num">3º</td><td class="num">2</td><td>Release <code>&lt;comp&gt;@&lt;hash&gt;</code> + set-commits + pipelines</td>
+    <td class="pct bad">~10%</td><td><div class="bar lo"><span style="width:10%"></span></div></td>
+  </tr>
+  <tr>
+    <td class="num">4º</td><td class="num">4</td><td><code>migrate_schemas</code> + gate de drift</td>
+    <td class="pct warn">~20%</td><td><div class="bar mid"><span style="width:20%"></span></div></td>
+  </tr>
+  <tr>
+    <td class="num">5º</td><td class="num">5</td><td>Consolidar init no <code>init_sentry</code></td>
+    <td class="pct warn">~30%</td><td><div class="bar mid"><span style="width:30%"></span></div></td>
+  </tr>
+  <tr>
+    <td class="num">6º</td><td class="num">6</td><td>beforeSend / Inbound Filters / health morto</td>
+    <td class="pct warn">~40%</td><td><div class="bar mid"><span style="width:40%"></span></div></td>
+  </tr>
+  <tr>
+    <td class="num">7º</td><td class="num">3</td><td><code>PeriodicTask</code> órfã do Beat</td>
+    <td class="pct hi">~60%</td><td><div class="bar hi"><span style="width:60%"></span></div></td>
+  </tr>
+  <tr>
+    <td class="num">8º</td><td class="num">1</td><td>tag <code>environment</code> nos 3 SDKs + isolar DEV/PRD</td>
+    <td class="pct hi">~70%</td><td><div class="bar hi"><span style="width:70%"></span></div></td>
+  </tr>
+</table>
+
+<h2>Por que cada posição</h2>
+
+<div class="item">
+  <h3><span class="pos">1º</span> — Item 7 · PII/LGPD <span class="badge b-lo">~5%</span></h3>
+  <p>A mais distante. A config está <b>oposta</b> ao objetivo: <code>sendDefaultPii:true</code> em 3 configs do frontend + no Custos, <code>setUser({email})</code>, e Session Replay <b>sem</b> masking. Único ponto a favor é o backend ter <code>send_default_pii=False</code> por convenção (default). É risco LGPD vivo, não só “não feito”.</p>
+</div>
+
+<div class="item">
+  <h3><span class="pos">2º</span> — Item 8 · Triagem <span class="badge b-lo">~8%</span></h3>
+  <p>Não começou: <b>0 issues resolvidas</b> no AutoChecker (confirmado ao vivo). Backlog cheio e ativo no worker. Falta critério escrito + passar issue a issue. É processo, não código — nada feito ainda.</p>
+</div>
+
+<div class="item">
+  <h3><span class="pos">3º</span> — Item 2 · Release/set-commits/pipelines <span class="badge b-lo">~10%</span></h3>
+  <p>Intocada. O <code>withSentryConfig</code> existe (scaffolding), mas com defaults <b>errados</b> (<code>automind-teste</code>/<code>javascript-nextjs</code>), <b>sem</b> <code>release</code>, <b>sem</b> <code>setCommits</code>. Telemetria indo para o projeto errado.</p>
+</div>
+
+<div class="item">
+  <h3><span class="pos">4º</span> — Item 4 · <code>migrate_schemas</code> + gate <span class="badge b-mid">~20%</span></h3>
+  <p>Deploy ainda usa <code>migrate</code> simples; sem gate de drift; sem command de check. <b>A favor:</b> <code>migrate_schemas</code> já existe em <code>signals.py</code> (backend e worker) para tenant <b>novo</b>. Falta o essencial: trocar no deploy + gate + backfill de tenants antigos.</p>
+</div>
+
+<div class="item">
+  <h3><span class="pos">5º</span> — Item 5 · <code>init_sentry</code> <span class="badge b-mid">~30%</span></h3>
+  <p>O <b>helper já existe e está quase pronto</b> (groundwork feito), mas <b>nunca é chamado em produção</b> e precisa de ajuste (Celery no backend + filtro de Redis transiente). Integração = 0.</p>
+</div>
+
+<div class="item">
+  <h3><span class="pos">6º</span> — Item 6 · beforeSend/filtros <span class="badge b-mid">~40%</span></h3>
+  <p>A <b>fundação avançou</b>: <code>before_send</code> ativo e filtrando blips de Redis no backend. Mas <b>0 dos 3 entregáveis nomeados</b> prontos: filtro de health ainda aponta para <code>/health/</code> (real é <code>/api/core/healthcheck/</code>), <code>DisallowedHost</code> não filtrado, auth não reclassificada (piorou). Worker ainda sem filtro de Redis.</p>
+</div>
+
+<div class="item">
+  <h3><span class="pos">7º</span> — Item 3 · <code>PeriodicTask</code> órfã <span class="badge b-hi">~60%</span></h3>
+  <p><b>Lado-código 100% feito</b> (task comentada, <code>beat_schedule</code> limpo nos dois serviços, comentário guard no <code>backend/config/celery.py</code> — work item #53659 <b>Done</b>). Resta só o <b>expurgo runtime</b> do <code>/tmp/celerybeat-schedule</code> (#53707) + o bug colateral do <code>retry_failed_notifications</code> (#53705). A engenharia está feita; falta uma ação de ops.</p>
+</div>
+
+<div class="item">
+  <h3><span class="pos">8º</span> — Item 1 · tag <code>environment</code> <span class="badge b-hi">~70%</span></h3>
+  <p>A <b>mais implementada</b>. O código padroniza <code>environment</code> (env var + fallback) nos <b>3 SDKs</b> — o lado de código está pronto (condiz com “Concluído”). Falta endurecer o deploy (garantir a var sempre setada, nunca cair no fallback) e <b>medir o KPI ≥99%</b> na janela produtiva.</p>
+</div>
+
+<h2>Leitura rápida</h2>
+<div class="card">
+  <ul>
+    <li><b class="ok">Quase prontas (precisam de pouco):</b> itens <b>1</b> e <b>3</b> — falta runtime/deploy, não engenharia.</li>
+    <li><b class="warn">Meio do caminho:</b> itens <b>6</b> e <b>5</b> — têm fundação/helper, falta plugar.</li>
+    <li><b class="bad">Praticamente não iniciadas (~0–20%):</b> itens <b>2, 4, 7, 8</b> — sendo a <b>7 (PII)</b> a mais crítica por ser risco ativo, não só ausência.</li>
+  </ul>
+</div>
+
+<footer>
+  Gerado em 16/06/2026 · Onda 0 (itens 1–8) · base: <code>Detalhamento_Ondas0-3_…_2026-06-15.md</code> (verificado contra código),
+  itens 3 e 5 reconfirmados ao vivo via MCP Azure DevOps · org automindautomacao / projeto AutoChecker.
+  Percentuais são estimativas de implementação (código + runtime/processo), não medições automáticas.
+</footer>
+
+</div>
+</body>
+</html>

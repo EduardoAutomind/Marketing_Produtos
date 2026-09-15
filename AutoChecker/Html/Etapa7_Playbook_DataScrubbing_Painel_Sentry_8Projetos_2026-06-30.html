@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Etapa 7 — Playbook Data Scrubbing no painel do Sentry · AutoMind</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,400;0,500;0,700;0,900;1,400&display=swap');
+  :root{
+    --am-rosa:#FA094E; --am-magenta:#940755; --am-roxo:#44055A;
+    --am-navy:#03045E; --am-preto:#100F0F; --am-offwhite:#F3F3F0;
+    --am-gradiente-h:linear-gradient(90deg,#FA094E 0%,#03045E 100%);
+    --card:#ffffff; --line:#e4e2dd;
+    --ok:#1f8a4c; --warn:#b8860b; --crit:#FA094E;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{font-family:"Red Hat Display",system-ui,sans-serif;color:var(--am-preto);
+    background:var(--am-offwhite); margin:0; line-height:1.6; font-size:16px;}
+  .topbar{height:8px; background:var(--am-gradiente-h);}
+  header{padding:34px 7vw 22px; border-bottom:1px solid var(--line);}
+  .wordmark{font-weight:900; text-transform:uppercase; letter-spacing:.20em;
+    color:var(--am-roxo); font-size:15px;}
+  .wordmark .dot{color:var(--am-rosa);}
+  .tagline{font-size:11px; letter-spacing:.32em; text-transform:uppercase;
+    color:var(--am-navy); opacity:.7; margin-top:2px;}
+  h1{font-weight:900; color:var(--am-roxo); font-size:30px; line-height:1.2;
+    margin:18px 0 6px; letter-spacing:.01em;}
+  .sub{color:var(--am-navy); font-size:14px; opacity:.85;}
+  .pill{display:inline-block; background:var(--am-roxo); color:#fff; font-size:11px;
+    font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    padding:4px 11px; border-radius:999px; margin:8px 6px 0 0;}
+  .pill.alt{background:var(--am-rosa);}
+  main{padding:14px 7vw 60px; max-width:1080px;}
+  h2{font-weight:700; color:var(--am-roxo); font-size:21px; margin:38px 0 10px;
+    padding-top:14px; border-top:2px solid var(--am-rosa); display:inline-block;}
+  h3{font-weight:700; color:var(--am-navy); font-size:16px; margin:22px 0 6px;}
+  p{margin:10px 0;}
+  a{color:var(--am-rosa); text-decoration:none;} a:hover{text-decoration:underline;}
+  code{font-family:"SFMono-Regular",Consolas,monospace; background:#efeeea;
+    padding:1px 6px; border-radius:5px; font-size:.88em; color:var(--am-magenta);}
+  pre{background:var(--am-preto); color:#f3f3f0; padding:14px 16px; border-radius:12px;
+    overflow:auto; font-size:13px; line-height:1.5;}
+  pre code{background:none; color:inherit; padding:0;}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:18px 22px; margin:16px 0; box-shadow:0 1px 3px rgba(16,15,15,.04);}
+  .frase{background:linear-gradient(0deg,#fff,#fff) padding-box,var(--am-gradiente-h) border-box;
+    border:2px solid transparent; border-radius:16px; padding:16px 22px; font-size:17px;}
+  table{border-collapse:collapse; width:100%; margin:14px 0; font-size:14px;}
+  th,td{text-align:left; padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top;}
+  th{background:#efeeea; color:var(--am-roxo); font-weight:700; font-size:12px;
+    text-transform:uppercase; letter-spacing:.05em;}
+  tr:last-child td{border-bottom:none;}
+  .flag{font-weight:700; font-size:12px; padding:2px 8px; border-radius:6px; white-space:nowrap;}
+  .f-sei{background:#e3f3e9; color:var(--ok);}
+  .f-parc{background:#fbf2da; color:var(--warn);}
+  .f-nao{background:#fde4ea; color:var(--crit);}
+  .prio-alta{color:var(--crit); font-weight:700;}
+  .prio-med{color:var(--warn); font-weight:700;}
+  .prio-baixa{color:var(--am-navy); opacity:.7; font-weight:600;}
+  .check li{margin:6px 0; list-style:none; padding-left:26px; position:relative;}
+  .check li:before{content:"☐"; position:absolute; left:0; color:var(--am-rosa); font-size:18px;}
+  .callout{border-left:4px solid var(--am-rosa); background:#fff; border-radius:0 12px 12px 0;
+    padding:12px 18px; margin:14px 0; font-size:14.5px;}
+  .callout.warn{border-color:var(--warn); background:#fffdf6;}
+  footer{padding:24px 7vw 50px; color:var(--am-navy); opacity:.7; font-size:12.5px;
+    border-top:1px solid var(--line);}
+  ol.src{font-size:13.5px; line-height:1.8;}
+</style>
+</head>
+<body>
+<div class="topbar"></div>
+<header>
+  <div class="wordmark">AUTOMIND<span class="dot">.</span></div>
+  <div class="tagline">Simple · Smart · Reliable</div>
+  <h1>Etapa 7 — Playbook de Data Scrubbing<br>no painel do Sentry <span style="color:var(--am-rosa)">(sem deploy)</span></h1>
+  <div class="sub">Cronograma de Observabilidade · AutoChecker (driver) + os 8 projetos · gerado 2026-06-30</div>
+  <span class="pill">Onda 0 — Saneamento</span>
+  <span class="pill alt">100% painel · sem PR</span>
+  <span class="pill">Executável por você</span>
+</header>
+
+<main>
+
+  <div class="frase">
+    <strong>Em uma frase —</strong> o Sentry redige dados sensíveis <em>no servidor, na ingestão, antes de gravar</em>, configurado só pelo painel. Você <strong>reduz o risco LGPD da Etapa 7 agora</strong>, como rede de segurança, <strong>enquanto a correção no código (SDK) espera o dev</strong>.
+  </div>
+
+  <h2>A fronteira honesta</h2>
+  <p>O ponto mais importante — para não comunicar “resolvido” além do que é verdade.</p>
+  <table>
+    <tr><th>Risco da Etapa 7</th><th>Painel resolve?</th><th>Flag</th></tr>
+    <tr><td>CPF / CNPJ / RG / e-mail em erros, tags, <code>extra</code>, request</td><td>Sim — regras server-side</td><td><span class="flag f-sei">Sei</span></td></tr>
+    <tr><td>IP do usuário armazenado</td><td>Sim — toggle “Prevent Storing of IP Addresses”</td><td><span class="flag f-sei">Sei</span></td></tr>
+    <tr><td>Geolocalização derivada do IP</td><td>Sim — regra <code>$user.geo.**</code></td><td><span class="flag f-sei">Sei</span></td></tr>
+    <tr><td>Texto dentro de Session Replay</td><td>Parcial — honra regra de texto, mas o confiável é mascarar no SDK</td><td><span class="flag f-parc">Parcial</span></td></tr>
+    <tr><td><strong>Vídeo/imagem de documentos</strong> no replay (CNH, ASO)</td><td>Não — <code>blockAllMedia</code> é client-side (código)</td><td><span class="flag f-sei">Sei (não resolve)</span></td></tr>
+    <tr><td>Causa-raiz <code>sendDefaultPii: true</code></td><td>Não — flag do SDK (código)</td><td><span class="flag f-sei">Sei (não resolve)</span></td></tr>
+    <tr><td>Dados já capturados no passado</td><td>Parcial — purga manual (Parte E)</td><td><span class="flag f-parc">Parcial</span></td></tr>
+  </table>
+  <div class="callout"><strong>Conclusão:</strong> este playbook entrega o <strong>item 3</strong> da Etapa 7 (rede de segurança server-side) e mitiga risco <strong>hoje</strong>. Não substitui os itens 1, 2 e 4 (SDK), que seguem com o dev. Comunique como <em>“camada server-side aplicada; correção de origem ainda pendente no código”</em>.</div>
+
+  <h2>Como funciona (3 mecanismos)</h2>
+  <p>Tudo em <strong>Settings → Security &amp; Privacy</strong>, em dois níveis: <strong>organização</strong> (os 8 projetos) e <strong>projeto</strong>.</p>
+  <div class="callout warn"><strong>Precedência:</strong> config de <em>Data Scrubbing</em> na <strong>organização sobrepõe</strong> a do projeto — para usar o nível de projeto nesses toggles, desligue o da org antes. Já as regras de <strong>Advanced Data Scrubbing</strong> coexistem, e <strong>regra avançada tem precedência até sobre Safe Fields</strong>.</div>
+  <h3>1) Data Scrubber padrão (já vem ligado)</h3>
+  <p>Redige cartões de crédito e valores/chaves com: <code>password</code>, <code>secret</code>, <code>passwd</code>, <code>api_key</code>, <code>apikey</code>, <code>auth</code>, <code>credentials</code>, <code>token</code>, <code>bearer</code>, <code>private_key</code>…</p>
+  <h3>2) Additional Sensitive Fields</h3>
+  <p>Nomes de campo que você adiciona — remove o campo <em>e</em> qualquer valor que <em>contenha</em> aquela string.</p>
+  <div class="callout warn"><strong>Over-scrubbing:</strong> casa por substring no valor — termo curto apaga demais (pôr <code>exp</code> faz sumir <code>"Unexpected error"</code>). Use nomes <strong>específicos</strong>.</div>
+  <h3>3) Advanced Data Scrubbing</h3>
+  <p>Regra = <strong>Método</strong> (Remove / Mask / Hash / Replace) × <strong>Tipo</strong> (Regex dialeto <strong>Rust</strong>, Email, IP, Credit Card, Anything…) × <strong>Origem</strong> (<code>$string</code>, <code>$message</code>, <code>$error.value</code>, <code>$user.geo.**</code>, <code>extra.**</code>…). <strong>Safe Fields</strong> = exceções (preservar <code>user.id</code> com caminho completo).</p>
+
+  <h2>Os 8 projetos e a prioridade</h2>
+  <table>
+    <tr><th>Projeto Sentry</th><th>Produto</th><th>Prioridade</th><th>Por quê</th></tr>
+    <tr><td><code>autochecker-frontend</code></td><td>AutoChecker</td><td class="prio-alta">🔴 Alta</td><td>Replay + telas com CNH/ASO/CPF (driver)</td></tr>
+    <tr><td><code>autochecker-backend</code></td><td>AutoChecker</td><td class="prio-alta">🔴 Alta</td><td>Processa documento/ASO (dado de saúde)</td></tr>
+    <tr><td><code>autochecker-worker</code></td><td>AutoChecker</td><td class="prio-alta">🔴 Alta</td><td>Jobs sobre os mesmos dados</td></tr>
+    <tr><td><code>autoloadv4-frontend</code></td><td>AutoLoad V4</td><td class="prio-med">🟠 Média</td><td>PII de usuário (já tem prod)</td></tr>
+    <tr><td><code>autoloadv4-portal-cliente</code></td><td>AutoLoad V4</td><td class="prio-med">🟠 Média</td><td>PII de cliente</td></tr>
+    <tr><td><code>autoloadv4-backend</code></td><td>AutoLoad V4</td><td class="prio-baixa">🟡 Baixa</td><td>Ainda sem DSN de prod</td></tr>
+    <tr><td><code>autoloadv4-edgegateway</code></td><td>AutoLoad V4</td><td class="prio-baixa">🟡 Baixa</td><td>Headers/tokens (default já cobre)</td></tr>
+    <tr><td><code>automed</code></td><td>AutoMed</td><td class="prio-med">🟠 Média</td><td>Domínio médico → potencial dado de saúde</td></tr>
+  </table>
+  <div class="callout">Regra base (CPF/CNPJ/e-mail/IP) → <strong>org-wide</strong> (cobre os 8). Regras de ASO/saúde e replay → <strong>nível de projeto</strong> (AutoChecker, talvez AutoMed).</div>
+
+  <h2>Parte A — Base na organização (cobre os 8)</h2>
+  <p><code>Settings (org) → Security &amp; Privacy → DATA SCRUBBING</code></p>
+  <ul class="check">
+    <li><strong>Data Scrubber</strong> = ON (confirmar)</li>
+    <li><strong>Use Default Scrubbers</strong> = ON</li>
+    <li><strong>Prevent Storing of IP Addresses</strong> = ON <em>(geo ainda deriva do IP → ver Parte B)</em></li>
+    <li><strong>Additional Sensitive Fields</strong> — termos específicos BR (abaixo)</li>
+    <li><strong>Safe Fields</strong> — adicionar <code>user.id</code></li>
+  </ul>
+  <pre><code>cpf
+cnpj
+rg
+cnh
+aso
+exame
+laudo
+prontuario
+paciente
+motorista
+nome_completo
+data_nascimento
+telefone
+celular
+endereco</code></pre>
+  <p style="font-size:13.5px;opacity:.8"><code>password</code>, <code>token</code>, <code>auth</code>, <code>secret</code>, <code>api_key</code>, <code>bearer</code> já vêm no default — não repetir.</p>
+
+  <h2>Parte B — Regras avançadas</h2>
+  <p><code>Security &amp; Privacy → Advanced Data Scrubbing → Add Rule</code> · 1–4 na org, 5–6 no projeto AutoChecker/AutoMed.</p>
+  <table>
+    <tr><th>#</th><th>Método</th><th>Tipo de dado</th><th>Origem</th><th>Cobre</th></tr>
+    <tr><td>1</td><td>Mask</td><td><code>(?i)\b\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b</code></td><td><code>$string</code></td><td><strong>CPF</strong></td></tr>
+    <tr><td>2</td><td>Mask</td><td><code>\b\d{2}\.?\d{3}\.?\d{3}/?\d{4}-?\d{2}\b</code></td><td><code>$string</code></td><td><strong>CNPJ</strong></td></tr>
+    <tr><td>3</td><td>Mask</td><td>Email Addresses</td><td><code>$string</code></td><td>E-mails</td></tr>
+    <tr><td>4</td><td>Remove</td><td>Anything</td><td><code>$user.geo.**</code></td><td>Geolocalização</td></tr>
+    <tr><td>5</td><td>Remove</td><td>Anything</td><td><code>$message</code> + <code>$error.value</code></td><td>Documento em mensagem de erro</td></tr>
+    <tr><td>6</td><td>Remove</td><td>Anything</td><td><code>extra.**</code></td><td>Contexto extra com ASO/exame</td></tr>
+  </table>
+  <div class="callout warn">Dialeto regex = <strong>Rust</strong> (teste em regex101.com → Rust). Campo <strong>“event ID”</strong> acima de <em>Source</em> autocompleta caminhos a partir de um evento real (não é salvo). Regras valem <strong>só para eventos novos</strong>.<br><strong>CNH</strong>: evitei regra de 11 dígitos (falso-positivo com IDs) → cubro pela chave <code>cnh</code> na Parte A. <span class="flag f-parc">Parcial</span></div>
+
+  <h2>Parte C — Session Replay (AutoChecker)</h2>
+  <p>Regras de texto também alcançam o texto do replay <span class="flag f-parc">Parcial</span>. O painel <strong>não</strong> bloqueia o <strong>vídeo</strong> das telas (CNH/ASO) — isso é <code>maskAllText</code> + <code>blockAllMedia</code> no SDK (dev). Se jurídico exigir parada imediata, dá para <strong>desativar a feature Replay do projeto</strong> pelo painel. <span class="flag f-parc">Parcial</span></p>
+
+  <h2>Parte D — Logs estruturados (futuro)</h2>
+  <p>Logs <strong>honram as regras padrão</strong>. Para regra avançada em log, escolha o <strong>dataset de Logs</strong> ao criar. <span class="flag f-sei">Sei (conceito)</span> <span class="flag f-parc">Parcial (uso)</span> — deixar pronto para quando ligarem a feature.</p>
+
+  <h2>Parte E — Purgar o passado</h2>
+  <ul>
+    <li><strong>Issues:</strong> abrir → ícone de <strong>lixeira</strong> (deleta a issue; não há delete de evento isolado).</li>
+    <li><strong>Tags:</strong> <code>Project Settings → Tags</code> → remover valor (deletar issue não limpa a tag).</li>
+    <li><strong>Replays pretéritos:</strong> eliminação (LGPD art. 16 c/c 18, IV) — confirmar procedimento com o DPO. <span class="flag f-parc">Parcial</span></li>
+    <li><strong>Caso extremo:</strong> deletar/recriar projeto — só com o dev (perde histórico, muda DSN).</li>
+  </ul>
+
+  <h2>Parte F — Validar</h2>
+  <p>Gerar evento novo → abrir → link <strong>“JSON”</strong> → confirmar campo como <code>[Filtered]</code>/<code>null</code>/mascarado. Conferir replay novo. Marcar projetos concluídos.</p>
+
+  <h2>O que isto vira no board</h2>
+  <table>
+    <tr><th>Ticket</th><th>Quem</th><th>O quê</th></tr>
+    <tr><td>1</td><td><strong>Você fecha</strong></td><td>Data Scrubbing server-side (Partes A–B) na org + 3 projetos AutoChecker</td></tr>
+    <tr><td>2</td><td>Dev (você redige)</td><td>SDK: <code>sendDefaultPii=false</code>, <code>maskAllText</code>, <code>blockAllMedia</code>, <code>setUser</code> só id</td></tr>
+    <tr><td>3</td><td>DPO</td><td>Eliminar replays/eventos pretéritos + DPA com Sentry</td></tr>
+  </table>
+  <div class="callout">Você <strong>avança a Etapa 7 sozinho</strong> (A–F) e deixa o resto <strong>destravado e sem ambiguidade</strong> para quem tem permissão de código.</div>
+
+  <h2>Fontes</h2>
+  <ol class="src">
+    <li>Sentry Docs — <a href="https://docs.sentry.io/security-legal-pii/scrubbing/server-side-scrubbing/">Server-Side Data Scrubbing</a></li>
+    <li>Sentry Docs — <a href="https://docs.sentry.io/security-legal-pii/scrubbing/advanced-datascrubbing/">Advanced Data Scrubbing</a></li>
+    <li>Sentry Docs — <a href="https://docs.sentry.io/security-legal-pii/scrubbing/server-side-scrubbing/event-pii-fields/">Event PII Fields</a></li>
+    <li>Sentry Docs — Advanced Data Scrubbing → Data Scrubbing for Logs</li>
+    <li>Org/projetos via Sentry MCP (<code>automind-qd</code>, 8 projetos) — 2026-06-30</li>
+    <li><code>Etapa7_Scrubbing_PII_LGPD_Frontend_AutoChecker.md</code> (parte SDK)</li>
+    <li><code>Etapa7_Analise_Consentimento_LGPD_Termo_vs_Sentry_AutoChecker.md</code></li>
+    <li><code>Etapa7_Auditoria_Conformidade_LGPD_Consentimento_vs_Scrubbing_AutoChecker.md</code></li>
+    <li>Memória — <code>sentry-token-readonly</code></li>
+    <li>Memória — <code>autochecker-etapa7-analise-lgpd</code></li>
+  </ol>
+
+</main>
+<footer>
+  AutoMind · Observabilidade — entregável de configuração (não toca código). Identidade visual aplicada via skill <code>identidade-visual-automind</code>. As regras valem para eventos novos; consulte o DPO para purga de dados pretéritos.
+</footer>
+</body>
+</html>

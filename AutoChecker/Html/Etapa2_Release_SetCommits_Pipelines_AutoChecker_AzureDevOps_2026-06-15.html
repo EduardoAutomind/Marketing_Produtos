@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Etapa 2 — Release + set-commits + isolar pipelines · AutoChecker (Azure DevOps ao vivo)</title>
+<style>
+  :root{
+    --bg:#222834; --bg-elev:#2b3340; --bg-card:#2f3845; --line:#3d4757;
+    --txt:#e6eaf0; --txt-dim:#aab4c2; --accent:#6ea8fe; --accent2:#7ee0c0;
+    --ok:#5fd38d; --warn:#f0c674; --bad:#ff7b72; --partial:#f0a868;
+    --code-bg:#1c222c;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);
+       font:16px/1.62 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:980px;margin:0 auto;padding:48px 28px 96px}
+  h1{font-size:1.9rem;line-height:1.25;margin:0 0 6px;color:#fff}
+  h2{font-size:1.32rem;margin:42px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--line);color:#fff}
+  h3{font-size:1.08rem;margin:26px 0 8px;color:var(--accent2)}
+  p{margin:10px 0}
+  a{color:var(--accent)}
+  .sub{color:var(--txt-dim);font-size:.96rem}
+  .lead{background:var(--bg-elev);border-left:4px solid var(--accent);
+        padding:14px 18px;border-radius:8px;margin:18px 0}
+  .meta{background:var(--bg-card);border:1px solid var(--line);border-radius:10px;
+        padding:16px 20px;margin:18px 0}
+  .meta ol,.meta ul{margin:6px 0 0;padding-left:22px}
+  code{background:var(--code-bg);padding:.12em .4em;border-radius:5px;
+       font:.88em ui-monospace,SFMono-Regular,Consolas,monospace;color:#e6c07b}
+  pre{background:var(--code-bg);border:1px solid var(--line);border-radius:10px;
+      padding:14px 16px;overflow:auto}
+  pre code{background:none;color:#d6deea;padding:0}
+  table{border-collapse:collapse;width:100%;margin:16px 0;font-size:.94rem}
+  th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+  th{background:var(--bg-elev);color:#fff}
+  tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+  .pill{display:inline-block;padding:.12em .6em;border-radius:999px;font-size:.8rem;font-weight:600}
+  .p-ok{background:rgba(95,211,141,.16);color:var(--ok)}
+  .p-bad{background:rgba(255,123,114,.16);color:var(--bad)}
+  .p-part{background:rgba(240,168,104,.18);color:var(--partial)}
+  .p-na{background:rgba(170,180,194,.16);color:var(--txt-dim)}
+  .callout{border-radius:10px;padding:13px 18px;margin:16px 0;border:1px solid var(--line)}
+  .c-bug{background:rgba(255,123,114,.08);border-color:rgba(255,123,114,.4)}
+  .c-warn{background:rgba(240,198,116,.08);border-color:rgba(240,198,116,.4)}
+  .c-note{background:rgba(110,168,254,.08);border-color:rgba(110,168,254,.4)}
+  .ok{color:var(--ok)} .bad{color:var(--bad)} .part{color:var(--partial)} .warn{color:var(--warn)}
+  ul.tight li{margin:4px 0}
+  footer{margin-top:60px;color:var(--txt-dim);font-size:.85rem;border-top:1px solid var(--line);padding-top:16px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Etapa 2 — “Padronizar release <code>&lt;comp&gt;@&lt;hash&gt;</code> + set-commits + isolar pipelines Azure”</h1>
+<p class="sub">AutoChecker · Onda 0 (Saneamento da Base) · Esforço M · Status na planilha: <strong>Não iniciado</strong> · Revisão <strong>ao vivo no Azure DevOps</strong> — 2026-06-15</p>
+
+<div class="lead">
+Esta revisão fecha o gap do estudo de 11/06 (que só olhou os <code>next.config.js</code> e deixou os itens de pipeline como “não dá pra atestar por esses arquivos”), agora com dados <strong>ao vivo</strong> da org <code>automindautomacao</code> / projeto <code>AutoChecker</code>.
+</div>
+
+<div class="meta">
+<strong>Fontes (as 3 da etapa):</strong>
+<ol>
+<li><strong>Código real</strong> — pipelines YAML ao vivo, baixados via REST API para <code>_azdo_yaml/</code>.</li>
+<li><strong>Documentação</strong> — <code>Cronograma_Observabilidade_AutoChecker_2026-06-03.xlsx</code>, item #2.</li>
+<li><strong>Config do Azure DevOps ao vivo</strong> — build definitions, triggers, pools, environments (REST API).</li>
+</ol>
+<p class="sub" style="margin-top:10px">Método: <strong>REST API do Azure DevOps autenticada por PAT</strong> (não há MCP; não é scrape de UI). Reproduzível com o PAT em <code>.azdo_pat.txt</code> (gitignored).</p>
+</div>
+
+<h2>0. O que existe de verdade (vs. o que a planilha assume)</h2>
+<p>A etapa fala em <strong>“isolar as 4 pipelines (backend, frontend, worker, tests)”</strong>. A realidade são <strong>6 build definitions</strong>:</p>
+<table>
+<thead><tr><th>#</th><th>Pipeline (id)</th><th>Repo de origem</th><th>YAML</th><th>Observação</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><strong>Backend</strong> (431)</td><td><code>AutoChecker</code> (monorepo)</td><td><code>backend.azure-pipelines.yml</code></td><td>deploy via SSH</td></tr>
+<tr><td>2</td><td><strong>Worker</strong> (430)</td><td><code>AutoChecker</code> (monorepo)</td><td><code>worker.azure-pipelines.yml</code></td><td>deploy via SSH</td></tr>
+<tr><td>3</td><td><strong>Frontend</strong> (428)</td><td><code>AutoChecker</code> (monorepo)</td><td><code>frontend.azure-pipelines.yml</code></td><td>deploy DigitalOcean</td></tr>
+<tr><td>4</td><td><strong>AutoChecker_Frontend</strong> (491)</td><td><code>AutoChecker_Frontend</code> (repo separado)</td><td><code>azure-pipelines.yml</code></td><td>deploy DigitalOcean</td></tr>
+<tr><td>5</td><td><strong>AutoChecker_Frontend</strong> (492)</td><td><code>AutoChecker_Frontend</code></td><td><code>azure-pipelines-validate.yml</code></td><td>só testes de PR</td></tr>
+<tr><td>6</td><td><strong>AutoChecker_APP</strong> (487)</td><td><code>AutoChecker_APP</code></td><td><code>app.azure-pipelines.yml</code></td><td><span class="warn">placeholder “Hello world”</span></td></tr>
+</tbody>
+</table>
+<p><strong>Discrepâncias (flag: Sei — confirmado ao vivo):</strong></p>
+<ul class="tight">
+<li><strong>Não existe pipeline “tests” dedicada</strong> — testes são <em>stages</em> dentro de cada pipeline.</li>
+<li><strong>6 definitions, não 4</strong> — e duas se chamam <code>AutoChecker_Frontend</code>.</li>
+<li><strong>“Dois frontends” confirmado no nível de pipeline:</strong> <code>Frontend</code> (428) builda o frontend <em>dentro</em> do monorepo; <code>AutoChecker_Frontend</code> (491) builda um <strong>repo Git separado</strong>. Triggers divergem (<code>dev</code>/<code>main</code> vs <code>develop</code>/<code>main</code>) e empurram para <strong>repos GitHub diferentes</strong>. Ambas vivas.</li>
+<li><strong><code>AutoChecker_APP</code></strong> (Expo/mobile) existe e não é citado na etapa; hoje só dá <code>echo Hello, world!</code>.</li>
+</ul>
+
+<h2>1. Release <code>&lt;comp&gt;@&lt;hash&gt;</code> — <span class="pill p-part">PARCIAL</span></h2>
+<p>Descoberta nova vs. 11/06: <strong>backend e worker JÁ setam o release</strong> — mas no <strong>servidor</strong>, durante o deploy SSH, não via <code>sentry-cli</code> no CI.</p>
+<table>
+<thead><tr><th>Serviço</th><th>Release?</th><th>Evidência (<code>_azdo_yaml/…</code>)</th></tr></thead>
+<tbody>
+<tr><td><strong>backend</strong></td><td class="ok">✅ <code>backend@&lt;hash&gt;</code></td><td><code>AutoChecker__backend…yml:139-141</code> (dev), <code>:219-221</code> (prod)</td></tr>
+<tr><td><strong>worker</strong></td><td class="ok">✅ <code>worker@&lt;hash&gt;</code></td><td><code>AutoChecker__worker…yml:135-137</code> (dev), <code>:186-188</code> (prod)</td></tr>
+<tr><td><strong>frontend</strong></td><td class="bad">❌ inexistente</td><td>nenhuma das 2 pipelines de frontend seta release — só sincroniza GitHub</td></tr>
+</tbody>
+</table>
+<p><strong>Veredito #1: <span class="part">PARCIAL</span></strong> — padronizado em backend e worker; falta justo o <strong>frontend</strong> (que também tem o <code>org/project</code> errado). É uma <strong>mudança</strong> vs. o doc de 11/06, que dava release como inexistente nos três.</p>
+<div class="callout c-bug">
+🐞 <strong>Bug real no worker em produção</strong> (<code>worker.azure-pipelines.yml</code>, job <code>DeploySSH</code>, branch <code>main</code>):
+<ul class="tight">
+<li>linha <strong>183</strong>: <code>git pull origin dev</code> — o deploy de <strong>produção puxa a branch <code>dev</code></strong>.</li>
+<li>linha <strong>188</strong>: grava <code>SENTRY_RELEASE</code> em <strong><code>worker/.env.dev</code></strong>, mas o compose de prod usa <strong><code>.env.prod</code></strong> (linha 195) → release provavelmente <strong>não chega ao container</strong>.</li>
+</ul>
+O backend faz certo. Confiança: <strong>alta</strong>.
+</div>
+
+<h2>2. <code>set-commits --auto</code> (suspect commits) — <span class="pill p-bad">NÃO CUMPRIDA</span></h2>
+<p><strong>Não há <code>sentry-cli</code> em nenhuma das 6 pipelines.</strong> <code>SENTRY_RELEASE</code> é só uma env var consumida pelo SDK em runtime; ninguém associa commits ao release. Sem isso, o Sentry <strong>não aponta o “suspect commit”</strong> — que é o ganho da etapa. Confiança: <strong>alta</strong>.</p>
+
+<h2>3. Isolar pipelines Azure — <span class="pill p-bad">NÃO CUMPRIDA</span></h2>
+<p>Reler o objetivo: <strong>não há agente de máquina dev</strong> — tudo roda no pool hospedado <code>Azure Pipelines</code>. O risco real é <strong>dev e prod compartilharem a mesma pipeline sem gate</strong>.</p>
+<ul class="tight">
+<li><strong>0 Environments no projeto</strong> (<code>_apis/pipelines/environments</code> → <code>count: 0</code>) ⇒ <strong>nenhum gate de aprovação/checks</strong> antes de prod. Confiança: <strong>alta</strong>.</li>
+<li><strong>dev e main na mesma pipeline</strong> — prod gated só por <code>condition: eq(Build.SourceBranchName,'main')</code> (<code>backend:197</code>, <code>worker:165</code>). Push na <code>main</code> publica em prod sem aprovação.</li>
+<li><strong>Worker dev usa a connection do backend:</strong> <code>sshEndpoint: "backend-dev"</code> (<code>worker…yml:115</code>).</li>
+<li>Connections SSH em uso (dos YAMLs): <code>backend-dev</code>, <code>backend-prod</code>, <code>ssh-service-connection-worker</code>. Config interna <strong>não verificável</strong> (PAT sem escopo → 401). Flag: <span class="p-na pill">Não sei</span>.</li>
+</ul>
+<p><strong>Veredito #3: <span class="bad">NÃO CUMPRIDA</span></strong> — há separação por componente, mas <strong>nenhum isolamento dev↔prod</strong>.</p>
+
+<h2>4. <code>org</code>/<code>project</code> do <code>withSentryConfig</code> (frontend) — <span class="pill p-bad">❌ / Parcial</span></h2>
+<p>Vive no <code>next.config.js</code>, fora do Azure → não verificável por estas fontes. Mantém o veredito de 11/06: ainda <code>org:'automind-teste'</code> / <code>project:'javascript-nextjs'</code>. Flag: <span class="p-part pill">Parcial</span> (não relido hoje).</p>
+<div class="callout c-note">
+Nota nova: as pipelines de frontend <strong>não rodam <code>sentry-cli</code> nem upload de source maps no CI</strong> — o <code>withSentryConfig</code> só age no build do DigitalOcean. Logo, corrigir <code>org/project</code> no código continua sendo o ponto-chave; o CI não compensa.
+</div>
+
+<h2>5. Veredito consolidado</h2>
+<table>
+<thead><tr><th>Entrega</th><th>Situação (ao vivo)</th><th>Δ vs. 11/06</th></tr></thead>
+<tbody>
+<tr><td>release <code>&lt;comp&gt;@&lt;hash&gt;</code></td><td><span class="pill p-part">PARCIAL</span> backend ✅ · worker ✅(bug prod) · frontend ❌</td><td>era “❌ nos 3”</td></tr>
+<tr><td>set-commits (suspect commits)</td><td><span class="pill p-bad">NÃO CUMPRIDA</span> sem <code>sentry-cli</code></td><td>igual</td></tr>
+<tr><td>isolar pipelines (dev↔prod)</td><td><span class="pill p-bad">NÃO CUMPRIDA</span> 0 environments</td><td>confirmado por API</td></tr>
+<tr><td>org/project no frontend</td><td><span class="pill p-bad">❌/Parcial</span> vive no <code>next.config.js</code></td><td>não revalidado hoje</td></tr>
+<tr><td><strong>Status geral</strong></td><td colspan="2"><strong>❌ Em aberto, mas mais avançado do que a planilha diz</strong> (“Não iniciado”) — backend/worker já fazem release.</td></tr>
+</tbody>
+</table>
+
+<h2>6. Achados extra (reais)</h2>
+<ol>
+<li><strong>Segredo embutido + history overwrite:</strong> sync Azure→GitHub com <code>https://rochaTarcisio:$(GITHUB_TOKEN)@github.com/…</code> e <strong><code>git push --force</code></strong> após <code>rm -rf .git; git init</code> (<code>frontend:113-116</code>, <code>backend:103-106</code>, <code>worker:98-101</code>).</li>
+<li><strong>Modelo de deploy real:</strong> Azure testa → espelha no GitHub (force push) → <strong>SSH no droplet</strong> → <code>git pull</code> + <code>docker compose</code>/<code>systemctl</code>. Build acontece <strong>no servidor</strong>. Isso muda <em>onde</em> o <code>set-commits</code> deve rodar (precisa do histórico git — melhor no CI, antes do mirror destrutivo).</li>
+<li><strong><code>AutoChecker_APP</code></strong> é só placeholder hoje.</li>
+</ol>
+
+<h2>7. Plano de resolução (na ordem)</h2>
+<h3>Passo 1 — Frontend: fechar release + org/project</h3>
+<p>Corrigir <code>org</code>/<code>project</code> nos <code>next.config.js</code> e definir <code>SENTRY_RELEASE=autochecker-frontend@&lt;hash&gt;</code> no build, alinhando com backend/worker.</p>
+<h3>Passo 2 — set-commits no CI (os 3 serviços)</h3>
+<pre><code>sentry-cli releases new "&lt;comp&gt;@$HASH"
+sentry-cli releases set-commits "&lt;comp&gt;@$HASH" --auto
+sentry-cli releases finalize "&lt;comp&gt;@$HASH"</code></pre>
+<p>Rodar <strong>antes</strong> do <code>rm -rf .git</code> (senão perde o histórico). Token via <code>SENTRY_AUTH_TOKEN</code> secreto do CI.</p>
+<h3>Passo 3 — Corrigir o bug do worker em prod</h3>
+<p><code>git pull origin dev</code> → <code>main</code> (linha 183) e gravar em <code>worker/.env.prod</code>, não <code>.env.dev</code> (linha 188).</p>
+<h3>Passo 4 — Isolamento dev↔prod de verdade</h3>
+<p>Criar <strong>Environments</strong> (<code>autochecker-prod</code>/<code>-dev</code>) com <strong>approval check</strong> em prod; converter os jobs de prod em <strong>deployment jobs</strong> (<code>environment:</code>); separar a connection do worker da do backend.</p>
+<h3>Passo 5 — Decidir o frontend canônico</h3>
+<p>Há <strong>duas</strong> pipelines de frontend vivas apontando para repos diferentes. Definir a de produção e <strong>desabilitar/arquivar a outra</strong>.</p>
+
+<h2>8. Ressalvas / não verificado <span class="pill p-na">Não sei</span></h2>
+<ul class="tight">
+<li><strong>Config das service connections</strong> (<code>backend-dev</code>, <code>backend-prod</code>, <code>ssh-service-connection-worker</code>): PAT sem escopo (401).</li>
+<li><strong>Variable groups / Library</strong>: idem 401. Variáveis vistas vêm do nível da definition.</li>
+<li><strong>Branch policies</strong> dos repos: não consultadas.</li>
+<li><strong><code>next.config.js</code></strong>: não relido hoje; veredito do frontend herda o doc de 11/06.</li>
+</ul>
+
+<footer>
+AutoChecker · Detalhamento da Etapa 2 (Onda 0) · dados ao vivo do Azure DevOps via REST API · 2026-06-15.<br>
+Fonte canônica em Markdown: <code>Etapa2_Release_SetCommits_Pipelines_AutoChecker_AzureDevOps_2026-06-15.md</code>.
+</footer>
+
+</div>
+</body>
+</html>

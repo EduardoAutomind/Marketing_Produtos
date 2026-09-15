@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resumo Executivo — Avanços do Cronograma de Observabilidade · AutoChecker</title>
+<style>
+  :root{
+    --bg:#ffffff; --ink:#1c2330; --muted:#5b6678; --line:#e3e7ee; --card:#ffffff;
+    --accent:#2b5cff; --accent-soft:#eef2ff;
+    --ok:#1a7f4b; --ok-soft:#e7f6ee; --ok-line:#bfe6cf;
+    --warn:#9a6700; --warn-soft:#fff7e0; --warn-line:#e9cf8a;
+    --bad:#b4232a; --bad-soft:#fff1f1; --bad-line:#f2c4c4;
+    --pend:#8a5a00; --pend-soft:#fff4d6;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:14px/1.62 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:1000px;margin:0 auto;padding:28px 30px 56px;}
+  header.hero{background:linear-gradient(135deg,#1c2330,#2b3a55);color:#fff;border-radius:14px;
+    padding:28px 32px;margin-bottom:22px;}
+  header.hero h1{margin:0 0 4px;font-size:23px;letter-spacing:-.3px}
+  header.hero .sub{margin:2px 0;color:#c8d2e6;font-size:13px}
+  header.hero .meta{margin-top:14px;display:flex;flex-wrap:wrap;gap:7px}
+  header.hero .pill{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);
+    border-radius:999px;padding:3px 11px;font-size:11.5px}
+  h2{font-size:18px;margin:30px 0 12px;padding-bottom:7px;border-bottom:2px solid var(--line)}
+  h3{font-size:14.5px;margin:18px 0 6px}
+  p{margin:8px 0}
+  code{background:#eef1f6;border:1px solid #e0e5ee;border-radius:4px;padding:1px 4px;
+    font:12px/1.4 Consolas,"Liberation Mono",Menlo,monospace;color:#34405a}
+  .lead{font-size:14.5px;color:#33405a}
+
+  /* KPI cards */
+  .kpis{display:flex;flex-wrap:wrap;gap:10px;margin:6px 0 4px}
+  .kpi{flex:1 1 150px;border:1px solid var(--line);border-radius:11px;padding:13px 15px;background:#fbfcfe}
+  .kpi .n{font-size:25px;font-weight:700;line-height:1.1}
+  .kpi .l{font-size:11.5px;color:var(--muted);margin-top:3px}
+  .kpi.ok .n{color:var(--ok)} .kpi.warn .n{color:var(--warn)}
+  .kpi.bad .n{color:var(--bad)} .kpi.mut .n{color:var(--muted)}
+
+  table{border-collapse:collapse;width:100%;margin:10px 0;font-size:12.8px}
+  th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+  th{background:#f3f6fb;font-weight:600}
+  td.c,th.c{text-align:center;white-space:nowrap}
+
+  .badge{display:inline-block;border-radius:999px;padding:1px 9px;font-size:11px;font-weight:600;white-space:nowrap}
+  .b-ok{background:var(--ok-soft);color:var(--ok);border:1px solid var(--ok-line)}
+  .b-go{background:var(--accent-soft);color:var(--accent);border:1px solid #c3d0ff}
+  .b-pend{background:var(--pend-soft);color:var(--pend);border:1px solid var(--warn-line)}
+  .b-no{background:#f1f3f7;color:var(--muted);border:1px solid var(--line)}
+
+  .callout{border-radius:11px;padding:12px 16px;margin:14px 0;border:1px solid #d3deff;background:var(--accent-soft);color:#33405a}
+  .callout.ok{background:var(--ok-soft);border-color:var(--ok-line)}
+  .callout.bad{background:var(--bad-soft);border-color:var(--bad-line)}
+  .callout strong{color:inherit}
+
+  .card{border:1px solid var(--line);border-left-width:4px;border-radius:10px;padding:12px 16px;margin:11px 0;background:#fff}
+  .card.ok{border-left-color:var(--ok)} .card.go{border-left-color:var(--accent)}
+  .card.pend{border-left-color:var(--pend)}
+  .card h3{margin:0 0 4px;font-size:14px}
+  .card .ev{font-size:12px;color:var(--muted);margin-top:5px}
+
+  ul{margin:6px 0 6px 0;padding-left:20px} li{margin:3px 0}
+  footer{margin-top:34px;padding-top:12px;border-top:1px solid var(--line);font-size:11px;color:var(--muted)}
+  @media print{
+    .wrap{padding:0 8px}
+    .card,.kpi,table,.callout{break-inside:avoid}
+    h2{break-after:avoid}
+    @page{margin:14mm 12mm}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>Resumo Executivo — Avanços do Cronograma de Observabilidade</h1>
+  <div class="sub">Produto: <strong>AutoChecker</strong> · Ferramenta: Sentry (org <code>automind-qd</code>) · backend Django · worker Celery · frontend Next.js</div>
+  <div class="sub">Data da revisão: <strong>15/06/2026</strong> · Base: planilha do cronograma + auditoria código×Sentry + análise ao vivo (MCP)</div>
+  <div class="meta">
+    <span class="pill">7 ondas · 31 itens</span>
+    <span class="pill">Foco atual: Onda 0 (gate de saneamento)</span>
+    <span class="pill">Citações verificadas arquivo:linha</span>
+  </div>
+</header>
+
+<p class="lead">Esta revisão pontua <strong>todos os avanços</strong> registrados no cronograma de observabilidade do AutoChecker até 15/06/2026, separando o que já mudou <em>no produto e no Sentry</em> do trabalho de <em>diagnóstico e planejamento</em> que sustenta a execução. O número é deliberadamente honesto: a maior parte dos 31 itens ainda não começou — o avanço está concentrado na <strong>Onda 0</strong> (o gate de saneamento) e em uma base de diagnóstico hoje completa e auditada.</p>
+
+<h2>1. Onde estamos — em números</h2>
+<div class="kpis">
+  <div class="kpi ok"><div class="n">1</div><div class="l">Concluído (Item 1 · environment)</div></div>
+  <div class="kpi"><div class="n">2</div><div class="l">Em andamento (Itens 2 e 6)</div></div>
+  <div class="kpi warn"><div class="n">1</div><div class="l">Pendente (Item 3 · KeyError Beat)</div></div>
+  <div class="kpi mut"><div class="n">27</div><div class="l">Não iniciados (Ondas 1–6)</div></div>
+</div>
+<div class="kpis">
+  <div class="kpi ok"><div class="n">~1.640</div><div class="l">eventos do maior ruído histórico neutralizados (Item 3)</div></div>
+  <div class="kpi go"><div class="n">~1.800</div><div class="l">eventos de ruído mapeados p/ remover sem deploy (quick wins)</div></div>
+  <div class="kpi bad"><div class="n">1</div><div class="l">incidente real ativo trava o gate (Item 4 · drift de migração)</div></div>
+</div>
+
+<div class="callout">
+  <strong>Leitura executiva:</strong> a Onda 0 está em curso e já reduziu o maior ruído histórico do produto, mas o <strong>gate ainda não foi liberado</strong> — há 1 incidente real ativo (drift de migração multi-tenant) que precisa ser resolvido antes de ampliar para alertas, tracing e métricas. Em paralelo, a base de diagnóstico (cronograma auditado + detalhamento "como resolver" das Ondas 0–3 + revalidação ao vivo) está <strong>pronta</strong>, o que permite executar com baixo risco.
+</div>
+
+<h2>2. Avanços de execução — no produto e no Sentry</h2>
+<p>Mudanças concretas, verificadas <code>arquivo:linha</code> contra o código real e cruzadas com o Sentry ao vivo (15/06):</p>
+
+<div class="card ok">
+  <h3>Item 1 — Padronizar <code>environment</code> nos 3 SDKs + isolar DEV/PRD <span class="badge b-ok">Concluído</span></h3>
+  Os três SDKs (backend, worker, frontend) passaram a padronizar a tag <code>environment</code>. Era a base para tudo: sem ambiente correto, qualquer painel é estatisticamente sem sentido.
+  <div class="ev"><strong>Ressalva ao vivo (15/06):</strong> ainda persiste o fallback <code>"development"</code> quando a env var falta (<code>base.py:730</code>, <code>celery.py:24</code>, configs do frontend) e os alertas seguem <em>sem filtro de ambiente</em> → considerar <strong>parcial</strong> até fechar o lado de deploy e atingir o KPI ≥99% de eventos com ambiente correto.</div>
+</div>
+
+<div class="card go">
+  <h3>Item 6 — <code>beforeSend</code> / Inbound Filters (filtro de ruído) <span class="badge b-go">Em andamento</span></h3>
+  O <code>before_send</code> do backend, antes "morto", está agora <strong>ATIVO</strong>: descarta o caminho de health e blips transientes de Redis (<code>backend/config/settings/base.py:713–721</code>). O worker também ganhou um <code>before_send</code> parcial (<code>worker/config/celery.py:29–31</code>, só health).
+  <div class="ev"><strong>Falta:</strong> reclassificar o ruído de autenticação JWT por endpoint (sem dropar incidentes reais), o Inbound Filter de <code>DisallowedHost</code> (scanners) e os filtros do frontend.</div>
+</div>
+
+<div class="card pend">
+  <h3>Item 3 — PeriodicTask órfã do Beat (<code>KeyError process_scheduled_notifications</code>) <span class="badge b-pend">Pendente</span></h3>
+  Era o <strong>maior ofensor histórico</strong> do produto (~1.640 eventos). A task foi <strong>comentada no código</strong> (<code>notification_tasks.py:49–67</code>) e a issue está <strong>dormente há 26 dias</strong> no Sentry — saiu da lista de ativos por recência.
+  <div class="ev"><strong>Falta para fechar:</strong> expurgar a entrada órfã persistida (arquivo/registro do django-celery-beat) e resolver/ignorar a issue no painel (1 clique).</div>
+</div>
+
+<div class="card go">
+  <h3>Item 2 — Release padronizado + set-commits + isolar pipelines Azure <span class="badge b-go">Em andamento</span></h3>
+  Mapeado e em curso, mas <strong>sem evidência de conclusão</strong> na revisão ao vivo. Depende de mexer nas 4 pipelines Azure e de eleger o <code>next.config.js</code> canônico do frontend (hoje aponta para projeto Sentry errado por default).
+  <div class="ev">Desbloqueia "suspect commits" e a correlação picos × deploys.</div>
+</div>
+
+<h2>3. Avanços de diagnóstico e planejamento — a base que destrava a execução</h2>
+<p>Boa parte do valor entregue até aqui não é código: é a fundação que transforma o cronograma de "lista de boas intenções" em plano executável, item a item, sem chutes.</p>
+<ul>
+  <li><strong>Cronograma completo e auditado</strong> — 7 ondas, 31 itens, com esforço (P/M/G), camada, semana e evidência por linha. A Onda 0 é um <em>gate</em> explícito: nada de ampliação antes de sanear.</li>
+  <li><strong>Auditoria cronograma × código (10/06)</strong> — verificação <code>arquivo:linha</code> que corrigiu <strong>8 premissas falsas</strong> do plano original (ex.: o health check é uma view trivial que não checa dependências; o helper de init não dá <code>CeleryIntegration</code> ao backend; 17 <code>except</code> sem captura em <code>composition.py</code>; drift afeta tenants pré-existentes, não a criação).</li>
+  <li><strong>Detalhamento "como resolver cada etapa" — Ondas 0 a 3 (itens 1–21)</strong> — estudo fundamentado em 3 fontes (código real + documentação + Sentry ao vivo), com flags <em>Sei / Parcial / Não sei</em> e saída em md + html. É a fonte canônica de execução.</li>
+  <li><strong>Quick wins da Onda 0 (15/06)</strong> — sequência de ações de baixo custo que removem <strong>~1.800 eventos de ruído sem deploy e sem risco</strong> (Inbound Filter de <code>DisallowedHost</code>, fechar a KeyError dormente, filtro de ambiente nos 3 alertas).</li>
+  <li><strong>Revalidação Sentry ao vivo (15/06)</strong> — coleta via MCP cruzada com o código, separando RUÍDO de INCIDENTE REAL e registrando o que mudou desde 12/06.</li>
+</ul>
+
+<h2>4. O que ainda trava o gate da Onda 0</h2>
+<table>
+  <tr><th class="c">Item</th><th>Pendência que segura o gate</th><th class="c">Status</th><th class="c">Criticidade</th></tr>
+  <tr><td class="c">4</td><td>Drift de migração multi-tenant (<code>relation "..." does not exist</code>) — deploy roda <code>migrate</code>, nunca <code>migrate_schemas</code>; tenants pré-existentes ficam sem as tabelas novas.</td><td class="c"><span class="badge b-no">Não iniciado</span></td><td class="c">🔴 Incidente real ativo (nº 1)</td></tr>
+  <tr><td class="c">5</td><td>Consolidar init do Sentry no helper (+ <code>CeleryIntegration</code> no backend) — exige alterar o helper, não só trocar a chamada.</td><td class="c"><span class="badge b-no">Não iniciado</span></td><td class="c">Média</td></tr>
+  <tr><td class="c">7</td><td>Scrubbing de PII/LGPD no frontend — <code>sendDefaultPii:true</code> persiste; Session Replay sem masking sobre telas de CNH/ASO/CPF.</td><td class="c"><span class="badge b-no">Não iniciado</span></td><td class="c">Alta (compliance)</td></tr>
+  <tr><td class="c">8</td><td>Triagem ZERO do backlog — <strong>0 issues resolvidas</strong> em 7 dias nos 3 projetos; backlog cresce sem fechamento.</td><td class="c"><span class="badge b-no">Não iniciado</span></td><td class="c">Média</td></tr>
+</table>
+
+<h2>5. Próximos passos recomendados (priorizados)</h2>
+<table>
+  <tr><th class="c">#</th><th>Ação</th><th class="c">Item</th><th>Por quê agora</th></tr>
+  <tr><td class="c">1</td><td><strong>Backfill <code>migrate_schemas</code></strong> nos tenants em drift + gate <code>--check</code> no deploy.</td><td class="c">4</td><td>Único incidente real ativo (visto há 1–2 h); gera centenas de eventos/dia no worker.</td></tr>
+  <tr><td class="c">2</td><td>Aplicar os <strong>quick wins de painel</strong>: Inbound Filter de <code>DisallowedHost</code>, fechar a KeyError dormente, filtro de ambiente nos 3 alertas.</td><td class="c">6/3/1</td><td>Remove ~1.800 eventos de ruído sem deploy e sem risco; destrava a confiança nos alertas.</td></tr>
+  <tr><td class="c">3</td><td><strong>Reclassificar ruído de JWT</strong> por endpoint (warning/info para anônimo esperado) + ampliar <code>JWT_SKIP_PATHS</code> com rotas públicas reais.</td><td class="c">6</td><td>Maior fonte de ruído do backend; novas rotas entrando toda semana.</td></tr>
+  <tr><td class="c">4</td><td><strong>Desligar <code>sendDefaultPii</code></strong> no frontend e investigar o alerta "Potential Security Risk" (<code>.env</code>).</td><td class="c">7</td><td>Risco LGPD + possível exposição de segredo em payload.</td></tr>
+  <tr><td class="c">5</td><td>Fechar os pontos abertos do <strong>Item 1</strong> (env var no deploy, KPI ≥99%) e do <strong>Item 2</strong> (release/set-commits nas pipelines).</td><td class="c">1/2</td><td>Conclui formalmente o que já está "em andamento" e libera correlação deploy × picos.</td></tr>
+</table>
+
+<div class="callout ok">
+  <strong>Resumo da revisão:</strong> a Onda 0 saiu do papel — o maior ruído histórico foi neutralizado, o <code>before_send</code> está ativo e a base de diagnóstico está completa e auditada. Para <strong>liberar o gate</strong> e habilitar as ondas de alertas, tracing e métricas, o caminho crítico é resolver o drift de migração (Item 4), aplicar os quick wins de painel e fechar PII/triagem.
+</div>
+
+<footer>
+  Revisão gerada em 15/06/2026. Status extraído de <code>Cronograma_Observabilidade_AutoChecker_2026-06-03.xlsx</code>; avanços de execução e ressalvas verificados <code>arquivo:linha</code> contra o código real em <code>Produtos\Autochecker</code> e cruzados com o Sentry ao vivo (org <code>automind-qd</code>, janela 7d) via MCP. Fontes de apoio: detalhamento Ondas 0–3 (15/06), Quick Wins Onda 0 (15/06), análise Sentry × código (15/06).
+</footer>
+
+</div>
+</body>
+</html>

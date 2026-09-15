@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auditoria LGPD — IntegrationLog AutoChecker · AutoMind</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,400;0,500;0,700;0,900;1,400&display=swap');
+  :root{
+    --am-rosa:#FA094E; --am-magenta:#940755; --am-roxo:#44055A;
+    --am-navy:#03045E; --am-preto:#100F0F; --am-offwhite:#F3F3F0;
+    --am-gradiente-h:linear-gradient(90deg,#FA094E 0%,#03045E 100%);
+    --card:#ffffff; --line:#e4e2dd;
+    --ok:#1f8a4c; --warn:#b8860b; --crit:#FA094E;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{font-family:"Red Hat Display",system-ui,sans-serif;color:var(--am-preto);
+    background:var(--am-offwhite); margin:0; line-height:1.6; font-size:16px;}
+  .topbar{height:8px; background:var(--am-gradiente-h);}
+  header{padding:34px 7vw 22px; border-bottom:1px solid var(--line);}
+  .wordmark{font-weight:900; text-transform:uppercase; letter-spacing:.20em;
+    color:var(--am-roxo); font-size:15px;}
+  .wordmark .dot{color:var(--am-rosa);}
+  .tagline{font-size:11px; letter-spacing:.32em; text-transform:uppercase;
+    color:var(--am-navy); opacity:.7; margin-top:2px;}
+  h1{font-weight:900; color:var(--am-roxo); font-size:30px; line-height:1.2;
+    margin:18px 0 6px; letter-spacing:.01em;}
+  .sub{color:var(--am-navy); font-size:14px; opacity:.85;}
+  .pill{display:inline-block; background:var(--am-roxo); color:#fff; font-size:11px;
+    font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    padding:4px 11px; border-radius:999px; margin:8px 6px 0 0;}
+  .pill.alt{background:var(--am-rosa);}
+  main{padding:14px 7vw 60px; max-width:1080px;}
+  h2{font-weight:700; color:var(--am-roxo); font-size:21px; margin:38px 0 10px;
+    padding-top:14px; border-top:2px solid var(--am-rosa); display:inline-block;}
+  h3{font-weight:700; color:var(--am-navy); font-size:16px; margin:22px 0 6px;}
+  p{margin:10px 0;}
+  a{color:var(--am-rosa); text-decoration:none;} a:hover{text-decoration:underline;}
+  ul,ol{margin:10px 0; padding-left:22px;} li{margin:5px 0;}
+  code{font-family:"SFMono-Regular",Consolas,monospace; background:#efeeea;
+    padding:1px 6px; border-radius:5px; font-size:.88em; color:var(--am-magenta);}
+  pre{background:var(--am-preto); color:#f3f3f0; padding:14px 16px; border-radius:12px;
+    overflow:auto; font-size:13px; line-height:1.5;}
+  pre code{background:none; color:inherit; padding:0;}
+  hr{border:none; border-top:1px solid var(--line); margin:26px 0;}
+  blockquote{border-left:4px solid var(--am-rosa); background:#fff; border-radius:0 12px 12px 0;
+    padding:8px 18px; margin:14px 0; color:var(--am-navy); font-size:14.5px;}
+  table{border-collapse:collapse; width:100%; margin:14px 0; font-size:14px;}
+  th,td{text-align:left; padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top;}
+  th{background:#efeeea; color:var(--am-roxo); font-weight:700; font-size:12px;
+    text-transform:uppercase; letter-spacing:.05em;}
+  tr:last-child td{border-bottom:none;}
+  .tldr{background:linear-gradient(0deg,#fff,#fff) padding-box,var(--am-gradiente-h) border-box;
+    border:2px solid transparent; border-radius:16px; padding:16px 22px; font-size:16px; margin:18px 0;}
+  .flag{font-weight:700; font-size:12px; padding:1px 7px; border-radius:6px; white-space:nowrap;}
+  .f-sei{background:#e3f3e9; color:var(--ok);}
+  .f-parc{background:#fbf2da; color:var(--warn);}
+  .f-nao{background:#fde4ea; color:var(--crit);}
+  footer{padding:24px 7vw 50px; color:var(--am-navy); opacity:.7; font-size:12.5px;
+    border-top:1px solid var(--line);}
+</style>
+</head>
+<body>
+<div class="topbar"></div>
+<header>
+  <div class="wordmark">AUTOMIND<span class="dot">.</span></div>
+  <div class="tagline">Simple · Smart · Reliable</div>
+  <h1>Auditoria LGPD — <span style='color:var(--am-rosa)'>IntegrationLog</span><br>do AutoChecker</h1>
+  <div class="sub">Lei nº 13.709/2018 · ancorada artigo-a-artigo · gerado 2026-06-30</div>
+  <span class="pill">Conformidade LGPD</span>
+  <span class="pill alt">Parcial → não-conformidades</span>
+  <span class="pill">Etapa 7 correlata</span>
+</header>
+<main>
+<p><strong>Produto:</strong> AutoChecker
+<strong>Data:</strong> 30/06/2026
+<strong>Fonte da lei:</strong> <code>.claude/skills/lgpd-conformidade/reference/Lgpd.md</code> (Lei nº 13.709/2018, ed. Senado atualizada até jun/2024) — todo artigo citado abaixo foi conferido contra esse texto.
+<strong>Evidência de código (Azure DevOps, branch <code>dev</code>):</strong>
+- <code>shared/models/integrations.py</code> → classe <code>IntegrationLog</code>
+- <code>backend/apps/integrations/serializers.py</code> → <code>IntegrationLogListSerializer</code>, <code>IntegrationLogDetailSerializer</code>
+- <code>backend/apps/integrations/views.py</code> → <code>IntegrationLogViewSet</code> (filtros por entidade + ação <code>retry</code>) — PR 15213
+- <code>shared/tasks/integration_tasks.py</code> → <code>_create_log</code>/<code>_update_log</code>
+- Frontend <code>IntegrationTimeline*</code> (PR 15214) — expõe o log na UI</p>
+<p><strong>Pergunta de negócio:</strong> o <code>IntegrationLog</code> — que agora persiste o payload completo das integrações e o exibe na UI por motorista/veículo — está em conformidade com a LGPD? O que está autorizado, o que não está, e como corrigir?</p>
+<hr />
+<h2>1. Conclusão direta (TL;DR) — <strong><span class="flag f-parc">Parcial</span> → com não-conformidades</strong></h2>
+<p><strong>Manter um log de auditoria das chamadas de integração é legítimo</strong> (legítimo interesse, art. 7º, IX + dever de registro do art. 37). <strong>Porém</strong>, a forma atual reprova em três pontos concretos:</p>
+<ol>
+<li>🔴 <strong>Retenção indefinida</strong> — <code>integrations_log</code> não tem TTL nem rotina de expurgo. PII fica armazenada para sempre. Fere <strong>art. 15, I</strong> e <strong>art. 16</strong> (eliminação após o fim do tratamento) e <strong>art. 6º, III</strong> (necessidade).</li>
+<li>🔴 <strong>Excesso de coleta/armazenamento</strong> — persiste <code>request_payload</code> e <code>response_body</code> <strong>na íntegra</strong> (CPF, CNH, nome, documentos), mais do que um log de auditoria/retry precisa. Fere <strong>art. 6º, III</strong> (minimização).</li>
+<li>🔴 <strong>Possível vazamento de segredo</strong> — o <code>curl_command</code>/<code>request_body</code> gravados podem conter o header <code>Authorization</code>/token do provider, e agora são exibidos na UI. Fere <strong>art. 6º, VII</strong> e <strong>art. 46</strong> (segurança) e <strong>art. 46, §2º</strong> (segurança desde a concepção).</li>
+</ol>
+<p>Flag global: <strong><span class="flag f-parc">Parcial</span></strong> — a base legal do <em>registro</em> existe; o <em>desenho</em> (o quê se guarda, por quanto tempo, para quem se mostra) é que está em desconformidade. Há um ponto factual a confirmar (dado sensível e base_url no exterior) marcado abaixo.</p>
+<hr />
+<h2>2. Fatos — o que o <code>IntegrationLog</code> realmente trata</h2>
+<p>Campos persistidos (modelo <code>IntegrationLog</code>, <code>db_table="integrations_log"</code>, <code>app_label="tenants"</code> → <strong>gravado no schema do tenant</strong>, isolamento por tenant):</p>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Conteúdo</th>
+<th>Natureza</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>provider</code>, <code>event_type</code>, <code>status</code>, <code>response_status_code</code>, <code>retry_count</code>, <code>created_at</code>, <code>was_skipped</code>, <code>skip_reason</code></td>
+<td>metadados operacionais da chamada</td>
+<td>técnico (não-pessoal)</td>
+</tr>
+<tr>
+<td><code>entity_id</code></td>
+<td>UUID do <code>DriverNode</code>/<code>VehicleNode</code></td>
+<td>identificador indireto de pessoa</td>
+</tr>
+<tr>
+<td><code>entity_type</code>, <code>approved</code></td>
+<td>tipo da entidade / flag de aprovação</td>
+<td>técnico</td>
+</tr>
+<tr>
+<td><strong><code>request_payload</code></strong> (JSONField)</td>
+<td><strong>payload completo enviado ao ERP</strong> — <code>entity_data</code> do motorista/veículo: CPF, nome, CNH, documentos (MOPP, NR-20, NR-35, CRLV, CVV…)</td>
+<td><strong>dado pessoal (PII)</strong></td>
+</tr>
+<tr>
+<td><strong><code>response_body</code></strong> (TextField)</td>
+<td><strong>resposta completa do ERP externo</strong> (pode devolver dados do titular)</td>
+<td><strong>dado pessoal (potencial)</strong></td>
+</tr>
+<tr>
+<td><code>curl_command</code> / <code>request_body</code> (em <code>endpoint_payload</code>, via <code>_create_log</code>)</td>
+<td>comando/body da requisição — <strong>pode conter token/credencial no header</strong></td>
+<td><strong>segredo</strong></td>
+</tr>
+<tr>
+<td><code>error_message</code></td>
+<td>mensagem de erro (pode ecoar payload)</td>
+<td>variável</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Acesso/UI:</strong> o <code>IntegrationLogDetailSerializer</code> expõe <code>request_payload</code> <strong>e</strong> <code>response_body</code>; o <code>IntegrationTimelineModal</code> (PR 15214) mostra a timeline por entidade a qualquer usuário autenticado com <code>IntegrationsAccessPermission</code>. O <code>IntegrationLogViewSet</code> filtra por <code>provider__tenant=connection.tenant</code> → <strong>sem vazamento cross-tenant</strong> na consulta (isolamento OK).</p>
+<p><strong>Quem é quem:</strong> o cliente (transportadora/tenant) é <strong>controlador</strong> dos dados do motorista; a AutoMind/AutoChecker atua como <strong>operador</strong> (art. 5º, VII; art. 39). O destino da integração (ERP do cliente) é outro agente. Isso importa: o desenho do log (retenção, scrubbing) é decisão da AutoMind como operadora e impacta o cumprimento do art. 39 (seguir instruções do controlador) e art. 46/47 (segurança).</p>
+<hr />
+<h2>3. O que ESTÁ autorizado ✅</h2>
+<table>
+<thead>
+<tr>
+<th>Tratamento</th>
+<th>Base legal (conferida)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Registrar a chamada de integração</strong> (event_type, status, status_code, timestamps, erro, retry)</td>
+<td><strong>Legítimo interesse do controlador — art. 7º, IX</strong> ("interesses legítimos… exceto no caso de prevalecerem direitos e liberdades fundamentais do titular"). Reforçado pelo <strong>art. 37</strong>: "O controlador e o operador devem manter registro das operações de tratamento… especialmente quando baseado no legítimo interesse."</td>
+</tr>
+<tr>
+<td><strong>Reprocessar (retry) uma integração que falhou</strong></td>
+<td>Execução da operação contratada / legítimo interesse — <strong>art. 7º, V e IX</strong>. Operação técnica de continuidade do serviço.</td>
+</tr>
+<tr>
+<td><strong>Isolamento por tenant</strong> na consulta</td>
+<td>Boa prática de segurança — <strong>art. 46</strong> (medidas técnicas aptas a proteger contra acesso não autorizado).</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Observação: legítimo interesse só cobre o <strong>estritamente necessário</strong> à finalidade (<strong>art. 10, §1º</strong>) — o que nos leva direto às não-conformidades abaixo.</p>
+</blockquote>
+<hr />
+<h2>4. O que NÃO está autorizado ❌</h2>
+<h3>4.1 🔴 Retenção indefinida — art. 15, I + art. 16</h3>
+<p>Não há TTL, <code>expires_at</code> nem rotina de expurgo em <code>integrations_log</code> (só <code>created_at</code>). O <strong>art. 15</strong> determina o término do tratamento quando "os dados deixaram de ser necessários… ao alcance da finalidade específica" (inciso I); o <strong>art. 16</strong> exige que "os dados pessoais serão eliminados após o término de seu tratamento", salvo conservação para obrigação legal (inciso I) ou uso exclusivo anonimizado (inciso IV). Guardar payload com PII <strong>para sempre</strong> não se enquadra em nenhuma exceção do art. 16.</p>
+<h3>4.2 🔴 Excesso de armazenamento — art. 6º, III</h3>
+<p>O <strong>art. 6º, III</strong> (necessidade) limita o tratamento "ao mínimo necessário para a realização de suas finalidades… não excessivos". A finalidade de auditoria/diagnóstico/retry é atendida por metadados + identificador da entidade; <strong>armazenar o <code>request_payload</code> e o <code>response_body</code> na íntegra, com CPF/CNH/documentos</strong>, excede esse mínimo. O fato de o retry reler <code>log.request_payload</code> é uma escolha de conveniência — não uma necessidade que justifique persistir PII verbatim (o payload pode ser reconstruído a partir da entidade-fonte, ou armazenado mascarado/cifrado).</p>
+<h3>4.3 🔴 Segredo e segurança — art. 6º, VII + art. 46 e §2º</h3>
+<p><code>curl_command</code>/<code>request_body</code> podem conter o header de autenticação do provider (<code>Authorization: Bearer …</code>). Persistir e <strong>exibir isso na UI</strong> viola o princípio de <strong>segurança (art. 6º, VII)</strong> e o dever de <strong>medidas técnicas aptas a proteger… contra tratamento inadequado (art. 46)</strong>, que devem existir <strong>"desde a fase de concepção do produto… até a sua execução" (art. 46, §2º — privacy by design)</strong>. Não há scrubbing/masking aplicado antes de gravar.</p>
+<h3>4.4 ⚠️ Exibição ampla na UI — art. 6º, III + art. 46</h3>
+<p>Expor <code>request_payload</code> + <code>response_body</code> a todo usuário com <code>IntegrationsAccessPermission</code> precisa passar no teste de <strong>necessidade/need-to-know (art. 6º, III)</strong> e <strong>segurança (art. 46)</strong>. Pode ser aceitável se forem os mesmos operadores que já enxergam os documentos do motorista — mas o default invasivo (mostrar tudo, sem máscara) contraria o privacy by design do art. 46, §2º.</p>
+<hr />
+<h2>5. Dado sensível 🚨 — art. 5º, II + art. 11 — flag <strong><span class="flag f-parc">Parcial</span></strong></h2>
+<ul>
+<li><strong>Confirmado:</strong> <code>request_payload</code> contém <strong>dado pessoal</strong> (art. 5º, I) — CPF, nome, CNH.</li>
+<li><strong>A confirmar (<span class="flag f-parc">Parcial</span>):</strong> se o payload carrega <strong>dado pessoal sensível</strong> (art. 5º, II — "dado referente à saúde"), o regime restrito do <strong>art. 11</strong> passa a valer (consentimento específico e destacado — art. 11, I — ou hipótese do art. 11, II). Os tipos de documento mapeados na integração (<code>DOCUMENT_TYPE_CHOICES</code>: cnh, mopp, nr_20, nr_35, crlv, cvv, cipp…) são, em sua maioria, <strong>qualificação/habilitação</strong>, não saúde stricto sensu. <strong>Não confirmei</strong> que ASO/exame médico ou outro dado de saúde entra nesse payload — o <code>request_body_template</code> é configurável por tenant e poderia incluir.</li>
+<li><strong>O que falta:</strong> inspecionar, num tenant real, o conteúdo de um <code>request_payload</code> de motorista para ver se há campo de saúde/aptidão. Se houver → achado de severidade alta (sensível persistido e exibido sem base do art. 11).</li>
+</ul>
+<hr />
+<h2>6. Transferência internacional — art. 33 — flag <strong><span class="flag f-parc">Parcial</span>/fora de escopo direto</strong></h2>
+<p>O <code>IntegrationLog</code> <strong>em si</strong> é gravado no Postgres do tenant (Brasil, presumido) — <strong>não</strong> faz transferência internacional. <strong>Porém</strong>, o <em>despacho</em> envia o <code>request_payload</code> para <code>provider.base_url</code>, que é configurável e <strong>pode ser um ERP no exterior</strong>. Se for, a <strong>transferência</strong> (não o log) precisa de base do <strong>art. 33</strong> (ex.: inciso VIII — consentimento específico e destacado para transferência; ou inciso IX c/c art. 7º). <strong><span class="flag f-nao">Não sei</span></strong> se algum tenant aponta <code>base_url</code> para fora do Brasil — verificar. (Escopo adjacente, registrado para não se perder.)</p>
+<hr />
+<h2>7. Tabela-resumo</h2>
+<table>
+<thead>
+<tr>
+<th>Dado tratado</th>
+<th>Autorizado?</th>
+<th>Base legal / Conflito (art. citado)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Metadados da chamada (event_type, status, status_code, retry, timestamps)</td>
+<td>✅ Sim</td>
+<td>Legítimo interesse — art. 7º, IX + registro art. 37</td>
+</tr>
+<tr>
+<td><code>entity_id</code> (UUID do motorista/veículo)</td>
+<td>✅ Sim</td>
+<td>Necessário à finalidade de auditoria — art. 6º, III</td>
+</tr>
+<tr>
+<td>Retry de log <code>failed</code></td>
+<td>✅ Sim</td>
+<td>Art. 7º, V/IX (continuidade do serviço)</td>
+</tr>
+<tr>
+<td><code>request_payload</code> completo (CPF, CNH, nome, docs) persistido</td>
+<td>❌ Não</td>
+<td>Excesso — fere art. 6º, III (minimização) e art. 10, §1º</td>
+</tr>
+<tr>
+<td><code>response_body</code> completo do ERP</td>
+<td>⚠️ <span class="flag f-parc">Parcial</span></td>
+<td>Idem art. 6º, III — guardar só se necessário/mascarado</td>
+</tr>
+<tr>
+<td><code>curl_command</code>/<code>request_body</code> com token</td>
+<td>❌ Não</td>
+<td>Vazamento de segredo — art. 6º, VII + art. 46/§2º</td>
+</tr>
+<tr>
+<td>Retenção sem prazo de tudo acima</td>
+<td>❌ Não</td>
+<td>Art. 15, I + art. 16 (eliminação)</td>
+</tr>
+<tr>
+<td>Exibição de payload/response na UI a todos com permissão</td>
+<td>⚠️ <span class="flag f-parc">Parcial</span></td>
+<td>Need-to-know — art. 6º, III + art. 46</td>
+</tr>
+<tr>
+<td>Dado de saúde no payload (ASO)</td>
+<td>⚠️ A confirmar</td>
+<td>Se houver: art. 11 (sem base = risco alto)</td>
+</tr>
+<tr>
+<td>Envio do payload a <code>base_url</code> no exterior</td>
+<td>⚠️ A confirmar</td>
+<td>Se houver: art. 33 (transferência internacional)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>8. Caminho de correção (ordem) — <em>corrigir o comportamento primeiro, documentar depois</em></h2>
+<ol>
+<li><strong>(P0) Scrub de segredos antes de gravar.</strong> Remover/mascarar <code>Authorization</code> e tokens do <code>curl_command</code>/<code>request_body</code>/headers antes de persistir o log. É o mais urgente — segredo hoje visível na UI. (art. 46)</li>
+<li><strong>(P0/P1) Minimizar o payload persistido.</strong> Gravar só o necessário para auditoria/retry; mascarar CPF/CNH em <code>request_payload</code>/<code>response_body</code> em repouso. Se o retry precisa do payload completo, <strong>reconstruir a partir da entidade-fonte</strong> em vez de guardar verbatim, ou <strong>cifrar em repouso</strong>. (art. 6º, III)</li>
+<li><strong>(P1) Definir retenção + expurgo.</strong> TTL para <code>integrations_log</code> (ex.: 90–180 dias) com job de purga; conservar além disso só sob obrigação legal (art. 16, I). (art. 15/16)</li>
+<li><strong>(P1) Restringir a exibição na UI.</strong> Mascarar payload/response por default; revelar só sob permissão mais estrita (need-to-know). (art. 6º, III + 46)</li>
+<li><strong>(P2) Confirmar dado sensível</strong> no payload real (saúde/ASO). Se houver, tratar sob art. 11 (base + scrubbing).</li>
+<li><strong>(P2) Confirmar <code>base_url</code> no exterior.</strong> Se houver, garantir base do art. 33 para a transferência.</li>
+<li><strong>(P3) Documentar</strong> no registro de operações (art. 37) / RoPA — <strong>depois</strong> de 1–4. Reescrever política <strong>não</strong> cria base legal nem conserta excesso de coleta.</li>
+</ol>
+<hr />
+<h2>9. Pontos a verificar (flags <span class="flag f-parc">Parcial</span> / <span class="flag f-nao">Não sei</span>)</h2>
+<ul>
+<li><strong><span class="flag f-parc">Parcial</span></strong> — conteúdo real do <code>request_payload</code> (há dado de saúde/ASO?). Inspecionar um log real de motorista.</li>
+<li><strong><span class="flag f-nao">Não sei</span></strong> — algum <code>IntegrationProvider.base_url</code> aponta para servidor fora do Brasil?</li>
+<li><strong><span class="flag f-parc">Parcial</span></strong> — existe DPA/instrução do controlador (tenant) sobre retenção de logs de integração? (relevante ao art. 39).</li>
+</ul>
+<hr />
+<h2>10. Referências cruzadas</h2>
+<ul>
+<li><code>Mudancas_AutoChecker_Relevantes_Observabilidade_AzureDevOps_2026-06-30.md</code> — contexto da mudança (PRs 15213/15214).</li>
+<li><code>Etapa7_Analise_Consentimento_LGPD_Termo_vs_Sentry_AutoChecker.md</code> e <code>Etapa7_Auditoria_Conformidade_LGPD_Consentimento_vs_Scrubbing_AutoChecker.md</code> — caso análogo (Sentry): mesmo padrão de PII em telemetria.</li>
+<li><code>reference/Lgpd.md</code> — texto oficial (fonte desta auditoria).</li>
+<li>Memória: <code>autochecker-etapa7-analise-lgpd</code>.</li>
+</ul>
+<hr />
+<p><em>Toda afirmação legal acima foi ancorada no texto de <code>reference/Lgpd.md</code>. Onde a base não foi confirmada na lei ou na evidência, usei flag </em><em><span class="flag f-parc">Parcial</span></em><em> ou </em><em><span class="flag f-nao">Não sei</span></em><em> — sem suposição.</em></p>
+</main>
+<footer>Toda afirmação legal ancorada em reference/Lgpd.md (ed. Senado, jun/2024) · flags Sei/Parcial/Não sei sem suposição · AutoMind · 2026-06-30</footer>
+</body>
+</html>

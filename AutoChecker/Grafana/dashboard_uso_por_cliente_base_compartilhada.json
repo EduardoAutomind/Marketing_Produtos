@@ -1,0 +1,149 @@
+{
+  "uid": "autochecker-uso-cliente",
+  "title": "AutoChecker — Uso por Cliente (Base Compartilhada)",
+  "tags": ["autochecker", "uso", "loki", "base_compartilhada"],
+  "timezone": "America/Sao_Paulo",
+  "schemaVersion": 39,
+  "refresh": "30m",
+  "time": { "from": "now-7d", "to": "now" },
+  "templating": {
+    "list": [
+      {
+        "type": "textbox",
+        "name": "tenant",
+        "label": "Tenant (schema)",
+        "query": "base_compartilhada",
+        "current": { "text": "base_compartilhada", "value": "base_compartilhada" }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Requests no período (clientes reais)",
+      "gridPos": { "h": 4, "w": 8, "x": 0, "y": 0 },
+      "datasource": { "type": "loki", "uid": "ba808642-2177-4894-931e-93c97d6ae8b3" },
+      "targets": [
+        {
+          "refId": "A",
+          "editorMode": "code",
+          "queryType": "instant",
+          "expr": "sum(count_over_time({job=\"autochecker-backend\", environment=\"prod\"} |= \"$tenant\" | pattern \"<lvl> <js>\" | line_format \"{{.js}}\" | json | tenant_schema=\"$tenant\" | user_email!=\"\" [$__range]))"
+        }
+      ],
+      "fieldConfig": { "defaults": { "color": { "mode": "fixed", "fixedColor": "#44055A" }, "unit": "short" } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none", "textMode": "value" }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Pico de requests/hora",
+      "gridPos": { "h": 4, "w": 8, "x": 8, "y": 0 },
+      "datasource": { "type": "loki", "uid": "ba808642-2177-4894-931e-93c97d6ae8b3" },
+      "targets": [
+        {
+          "refId": "A",
+          "editorMode": "code",
+          "expr": "sum(count_over_time({job=\"autochecker-backend\", environment=\"prod\"} |= \"$tenant\" | pattern \"<lvl> <js>\" | line_format \"{{.js}}\" | json | tenant_schema=\"$tenant\" | user_email!=\"\" [1h]))"
+        }
+      ],
+      "fieldConfig": { "defaults": { "color": { "mode": "fixed", "fixedColor": "#FA094E" }, "unit": "short" } },
+      "options": { "reduceOptions": { "calcs": ["max"] }, "colorMode": "background", "graphMode": "area", "textMode": "value" }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Usuários (e-mails) distintos",
+      "gridPos": { "h": 4, "w": 8, "x": 16, "y": 0 },
+      "datasource": { "type": "loki", "uid": "ba808642-2177-4894-931e-93c97d6ae8b3" },
+      "targets": [
+        {
+          "refId": "A",
+          "editorMode": "code",
+          "queryType": "instant",
+          "expr": "count(sum by (user_email) (count_over_time({job=\"autochecker-backend\", environment=\"prod\"} |= \"$tenant\" | pattern \"<lvl> <js>\" | line_format \"{{.js}}\" | json | tenant_schema=\"$tenant\" | user_email!=\"\" [$__range])))"
+        }
+      ],
+      "fieldConfig": { "defaults": { "color": { "mode": "fixed", "fixedColor": "#03045E" }, "unit": "short" } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none", "textMode": "value" }
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Ritmo de uso — requests por hora (BRT)",
+      "description": "Volume horário de clientes reais. Sobe às 8h, pica ao meio-dia, cai após 18h, silencia à noite/domingo. Feriados estaduais de SP zeram o tenant.",
+      "gridPos": { "h": 9, "w": 24, "x": 0, "y": 4 },
+      "datasource": { "type": "loki", "uid": "ba808642-2177-4894-931e-93c97d6ae8b3" },
+      "targets": [
+        {
+          "refId": "A",
+          "editorMode": "code",
+          "legendFormat": "req/h",
+          "expr": "sum(count_over_time({job=\"autochecker-backend\", environment=\"prod\"} |= \"$tenant\" | pattern \"<lvl> <js>\" | line_format \"{{.js}}\" | json | tenant_schema=\"$tenant\" | user_email!=\"\" [1h]))"
+        }
+      ],
+      "fieldConfig": { "defaults": { "color": { "mode": "fixed", "fixedColor": "#FA094E" }, "unit": "short", "custom": { "drawStyle": "bars", "fillOpacity": 70, "lineWidth": 0, "gradientMode": "hue" } } },
+      "options": { "legend": { "showLegend": false }, "tooltip": { "mode": "single" } }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Por cliente — requests por hora",
+      "description": "Cada cliente tem seu relógio: Copercana = manhã e trabalha sábado; Rede Petro = tarde.",
+      "gridPos": { "h": 9, "w": 24, "x": 0, "y": 13 },
+      "datasource": { "type": "loki", "uid": "ba808642-2177-4894-931e-93c97d6ae8b3" },
+      "targets": [
+        { "refId": "A", "editorMode": "code", "legendFormat": "Copercana", "expr": "sum(count_over_time({job=\"autochecker-backend\", environment=\"prod\"} |= \"$tenant\" |= \"copercana\" | pattern \"<lvl> <js>\" | line_format \"{{.js}}\" | json | tenant_schema=\"$tenant\" | user_email!=\"\" [1h]))" },
+        { "refId": "B", "editorMode": "code", "legendFormat": "Rede Petro", "expr": "sum(count_over_time({job=\"autochecker-backend\", environment=\"prod\"} |= \"$tenant\" |= \"redepetro\" | pattern \"<lvl> <js>\" | line_format \"{{.js}}\" | json | tenant_schema=\"$tenant\" | user_email!=\"\" [1h]))" },
+        { "refId": "C", "editorMode": "code", "legendFormat": "Biopetro", "expr": "sum(count_over_time({job=\"autochecker-backend\", environment=\"prod\"} |= \"$tenant\" |= \"biopetro\" | pattern \"<lvl> <js>\" | line_format \"{{.js}}\" | json | tenant_schema=\"$tenant\" | user_email!=\"\" [1h]))" },
+        { "refId": "D", "editorMode": "code", "legendFormat": "Small", "expr": "sum(count_over_time({job=\"autochecker-backend\", environment=\"prod\"} |= \"$tenant\" |= \"small.com\" | pattern \"<lvl> <js>\" | line_format \"{{.js}}\" | json | tenant_schema=\"$tenant\" | user_email!=\"\" [1h]))" },
+        { "refId": "E", "editorMode": "code", "legendFormat": "Setta", "expr": "sum(count_over_time({job=\"autochecker-backend\", environment=\"prod\"} |= \"$tenant\" |= \"setta\" | pattern \"<lvl> <js>\" | line_format \"{{.js}}\" | json | tenant_schema=\"$tenant\" | user_email!=\"\" [1h]))" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "short", "custom": { "drawStyle": "line", "fillOpacity": 15, "lineWidth": 2, "showPoints": "never" } } },
+      "options": { "legend": { "showLegend": true, "placement": "right", "displayMode": "list" }, "tooltip": { "mode": "multi", "sort": "desc" } }
+    },
+    {
+      "id": 6,
+      "type": "table",
+      "title": "Top usuários (por e-mail) no período",
+      "gridPos": { "h": 10, "w": 12, "x": 0, "y": 22 },
+      "datasource": { "type": "loki", "uid": "ba808642-2177-4894-931e-93c97d6ae8b3" },
+      "targets": [
+        {
+          "refId": "A",
+          "editorMode": "code",
+          "queryType": "instant",
+          "format": "table",
+          "expr": "topk(15, sum by (user_email) (count_over_time({job=\"autochecker-backend\", environment=\"prod\"} |= \"$tenant\" | pattern \"<lvl> <js>\" | line_format \"{{.js}}\" | json | tenant_schema=\"$tenant\" | user_email!=\"\" [$__range])))"
+        }
+      ],
+      "transformations": [
+        { "id": "organize", "options": { "excludeByName": { "Time": true }, "renameByName": { "user_email": "E-mail", "Value": "Requests" } } },
+        { "id": "sortBy", "options": { "sort": [{ "field": "Requests", "desc": true }] } }
+      ],
+      "fieldConfig": { "defaults": { "custom": { "align": "auto" } }, "overrides": [{ "matcher": { "id": "byName", "options": "Requests" }, "properties": [{ "id": "custom.cellOptions", "value": { "type": "gauge", "mode": "gradient" } }, { "id": "color", "value": { "mode": "continuous-reds" } }] }] }
+    },
+    {
+      "id": 7,
+      "type": "table",
+      "title": "Rotas mais acessadas no período",
+      "gridPos": { "h": 10, "w": 12, "x": 12, "y": 22 },
+      "datasource": { "type": "loki", "uid": "ba808642-2177-4894-931e-93c97d6ae8b3" },
+      "targets": [
+        {
+          "refId": "A",
+          "editorMode": "code",
+          "queryType": "instant",
+          "format": "table",
+          "expr": "topk(15, sum by (path) (count_over_time({job=\"autochecker-backend\", environment=\"prod\"} |= \"$tenant\" | pattern \"<lvl> <js>\" | line_format \"{{.js}}\" | json | tenant_schema=\"$tenant\" | user_email!=\"\" [$__range])))"
+        }
+      ],
+      "transformations": [
+        { "id": "organize", "options": { "excludeByName": { "Time": true }, "renameByName": { "path": "Rota", "Value": "Requests" } } },
+        { "id": "sortBy", "options": { "sort": [{ "field": "Requests", "desc": true }] } }
+      ],
+      "fieldConfig": { "defaults": { "custom": { "align": "auto" } }, "overrides": [{ "matcher": { "id": "byName", "options": "Requests" }, "properties": [{ "id": "custom.cellOptions", "value": { "type": "gauge", "mode": "gradient" } }, { "id": "color", "value": { "mode": "continuous-blues" } }] }] }
+    }
+  ]
+}

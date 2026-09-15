@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Análise do ambiente production — AutoChecker</title>
+<style>
+  :root{
+    --bg:#1e2230;--bg-soft:#272c3d;--bg-card:#2b3146;--border:#3a4159;
+    --text:#e6e9f2;--text-soft:#b8bfd4;--muted:#8a92ad;
+    --accent:#7aa2ff;--accent-soft:#9db8ff;--green:#5cd6a0;--yellow:#f2c94c;--red:#ff7b7b;--blue:#69b7ff;
+    --code-bg:#1a1e2b;--code-text:#ffd9a8;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;line-height:1.65;font-size:16px;}
+  .wrap{max-width:980px;margin:0 auto;padding:48px 28px 80px;}
+  h1{font-size:2rem;line-height:1.25;margin:0 0 8px;color:#fff;font-weight:700;letter-spacing:-.01em;}
+  .subtitle{color:var(--text-soft);font-size:1.05rem;margin:0 0 4px;}
+  h2{font-size:1.45rem;margin:48px 0 14px;padding-top:18px;border-top:1px solid var(--border);color:#fff;font-weight:650;}
+  h2:first-of-type{border-top:none;}
+  h3{font-size:1.05rem;margin:22px 0 6px;color:var(--accent-soft);font-weight:600;}
+  p{margin:10px 0;color:var(--text-soft);}
+  strong{color:var(--text);font-weight:650;}
+  a{color:var(--accent);}
+  code{background:var(--code-bg);color:var(--code-text);padding:.12em .4em;border-radius:5px;font-size:.84em;font-family:"Cascadia Code",Consolas,"Courier New",monospace;}
+  ul,ol{margin:10px 0;padding-left:22px;}
+  li{margin:6px 0;color:var(--text-soft);}
+  .intro{background:var(--bg-soft);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:10px;padding:18px 22px;margin:20px 0 8px;}
+  .meta-table{width:100%;border-collapse:collapse;margin-top:10px;}
+  .meta-table td{padding:4px 10px 4px 0;vertical-align:top;border:none;color:var(--text-soft);}
+  .meta-table td:first-child{color:var(--muted);white-space:nowrap;width:200px;}
+  .kpis{display:flex;flex-wrap:wrap;gap:14px;margin:22px 0 8px;}
+  .kpi{flex:1 1 140px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;}
+  .kpi .num{font-size:1.6rem;font-weight:700;color:#fff;line-height:1.1;}
+  .kpi .lbl{color:var(--muted);font-size:.82rem;margin-top:4px;}
+  table{width:100%;border-collapse:collapse;margin:18px 0;font-size:.9rem;}
+  th,td{border:1px solid var(--border);padding:9px 12px;text-align:left;vertical-align:top;}
+  th{background:var(--bg-soft);color:#fff;font-weight:600;}
+  tbody tr:nth-child(even){background:rgba(255,255,255,.02);}
+  td.num,th.num{text-align:right;white-space:nowrap;}
+  .hot{color:var(--red);font-weight:650;}
+  .ok{color:var(--green);font-weight:600;}
+  .callout{border-radius:10px;padding:14px 18px;margin:18px 0;border-left:4px solid var(--accent);background:var(--bg-soft);}
+  .callout.danger{border-left-color:var(--red);background:rgba(255,123,123,.07);}
+  .callout.warn{border-left-color:var(--yellow);background:rgba(242,201,76,.07);}
+  .callout.good{border-left-color:var(--green);background:rgba(92,214,160,.07);}
+  .callout p{margin:4px 0;}
+  hr{border:none;border-top:1px solid var(--border);margin:34px 0;}
+  .footer{margin-top:40px;font-size:.82rem;color:var(--muted);font-style:italic;border-top:1px solid var(--border);padding-top:18px;}
+  .tag{display:inline-block;padding:.1em .55em;border-radius:20px;font-size:.78em;font-weight:600;white-space:nowrap;}
+  .t-red{background:rgba(255,123,123,.16);color:var(--red);}
+  .t-yellow{background:rgba(242,201,76,.16);color:var(--yellow);}
+  .t-green{background:rgba(92,214,160,.16);color:var(--green);}
+  .t-blue{background:rgba(105,183,255,.16);color:var(--blue);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Análise do ambiente <code>production</code> — AutoChecker</h1>
+<p class="subtitle">Views, funções, páginas e jobs mais utilizados em produção — com performance, erros, base de usuários e contexto.</p>
+
+<div class="intro">
+<table class="meta-table"><tbody>
+<tr><td><strong>Data</strong></td><td>17/06/2026</td></tr>
+<tr><td><strong>Produto</strong></td><td>AutoChecker (backend Django/Python · frontend Next.js · worker Celery · multi-tenant por schema)</td></tr>
+<tr><td><strong>Org Sentry</strong></td><td><code>automind-qd</code></td></tr>
+<tr><td><strong>Ambiente</strong></td><td><code>production</code></td></tr>
+<tr><td><strong>Janela</strong></td><td>Últimos 30 dias</td></tr>
+<tr><td><strong>Fonte</strong></td><td>Sentry ao vivo (<code>spans</code> e <code>errors</code>) — projetos backend, frontend e worker</td></tr>
+</tbody></table>
+</div>
+
+<div class="callout good">
+<p><strong>✅ Instrumentação completa — o oposto do AutoLoad.</strong> Aqui a stack inteira reporta em produção, com ambientes limpos (<code>production</code> + <code>staging</code>, sem rótulos duplicados). É a referência de observabilidade entre os produtos.</p>
+</div>
+
+<h2>1. Retrato do ambiente <code>production</code></h2>
+
+<div class="kpis">
+  <div class="kpi"><div class="num">98.967</div><div class="lbl">transações backend (30d)</div></div>
+  <div class="kpi"><div class="num">61.970</div><div class="lbl">transações frontend (30d)</div></div>
+  <div class="kpi"><div class="num">10.004</div><div class="lbl">execuções worker (30d)</div></div>
+  <div class="kpi"><div class="num">980</div><div class="lbl">usuários únicos</div></div>
+  <div class="kpi"><div class="num">autochecker.cloud</div><div class="lbl">domínio</div></div>
+</div>
+
+<table>
+<thead><tr><th>Projeto</th><th class="num">Transações <code>production</code></th><th>Telemetria prod?</th></tr></thead>
+<tbody>
+<tr><td><code>autochecker-backend</code></td><td class="num">98.967</td><td><span class="tag t-green">✓ sim</span></td></tr>
+<tr><td><code>autochecker-frontend</code></td><td class="num">61.970</td><td><span class="tag t-green">✓ sim</span></td></tr>
+<tr><td><code>autochecker-worker</code></td><td class="num">10.004</td><td><span class="tag t-green">✓ sim</span></td></tr>
+</tbody>
+</table>
+<p>Arquitetura <strong>multi-tenant por schema</strong> (Django + <code>SchemaHeaderMiddleware</code> / <code>TenantJWTAuthentication</code>). Notificações via polling de inbox + Firebase (push) + WhatsApp.</p>
+
+<h2>2. Telas mais usadas — frontend (Next.js)</h2>
+<p>Páginas reais (client-side), com a latência percebida pelo usuário.</p>
+<table>
+<thead><tr><th>#</th><th>Tela</th><th class="num">Acessos</th><th class="num">p75</th><th class="num">p95</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><strong>Configurações</strong> <code>/tenant/settings</code></td><td class="num">938</td><td class="num">1,11 s</td><td class="num">2,09 s</td></tr>
+<tr><td>2</td><td><strong>Documentos</strong> <code>/tenant/documents</code></td><td class="num">709</td><td class="num hot">2,04 s</td><td class="num hot">3,40 s</td></tr>
+<tr><td>3</td><td>Login <code>/login</code></td><td class="num">526</td><td class="num">1,57 s</td><td class="num">3,14 s</td></tr>
+<tr><td>4</td><td>Home do tenant <code>/tenant/home</code></td><td class="num">364</td><td class="num">1,81 s</td><td class="num hot">4,19 s</td></tr>
+<tr><td>5</td><td>Upload <code>/tenant/upload</code></td><td class="num">252</td><td class="num">1,23 s</td><td class="num">2,67 s</td></tr>
+</tbody>
+</table>
+<div class="callout"><p><strong>Leitura:</strong> o fluxo gira em torno de <strong>Documentos</strong> (lista, upload, visualização) — o core do produto (validação documental). Telas-chave com p95 de 3–4 s, com espaço de otimização.</p></div>
+
+<h3>BFF / rotas de API do frontend mais chamadas</h3>
+<table>
+<thead><tr><th>Rota (Next.js BFF)</th><th class="num">Chamadas</th><th class="num">p95</th></tr></thead>
+<tbody>
+<tr><td><code>GET /api/notifications/inbox-get-unread</code></td><td class="num">25.820</td><td class="num">562 ms</td></tr>
+<tr><td><code>GET /api/permission/get</code></td><td class="num">5.825</td><td class="num">572 ms</td></tr>
+<tr><td><code>GET /api/trial/status</code></td><td class="num">2.600</td><td class="num">358 ms</td></tr>
+<tr><td><code>GET /api/login/companySwitch</code></td><td class="num">2.385</td><td class="num">915 ms</td></tr>
+<tr><td><code>GET /api/notifications/inbox-list</code></td><td class="num">2.270</td><td class="num">679 ms</td></tr>
+<tr><td><code>GET /api/document/list-paged</code></td><td class="num">1.180</td><td class="num hot">1,64 s</td></tr>
+<tr><td><code>GET /api/document/view</code></td><td class="num">535</td><td class="num hot">2,57 s</td></tr>
+</tbody>
+</table>
+
+<h2>3. Views de backend (Django) mais usadas</h2>
+<table>
+<thead><tr><th>#</th><th>View / endpoint</th><th class="num">Chamadas</th><th class="num">p75</th><th class="num">p95</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><code>/api/notifications/inbox/unread_count/</code></td><td class="num">25.835</td><td class="num">113 ms</td><td class="num">302 ms</td></tr>
+<tr><td>2</td><td><code>/api/core/permissions/</code></td><td class="num">5.890</td><td class="num">129 ms</td><td class="num">334 ms</td></tr>
+<tr><td>3</td><td><code>/</code> (root/health)</td><td class="num">4.955</td><td class="num ok">4 ms</td><td class="num">7 ms</td></tr>
+<tr><td>4</td><td><code>/api/trial/status/</code></td><td class="num">2.660</td><td class="num">121 ms</td><td class="num">259 ms</td></tr>
+<tr><td>5</td><td><code>/api/tenants/all-tenants-switcher/</code></td><td class="num">2.375</td><td class="num hot">402 ms</td><td class="num hot">831 ms</td></tr>
+<tr><td>6</td><td><code>/api/notifications/inbox/</code></td><td class="num">2.300</td><td class="num">128 ms</td><td class="num">245 ms</td></tr>
+<tr><td>7</td><td><code>/api/documents/upload-usage/</code></td><td class="num">1.545</td><td class="num">139 ms</td><td class="num">295 ms</td></tr>
+<tr><td>8</td><td><code>/api/documents/</code></td><td class="num">1.270</td><td class="num">531 ms</td><td class="num hot">1,04 s</td></tr>
+<tr><td>9</td><td><code>/api/accounts/me/</code></td><td class="num">915</td><td class="num">106 ms</td><td class="num">256 ms</td></tr>
+<tr><td>10</td><td><code>/api/documents/{document_id}/view/</code></td><td class="num">535</td><td class="num">379 ms</td><td class="num">668 ms</td></tr>
+<tr><td>11</td><td><code>/api/accounts/login/step1/</code></td><td class="num">385</td><td class="num hot">809 ms</td><td class="num">1,22 s</td></tr>
+<tr><td>—</td><td><code>/api/entity/driver/</code> · <code>/api/entity/vehicle/</code></td><td class="num">320 · 235</td><td class="num">~120 ms</td><td class="num">~200 ms</td></tr>
+</tbody>
+</table>
+<div class="callout warn"><p><strong>Insight #1 — polling domina tudo.</strong> <code>inbox/unread_count/</code> (backend 25.835 + BFF 25.820 ≈ <strong>52 mil chamadas</strong>) é ~⅓ de todo o tráfego. Maior alavanca: trocar polling por push/websocket ou aumentar o intervalo.</p></div>
+
+<h3>🔍 Ruído de varredura de segurança (bots)</h3>
+<p>O backend recebe scans automáticos procurando segredos/PHP — respondem 404 rápido, mas poluem os dados e indicam exposição.</p>
+<table>
+<thead><tr><th>Alvo</th><th class="num">Hits</th></tr></thead>
+<tbody>
+<tr><td><code>/.env</code> · <code>/.env.local</code> · <code>/.env.production</code></td><td class="num">1.180 · 235 · 230</td></tr>
+<tr><td><code>/index.php</code></td><td class="num">210</td></tr>
+<tr><td><code>/favicon.ico</code> · <code>/*</code></td><td class="num">355 · 460</td></tr>
+</tbody>
+</table>
+<p>Recomendado: bloquear no edge (Cloudflare/WAF) e filtrar (inbound filter) no Sentry.</p>
+
+<h2>4. Jobs do worker (Celery) mais executados</h2>
+<table>
+<thead><tr><th>#</th><th>Task</th><th class="num">Execuções</th><th class="num">p75</th><th class="num">p95</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><code>report_tasks.generate_user_scheduled_report</code></td><td class="num">4.318</td><td class="num">480 ms</td><td class="num">2,05 s</td></tr>
+<tr><td>2</td><td><code>notification_tasks.process_notification_task</code></td><td class="num">2.291</td><td class="num">911 ms</td><td class="num">1,17 s</td></tr>
+<tr><td>3</td><td><code>integration_tasks.integration_reauth</code></td><td class="num">1.776</td><td class="num">551 ms</td><td class="num">928 ms</td></tr>
+<tr><td>4</td><td><code>classification.classify_document</code></td><td class="num">270</td><td class="num">2,93 s</td><td class="num">4,03 s</td></tr>
+<tr><td>5</td><td><code>authenticator.authenticate_document</code></td><td class="num">265</td><td class="num hot">61,9 s</td><td class="num hot">63,6 s</td></tr>
+<tr><td>6</td><td><code>entry.process_document_validation</code></td><td class="num">190</td><td class="num ok">135 ms</td><td class="num">180 ms</td></tr>
+<tr><td>7</td><td><code>extract.extract_data</code></td><td class="num">167</td><td class="num hot">8,2 s</td><td class="num">9,2 s</td></tr>
+<tr><td>8</td><td><code>ocr.run_textract</code></td><td class="num">160</td><td class="num hot">30,5 s</td><td class="num hot">52,6 s</td></tr>
+<tr><td>9</td><td><code>report_tasks.generate_scheduled_reports</code></td><td class="num">152</td><td class="num">1,42 s</td><td class="num">3,17 s</td></tr>
+<tr><td>10</td><td><code>site_monitoring.collect_sites_availability</code></td><td class="num">143</td><td class="num hot">21,2 s</td><td class="num">24,6 s</td></tr>
+</tbody>
+</table>
+<div class="callout warn"><p><strong>Insight #2 — pipeline de validação documental é o peso.</strong> OCR (<code>run_textract</code> 30–52 s), <code>authenticate_document</code> (<strong>62 s</strong>), <code>extract_data</code> (8 s) e <code>collect_sites_availability</code> (21 s) são os mais lentos. São assíncronos (tolerável), mas <code>authenticate_document</code> a 62 s merece revisão de timeout/dependência externa.</p></div>
+
+<h2>5. Erros em produção</h2>
+
+<h3>Backend (Django)</h3>
+<table>
+<thead><tr><th>Erro</th><th class="num">Eventos</th><th>Avaliação</th></tr></thead>
+<tbody>
+<tr><td><code>KeyError: '…process_scheduled_notifications'</code></td><td class="num">243</td><td><span class="tag t-red">bug</span> Task órfã no Celery Beat (ver Etapa 3)</td></tr>
+<tr><td><code>[TenantJWTAuthentication] Autenticação JWT falhou</code> (endpoints públicos)</td><td class="num">179+105+…</td><td><span class="tag t-yellow">ruído</span> Esperado em público, mas logado como erro</td></tr>
+<tr><td><code>[SchemaHeaderMiddleware] Erro ao processar token JWT</code></td><td class="num">45</td><td>Auth/token</td></tr>
+<tr><td><code>DisallowedHost: '192.0.2.1' / '159.223.151.055'</code></td><td class="num">43+13</td><td><span class="tag t-yellow">scan</span> Probe de segurança</td></tr>
+<tr><td><code>FieldError: Cannot resolve keyword 'name'</code></td><td class="num">19</td><td><span class="tag t-red">bug</span> Query real</td></tr>
+<tr><td><code>SchemaHeaderMiddleware: Tenant não encontrado</code></td><td class="num">21+19</td><td>Resolução multi-tenant</td></tr>
+<tr><td><code>Cannot connect to redis://10.116.0.6:6389</code></td><td class="num">13</td><td>Blip de infra (Redis)</td></tr>
+</tbody>
+</table>
+<p style="color:var(--muted);font-size:.85rem;"><code>count_unique(user)</code> = 0 em todos — erros server-side sem contexto de usuário. Enriquecer com user/tenant ajudaria.</p>
+
+<h3>Worker (Celery)</h3>
+<table>
+<thead><tr><th>Erro</th><th class="num">Eventos</th><th>Avaliação</th></tr></thead>
+<tbody>
+<tr><td><code>Task failed</code> (genérico)</td><td class="num">159</td><td>Sem mensagem específica</td></tr>
+<tr><td><code>Erro HTTP ao enviar webhook: 404 - Token não encontrado</code></td><td class="num">153</td><td><span class="tag t-red">bug</span> Entrega de webhook quebrada</td></tr>
+<tr><td><code>ProgrammingError: relation "notifications_notificationlog" does not exist</code></td><td class="num">87</td><td><span class="tag t-red">crítico</span> Migração não aplicada em schema</td></tr>
+<tr><td><code>ProgrammingError: relation "upload_document" does not exist</code></td><td class="num">34</td><td><span class="tag t-red">crítico</span> Tabela ausente em schema</td></tr>
+<tr><td><code>RuntimeError: Falha no scraping CIV/CIPP … Retentar</code></td><td class="num">&gt;100</td><td>Dependência externa (scraping gov) instável</td></tr>
+<tr><td><code>KeyError: '…process_scheduled_notifications'</code></td><td class="num">23</td><td><span class="tag t-red">bug</span> Mesma task órfã do Beat</td></tr>
+<tr><td><code>WhatsApp 404 - Template 'password_reset' não existe</code></td><td class="num">18+12</td><td><span class="tag t-red">bug</span> Reset de senha por WhatsApp quebrado</td></tr>
+<tr><td><code>Error checking site aux-server… ReadTimeout</code></td><td class="num">13</td><td>Timeout no monitor de sites</td></tr>
+</tbody>
+</table>
+
+<h3>Frontend (Next.js) — muito limpo</h3>
+<table>
+<thead><tr><th>Erro</th><th class="num">Eventos</th><th class="num">Usuários</th><th>Avaliação</th></tr></thead>
+<tbody>
+<tr><td><code>FirebaseError: Messaging unsupported-browser</code></td><td class="num">26</td><td class="num">16</td><td><span class="tag t-yellow">ruído</span> Compat de navegador (push)</td></tr>
+<tr><td><code>t.with</code></td><td class="num">2</td><td class="num">2</td><td>Minificado</td></tr>
+<tr><td><code>Object Not Found Matching Id… update</code></td><td class="num">1</td><td class="num">1</td><td>Ruído WebSocket</td></tr>
+</tbody>
+</table>
+
+<h2>6. Síntese e recomendações</h2>
+<ol>
+<li><strong>Reduzir polling de notificações.</strong> <code>inbox/unread_count/</code> é ~⅓ do tráfego (52k req). Migrar p/ push (já há FCM) / websocket, ou aumentar intervalo — maior alavanca de custo/performance.</li>
+<li><strong>Corrigir a task órfã do Beat</strong> (<code>process_scheduled_notifications</code>, 243+23 erros). Já mapeada na <strong>Etapa 3</strong> (tickets #53659/#53707). Fechamento rápido.</li>
+<li><strong>Migrações faltando em schemas de tenant</strong> (<code>notifications_notificationlog</code>, <code>upload_document</code>). Risco real de perda de notificação/documento — auditar <code>migrate_schemas</code>.</li>
+<li><strong>WhatsApp <code>password_reset</code> ausente</strong> — reset de senha por WhatsApp falhando. Cadastrar/aprovar template na Meta.</li>
+<li><strong>Performance do pipeline documental.</strong> <code>authenticate_document</code> 62 s e <code>run_textract</code> 30–52 s — revisar timeouts e dependências externas.</li>
+<li><strong>Reduzir ruído no Sentry:</strong> rebaixar <code>TenantJWTAuthentication</code> em endpoints públicos p/ warning; filtrar scans (<code>/.env</code>, <code>DisallowedHost</code>) no edge + inbound filters.</li>
+<li><strong>Telas lentas:</strong> <code>/tenant/documents</code> (p95 3,4 s) e <code>/tenant/home</code> (p95 4,2 s) — investigar (provável <code>list-paged</code> p95 1,6 s + payload).</li>
+</ol>
+
+<div class="footer">
+Dados ao vivo do Sentry (org <code>automind-qd</code>, projetos backend/frontend/worker, <code>environment:production</code>, 30 dias). Latências p75/p95 em <code>span.duration</code>. Consulta projeto a projeto. Documento gerado em 17/06/2026.
+</div>
+
+</div>
+</body>
+</html>

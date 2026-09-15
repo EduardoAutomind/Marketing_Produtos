@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mudanças AutoChecker relevantes p/ Observabilidade · AutoMind</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,400;0,500;0,700;0,900;1,400&display=swap');
+  :root{
+    --am-rosa:#FA094E; --am-magenta:#940755; --am-roxo:#44055A;
+    --am-navy:#03045E; --am-preto:#100F0F; --am-offwhite:#F3F3F0;
+    --am-gradiente-h:linear-gradient(90deg,#FA094E 0%,#03045E 100%);
+    --card:#ffffff; --line:#e4e2dd;
+    --ok:#1f8a4c; --warn:#b8860b; --crit:#FA094E;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{font-family:"Red Hat Display",system-ui,sans-serif;color:var(--am-preto);
+    background:var(--am-offwhite); margin:0; line-height:1.6; font-size:16px;}
+  .topbar{height:8px; background:var(--am-gradiente-h);}
+  header{padding:34px 7vw 22px; border-bottom:1px solid var(--line);}
+  .wordmark{font-weight:900; text-transform:uppercase; letter-spacing:.20em;
+    color:var(--am-roxo); font-size:15px;}
+  .wordmark .dot{color:var(--am-rosa);}
+  .tagline{font-size:11px; letter-spacing:.32em; text-transform:uppercase;
+    color:var(--am-navy); opacity:.7; margin-top:2px;}
+  h1{font-weight:900; color:var(--am-roxo); font-size:30px; line-height:1.2;
+    margin:18px 0 6px; letter-spacing:.01em;}
+  .sub{color:var(--am-navy); font-size:14px; opacity:.85;}
+  .pill{display:inline-block; background:var(--am-roxo); color:#fff; font-size:11px;
+    font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    padding:4px 11px; border-radius:999px; margin:8px 6px 0 0;}
+  .pill.alt{background:var(--am-rosa);}
+  main{padding:14px 7vw 60px; max-width:1080px;}
+  h2{font-weight:700; color:var(--am-roxo); font-size:21px; margin:38px 0 10px;
+    padding-top:14px; border-top:2px solid var(--am-rosa); display:inline-block;}
+  h3{font-weight:700; color:var(--am-navy); font-size:16px; margin:22px 0 6px;}
+  p{margin:10px 0;}
+  a{color:var(--am-rosa); text-decoration:none;} a:hover{text-decoration:underline;}
+  ul,ol{margin:10px 0; padding-left:22px;} li{margin:5px 0;}
+  code{font-family:"SFMono-Regular",Consolas,monospace; background:#efeeea;
+    padding:1px 6px; border-radius:5px; font-size:.88em; color:var(--am-magenta);}
+  pre{background:var(--am-preto); color:#f3f3f0; padding:14px 16px; border-radius:12px;
+    overflow:auto; font-size:13px; line-height:1.5;}
+  pre code{background:none; color:inherit; padding:0;}
+  hr{border:none; border-top:1px solid var(--line); margin:26px 0;}
+  blockquote{border-left:4px solid var(--am-rosa); background:#fff; border-radius:0 12px 12px 0;
+    padding:8px 18px; margin:14px 0; color:var(--am-navy); font-size:14.5px;}
+  table{border-collapse:collapse; width:100%; margin:14px 0; font-size:14px;}
+  th,td{text-align:left; padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top;}
+  th{background:#efeeea; color:var(--am-roxo); font-weight:700; font-size:12px;
+    text-transform:uppercase; letter-spacing:.05em;}
+  tr:last-child td{border-bottom:none;}
+  .tldr{background:linear-gradient(0deg,#fff,#fff) padding-box,var(--am-gradiente-h) border-box;
+    border:2px solid transparent; border-radius:16px; padding:16px 22px; font-size:16px; margin:18px 0;}
+  .flag{font-weight:700; font-size:12px; padding:1px 7px; border-radius:6px; white-space:nowrap;}
+  .f-sei{background:#e3f3e9; color:var(--ok);}
+  .f-parc{background:#fbf2da; color:var(--warn);}
+  .f-nao{background:#fde4ea; color:var(--crit);}
+  footer{padding:24px 7vw 50px; color:var(--am-navy); opacity:.7; font-size:12.5px;
+    border-top:1px solid var(--line);}
+</style>
+</head>
+<body>
+<div class="topbar"></div>
+<header>
+  <div class="wordmark">AUTOMIND<span class="dot">.</span></div>
+  <div class="tagline">Simple · Smart · Reliable</div>
+  <h1>Mudanças no código do AutoChecker<br>relevantes para <span style='color:var(--am-rosa)'>Observabilidade</span></h1>
+  <div class="sub">Azure DevOps · org automindautomacao · janela 08→30/06/2026 · gerado 2026-06-30</div>
+  <span class="pill">Análise de código</span>
+  <span class="pill alt">Azure DevOps</span>
+  <span class="pill">IntegrationLog</span>
+</header>
+<main>
+<p><strong>Produto:</strong> AutoChecker
+<strong>Fonte:</strong> Azure DevOps — org <code>automindautomacao</code>, projeto <code>AutoChecker</code> (6 repositórios)
+<strong>Janela analisada:</strong> 08/06/2026 → 30/06/2026
+<strong>Data da análise:</strong> 30/06/2026
+<strong>Método:</strong> varredura de commits/PRs nos 6 repos + leitura dos diffs dos PRs relevantes (<code>apps/integrations/views.py</code>, <code>shared/tasks/integration_tasks.py</code>, componentes de timeline do frontend) e do modelo/serializer <code>IntegrationLog</code>.</p>
+<hr />
+<h2>TL;DR</h2>
+<p>Sim, houve <strong>uma mudança grande e diretamente relevante</strong>: o subsistema de <strong><code>IntegrationLog</code></strong> ganhou observabilidade <em>in-app</em> (timeline por entidade + retry manual), surfaceada na UI. É a primeira camada de observabilidade do AutoChecker que <strong>não depende do Sentry</strong>. Bom para o roadmap — mas acende um <strong>alerta LGPD</strong> (auditado em separado: <code>Auditoria_LGPD_IntegrationLog_AutoChecker_2026-06-30.md</code>), porque passa a <strong>persistir e exibir payloads completos</strong> que contêm PII.</p>
+<p><strong>Não houve</strong> nenhuma mudança de Sentry/DSN/instrumentação de erro no período.</p>
+<hr />
+<h2>Repos com movimento no período</h2>
+<table>
+<thead>
+<tr>
+<th>Repositório</th>
+<th>Commits no período</th>
+<th>Relevante p/ observabilidade?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AutoChecker</code> (backend Django)</td>
+<td>sim</td>
+<td>✅ Sim — IntegrationLog</td>
+</tr>
+<tr>
+<td><code>AutoChecker_Frontend</code> (Next.js)</td>
+<td>sim</td>
+<td>✅ Sim — IntegrationTimeline</td>
+</tr>
+<tr>
+<td><code>AutoChecker_APP</code> (mobile)</td>
+<td>sim</td>
+<td>⚪ Não (LGPD/UX)</td>
+</tr>
+<tr>
+<td><code>AutoChecker_OCR</code></td>
+<td>—</td>
+<td>sem commits</td>
+</tr>
+<tr>
+<td><code>AutoChecker_AIAgent</code></td>
+<td>—</td>
+<td>sem commits</td>
+</tr>
+<tr>
+<td><code>AutoChecker_Custos</code></td>
+<td>—</td>
+<td>sem commits</td>
+</tr>
+<tr>
+<td><code>Scrapping</code></td>
+<td>—</td>
+<td>sem commits</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>1. ⭐ Observabilidade in-app de integrações — PRs 15213 (backend) + 15214 (frontend), 29/06</h2>
+<p>Work item <strong>#55909</strong> (branch <code>fix/55909</code>).</p>
+<h3>Backend — <code>backend/apps/integrations/views.py</code> (PR 15213)</h3>
+<ul>
+<li>O <code>IntegrationLogViewSet</code> (ReadOnly, paginado 20/pág, <code>IntegrationsAccessPermission</code>) passou a <strong>filtrar por <code>entity_type</code> e <code>entity_id</code></strong> — além dos filtros já existentes <code>status</code>, <code>event_type</code>, <code>provider_id</code>. Na prática: dá para puxar <strong>o histórico/linha do tempo de integração de um motorista ou veículo específico</strong>.</li>
+<li>Ganhou a ação <strong><code>retry</code></strong> (<code>POST .../retry</code>): re-despacha um log com <code>status="failed"</code> reenfileirando a task Celery <code>process_integration_event.delay(...)</code>, reaproveitando <code>log.request_payload</code>, <code>event_type</code>, <code>entity_id</code>, <code>entity_type</code>, <code>approved</code>. Só aceita logs <code>failed</code>; erros são logados com <code>logger.error(..., exc_info=True)</code>.</li>
+<li>Cobertura de testes adicionada (<code>test_integrations_views.py</code>): valida os filtros por entidade e a configuração read-only do viewset.</li>
+</ul>
+<h3>Backend — <code>shared/tasks/integration_tasks.py</code></h3>
+<ul>
+<li>Cada evento de integração cria <strong>um <code>IntegrationLog</code> por endpoint executado</strong> (<code>_create_log</code> / <code>_update_log</code>), persistindo <code>request_payload</code> (entity_data), <code>endpoint_name</code>, <code>curl_command</code>, <code>request_body</code>, <code>status</code> (success/failed), <code>error_message</code>, <code>response_status_code</code>.</li>
+<li>Logging estruturado consistente com prefixos <code>[IntegrationTask]</code> / <code>[BatchDispatch]</code> (<code>logger.info</code>/<code>logger.error</code>).</li>
+<li><code>BatchDispatchView</code> despacha motoristas/veículos em lote com contagem de <code>queued</code>/<code>skipped</code> e <code>skipped_reasons</code> — bom para diagnóstico operacional.</li>
+</ul>
+<h3>Frontend — <code>AutoChecker_Frontend</code> (PR 15214)</h3>
+<ul>
+<li>Novos componentes: <code>IntegrationTimeline.tsx</code>, <code>IntegrationTimelineModal.tsx</code>, integrados às tabelas <code>DriversEntityTable.tsx</code> e <code>VehiclesEntityTable.tsx</code> + <code>EntityDetailsModal.tsx</code>.</li>
+<li>Novo <code>modules/settings/services/integrationService.ts</code> e tipos em <code>modules/settings/types/integration.ts</code>.</li>
+<li>Resultado: <strong>a timeline e os logs de integração por entidade aparecem na UI</strong>, com ação de retry. Testes em <code>__tests__/IntegrationTimeline.test.tsx</code>.</li>
+</ul>
+<h3>Por que importa para o roadmap</h3>
+<p>É a primeira ferramenta de <strong>troubleshooting/auditoria de falhas de integração nativa do produto</strong>, fora do Sentry. Endereça parte da lacuna de "visibilidade de falhas de integração" mapeada no cronograma. Sugiro registrar como item de observabilidade aplicada na Onda correspondente do AutoChecker. Cobre: status por entidade, motivo do erro, status code HTTP, retry com 1 clique.</p>
+<hr />
+<h2>2. ⚠️ Alerta LGPD (auditado em separado)</h2>
+<p>O modelo <code>IntegrationLog</code> (<code>shared/models/integrations.py</code>, <code>db_table=integrations_log</code>) <strong>persiste <code>request_payload</code> (JSON completo enviado ao ERP) e <code>response_body</code> (resposta completa do ERP)</strong>, sem TTL/retenção, e o <code>IntegrationLogDetailSerializer</code> <strong>expõe os dois na UI</strong>. Como o payload carrega PII (CPF, CNH, nome, documentos), isso replica — agora num log de aplicação próprio — o mesmo padrão de risco já mapeado no Sentry (Etapa 7). <strong>Ver auditoria dedicada:</strong> <code>Auditoria_LGPD_IntegrationLog_AutoChecker_2026-06-30.md</code>.</p>
+<hr />
+<h2>3. Bloco LGPD / aceite digital (colateral de auditoria e segurança)</h2>
+<p>PRs 14944 / 15192 / 15195 / 15196 (backend + frontend) — "Aceite Digital de Termos e Política (LGPD)" e "auditoria forense do aceite":
+- <code>LegalAcceptanceMiddleware</code> (enforcement do aceite no backend), interceptor 403, gate global de re-aceite.
+- Captura de <strong>IP + User-Agent reais</strong> nos proxies de aceite (trilha de auditoria forense) e <code>user_cpf</code> como evidência.
+- <code>f75496c</code> — <strong>"remover backend_url leak em devtools"</strong>: correção de vazamento de informação em devtools no frontend (higiene de segurança/observabilidade).</p>
+<p>Relevância: trilha de auditoria (accountability, art. 6º X LGPD) e correção de info-leak — tangenciais à observabilidade, mas no mesmo eixo de governança.</p>
+<hr />
+<h2>4. CI do frontend — PR 14983</h2>
+<p>Adicionado step de <strong>type-check no pipeline</strong> (<code>typecheck</code> no <code>package.json</code> + etapa no CI). Qualidade; relevância indireta.</p>
+<hr />
+<h2>O que NÃO mudou (e importa para o nosso escopo)</h2>
+<ul>
+<li><strong>Sentry:</strong> nenhuma alteração de DSN, settings, init ou instrumentação de erro nos repos do AutoChecker no período. A cobertura Sentry segue como no último snapshot.</li>
+<li><strong>Pilar de telemetria:</strong> backend continua com <code>logging.getLogger</code> padrão; não houve adoção de logging estruturado JSON, métricas ou tracing novos.</li>
+</ul>
+<hr />
+<h2>Referências cruzadas</h2>
+<ul>
+<li><code>Auditoria_LGPD_IntegrationLog_AutoChecker_2026-06-30.md</code> — auditoria LGPD do achado #2.</li>
+<li><code>Etapa7_Analise_Consentimento_LGPD_Termo_vs_Sentry_AutoChecker.md</code> — caso análogo no Sentry.</li>
+<li>Memória: <code>autochecker-etapa7-analise-lgpd</code>, <code>autochecker-cronograma-workitems-azure</code>.</li>
+</ul>
+<hr />
+<p><em>Análise baseada em leitura direta dos diffs dos PRs 15213/15214 e do modelo/serializer <code>IntegrationLog</code>. Não foram lidos integralmente os arquivos não relacionados a observabilidade que vieram no mesmo PR 15213 (correção de extrator CVV/regex).</em></p>
+</main>
+<footer>Análise baseada na leitura direta dos diffs dos PRs 15213/15214 e do modelo/serializer IntegrationLog · AutoMind · Observabilidade AutoMind · 2026-06-30</footer>
+</body>
+</html>

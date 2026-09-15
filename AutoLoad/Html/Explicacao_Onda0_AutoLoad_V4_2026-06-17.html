@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Explicação da Onda 0 — AutoLoad V4</title>
+<style>
+  :root{
+    --bg:#1e2230;            /* dark, mas não tão escuro */
+    --bg-soft:#272c3d;
+    --bg-card:#2b3146;
+    --border:#3a4159;
+    --text:#e6e9f2;
+    --text-soft:#b8bfd4;
+    --muted:#8a92ad;
+    --accent:#7aa2ff;
+    --accent-soft:#9db8ff;
+    --green:#5cd6a0;
+    --yellow:#f2c94c;
+    --red:#ff7b7b;
+    --blue:#69b7ff;
+    --code-bg:#1a1e2b;
+    --code-text:#ffd9a8;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.65;
+    font-size:16px;
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:48px 28px 80px;}
+  h1{
+    font-size:2rem;line-height:1.25;margin:0 0 8px;
+    color:#fff;font-weight:700;letter-spacing:-.01em;
+  }
+  h2{
+    font-size:1.45rem;margin:48px 0 14px;padding-top:18px;
+    border-top:1px solid var(--border);color:#fff;font-weight:650;
+  }
+  h2:first-of-type{border-top:none;}
+  h3{font-size:1.05rem;margin:20px 0 6px;color:var(--accent-soft);font-weight:600;}
+  p{margin:10px 0;color:var(--text-soft);}
+  strong{color:var(--text);font-weight:650;}
+  a{color:var(--accent);}
+  code{
+    background:var(--code-bg);color:var(--code-text);
+    padding:.12em .4em;border-radius:5px;font-size:.86em;
+    font-family:"Cascadia Code",Consolas,"Courier New",monospace;
+  }
+  ul{margin:10px 0;padding-left:22px;}
+  li{margin:6px 0;color:var(--text-soft);}
+  /* intro box */
+  .intro{
+    background:var(--bg-soft);border:1px solid var(--border);
+    border-left:4px solid var(--accent);border-radius:10px;
+    padding:18px 22px;margin:20px 0 8px;
+  }
+  .intro p{margin:6px 0;color:var(--text-soft);}
+  .meta-table{width:100%;border-collapse:collapse;margin-top:10px;}
+  .meta-table td{padding:4px 10px 4px 0;vertical-align:top;border:none;color:var(--text-soft);}
+  .meta-table td:first-child{color:var(--muted);white-space:nowrap;width:200px;}
+  /* etapa card */
+  .etapa{
+    background:var(--bg-card);border:1px solid var(--border);
+    border-radius:12px;padding:6px 26px 22px;margin:18px 0;
+  }
+  /* tables */
+  table{width:100%;border-collapse:collapse;margin:18px 0;font-size:.92rem;}
+  th,td{border:1px solid var(--border);padding:9px 12px;text-align:left;vertical-align:top;}
+  th{background:var(--bg-soft);color:#fff;font-weight:600;}
+  tbody tr:nth-child(even){background:rgba(255,255,255,.02);}
+  /* status badges */
+  .badge{display:inline-block;padding:.12em .55em;border-radius:20px;font-size:.82em;font-weight:600;white-space:nowrap;}
+  .b-done{background:rgba(92,214,160,.16);color:var(--green);}
+  .b-prog{background:rgba(105,183,255,.16);color:var(--blue);}
+  .b-warn{background:rgba(242,201,76,.16);color:var(--yellow);}
+  .b-none{background:rgba(255,123,123,.16);color:var(--red);}
+  .b-conf{background:rgba(154,184,255,.16);color:var(--accent-soft);}
+  /* callouts */
+  .callout{
+    border-radius:10px;padding:14px 18px;margin:18px 0;
+    border-left:4px solid var(--accent);background:var(--bg-soft);
+  }
+  .callout.danger{border-left-color:var(--red);background:rgba(255,123,123,.07);}
+  .callout.warn{border-left-color:var(--yellow);background:rgba(242,201,76,.07);}
+  .callout p{margin:4px 0;}
+  blockquote{
+    margin:18px 0;padding:12px 18px;border-left:4px solid var(--accent);
+    background:var(--bg-soft);border-radius:0 8px 8px 0;color:var(--text-soft);
+  }
+  .verdict{
+    font-size:1.12rem;font-weight:650;color:#fff;
+    background:rgba(255,123,123,.1);border:1px solid rgba(255,123,123,.35);
+    border-radius:10px;padding:16px 20px;margin:18px 0;
+  }
+  hr{border:none;border-top:1px solid var(--border);margin:34px 0;}
+  .footer{margin-top:40px;font-size:.82rem;color:var(--muted);font-style:italic;border-top:1px solid var(--border);padding-top:18px;}
+  .section-label{color:var(--green);font-weight:600;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Explicação da Onda 0 — AutoLoad V4</h1>
+
+<div class="intro"><p><strong>Para quem é este documento:</strong> alguém que está começando na área de tecnologia e quer
+entender, sem jargão, o que é a "Onda 0" do plano de observabilidade do AutoLoad V4, o que
+cada etapa faz e em que pé ela está.</p><table class="meta-table">
+
+<tbody>
+<tr>
+<td><strong>Data</strong></td>
+<td>17/06/2026</td>
+</tr>
+<tr>
+<td><strong>Produto</strong></td>
+<td>AutoLoad V4 (backend .NET 8 · frontend Next.js 14 · EdgeGateway .NET 8 Worker · portal-cliente)</td>
+</tr>
+<tr>
+<td><strong>Ferramenta de monitoramento</strong></td>
+<td>Sentry (org <code>automind-qd</code>)</td>
+</tr>
+<tr>
+<td><strong>Fonte de verdade do status</strong></td>
+<td>Auditoria de código (08/06/2026) — confronto etapa-a-etapa contra o código real em <code>Produtos/Autoload V4</code></td>
+</tr>
+<tr>
+<td><strong>Fontes lidas</strong></td>
+<td>Cronograma Revisado (Excel 02/06), Auditoria de código (08/06), Documentação do produto, Ata de alinhamento e Questionário do dev</td>
+</tr>
+</tbody>
+</table></div>
+
+<h2>O que é a Onda 0?</h2><p>Imagine que você vai construir uma casa de vários andares. Antes de levantar qualquer parede,
+você precisa de uma <strong>fundação firme e de um terreno limpo</strong>. A Onda 0 é exatamente isso para o
+plano de observabilidade do AutoLoad V4: é a <strong>fase de saneamento da base</strong>.</p>
+<p>"Observabilidade" é a capacidade de <strong>enxergar o que está acontecendo dentro do sistema</strong> — saber
+quando algo quebra, onde quebrou e por quê. A ferramenta que faz isso aqui é o <strong>Sentry</strong>, que
+funciona como uma "central de alarmes" que captura os erros do programa.</p>
+<p>O problema é que, hoje, essa central está com os alarmes <strong>mal regulados</strong>: dispara milhares de
+vezes para uma única falha (chega a projetar centenas de milhares de eventos por mês de <strong>um só</strong>
+erro), mistura dados de quatro frentes diferentes no mesmo lugar e pode estar deixando passar
+informações pessoais — CPF, placa, dados de motorista — que não deveriam aparecer. A Onda 0
+conserta tudo isso <strong>antes</strong> de seguir em frente.</p>
+<p>Por isso ela é chamada de <strong>"gate"</strong> (portão): enquanto a Onda 0 não estiver concluída, as próximas
+ondas (1 a 6) <strong>não devem começar</strong>. Não adianta construir andares novos sobre uma fundação torta.</p>
+<p>O AutoLoad V4 tem <strong>quatro "motores"</strong>: o <strong>backend</strong> (.NET 8, o cérebro), o <strong>frontend</strong> (Next.js,
+a tela que o operador vê), o <strong>EdgeGateway</strong> (um programa .NET que roda perto dos equipamentos de
+campo e fala com eles via MQTT) e o <strong>portal-cliente</strong> (a área do cliente). A Onda 0 tem <strong>8 etapas</strong>.
+Abaixo, cada uma é explicada em linguagem do dia a dia.</p>
+<div class="callout"><p><strong>Uma diferença importante em relação ao AutoChecker:</strong> o AutoLoad <strong>não tem um quadro de tarefas
+no Azure DevOps</strong> para servir de fonte de verdade. Por isso, aqui o status de cada etapa vem da
+<strong>auditoria de código</strong> feita em 08/06/2026, que abriu o repositório e confrontou, arquivo por
+arquivo, o que o cronograma afirma contra o que o código realmente faz. Onde a verdade depende do
+painel do Sentry ou do que acontece em produção (e não do código), isso está marcado como
+<strong>"não verificável no código"</strong> — não é um erro, é apenas algo que o repositório não consegue provar.</p></div>
+
+<div class="etapa">
+<h2>Etapa 1 — Padronizar a etiqueta <code>environment</code> nos 4 SDKs</h2>
+<h3>O que é essa etapa?</h3>
+<p>Todo erro que chega ao Sentry vem com uma <strong>etiqueta</strong> dizendo de onde ele veio: do ambiente de
+<strong>produção</strong> (onde estão os clientes reais), de <strong>homologação</strong> (testes) ou da <strong>máquina do próprio
+desenvolvedor</strong>. No AutoLoad essa etiqueta precisa estar igual nos quatro motores (backend, frontend,
+EdgeGateway e portal). Hoje ela está bagunçada — o backend praticamente <strong>não marca produção</strong> e o
+frontend mistura vários endereços no mesmo projeto. É como receber encomendas de quatro lojas sem
+saber de qual cada uma veio. Esta etapa garante que cada erro venha com o ambiente certo.</p>
+<h3>Onde ela atua no código?</h3>
+<ul>
+<li><strong>Backend</strong> (.NET 8): lê a etiqueta em <code>Program.cs:61</code> (a partir de <code>Sentry:Environment</code>).</li>
+<li><strong>EdgeGateway</strong> (.NET 8 Worker): lê em <code>Worker/Program.cs:19</code> (também de <code>Sentry:Environment</code>).</li>
+<li>A <strong>especificação oficial</strong> (<code>AUTOLOAD_V4_Specs/.../20260303_sentry_environment_tags/ESPECIFICACAO.md</code>)
+  define que os valores corretos são <strong><code>dev</code> / <code>hml</code> / <code>prd</code></strong> — e pede que a fonte da etiqueta passe
+  a ser <code>Logging:Automind:Context:env</code>. O KIOSK é um módulo à parte (React/Vite), separado por outra tag.</li>
+</ul>
+<h3>O que ela afeta na prática?</h3>
+<p>Afeta a <strong>confiança em tudo que vem depois</strong>. Se os erros de teste e de produção ficam misturados,
+ninguém sabe se um alarme é grave (cliente afetado) ou inofensivo (alguém testando). Arrumar isso é
+o que permite confiar nos números e nos alertas mais tarde.</p>
+<h3>Status segundo a auditoria de código (08/06/2026)</h3>
+<p><span class="badge b-warn">⚠️ Divergente</span> O código <strong>já lê</strong> a etiqueta <code>environment</code> no backend e no Edge — então não é
+"do zero". Mas há duas divergências: (1) os valores que o cronograma cita (<code>production, staging,
+development, kiosk</code>) <strong>não batem</strong> com os valores canônicos da especificação (<code>dev, hml, prd</code>); e
+(2) o código lê de <code>Sentry:Environment</code>, enquanto a spec pede <code>Logging:Automind:Context:env</code>.</p>
+<h3>Observação extra</h3>
+<p>O cronograma marca esta etapa como <strong>"Não iniciado"</strong>, mas isso é mais pessimista do que a realidade:
+parte já existe no código. O que <strong>não dá para provar pelo repositório</strong> é a <strong>cobertura real</strong> —
+a afirmação de que o backend manda 0% dos eventos com a etiqueta de produção é um estado de <strong>runtime</strong>,
+que só se confirma olhando o painel do Sentry. Resumindo: falta padronizar valor e fonte da etiqueta,
+e comprovar a cobertura no painel.</p>
+</div>
+
+<div class="etapa">
+<h2>Etapa 2 — Padronizar a "versão" (release), apontar o commit culpado e isolar a esteira</h2>
+<h3>O que é essa etapa?</h3>
+<p>Sempre que o sistema é publicado, ele ganha um número de <strong>versão</strong> (chamado de <em>release</em>). Quando um
+erro acontece, é muito útil saber <strong>em qual versão</strong> ele surgiu — e, melhor ainda, <strong>qual alteração de
+código</strong> provavelmente o causou (isso se chama <em>suspect commits</em>, o "commit suspeito"). Esta etapa
+padroniza esse número, liga o "commit suspeito" e impede que a <strong>máquina do desenvolvedor</strong> mande
+dados para o projeto de produção (isolar a "esteira" de publicação — o pipeline ADO).</p>
+<h3>Onde ela atua no código?</h3>
+<p>A versão <strong>já existe</strong> no código:
+- <strong>EdgeGateway</strong>: <code>Worker/Program.cs:40</code> define <code>options.Release = "AutoloadV4.EdgeGateway.Worker@&lt;versão&gt;"</code>.
+- <strong>Frontend</strong>: a versão é injetada no build pelo <code>withSentryConfig</code> (<code>next.config.mjs</code>).
+- <strong>Backend</strong>: não define a versão na mão; confia na detecção automática de <code>SENTRY_RELEASE</code>
+  (formato <code>&lt;componente&gt;@&lt;hash&gt;</code>, documentado em <code>Autoload_V4-documentacao.md:287</code>).</p>
+<h3>O que ela afeta na prática?</h3>
+<p>Afeta a <strong>velocidade para achar a causa de um problema</strong>. Com a versão e o commit suspeito
+configurados, quando algo quebra o time descobre em minutos qual mudança causou. Sem isso, vira
+investigação no escuro. Também é o que permite, mais tarde, cruzar <strong>picos de erro com deploys</strong>.</p>
+<h3>Status segundo a auditoria de código (08/06/2026)</h3>
+<p><span class="badge b-warn">⚠️ Divergente (já parcialmente no código)</span> O cronograma chega a dizer que a release <strong>já existe</strong>
+(<code>SENTRY_RELEASE</code>) — e a auditoria confirma. Então o trabalho real <strong>não é criar</strong>, e sim:
+<strong>padronizar o formato</strong> em todos os componentes, ativar o <strong><code>set-commits --auto</code></strong> (o commit suspeito)
+e <strong>isolar a esteira</strong> para que máquinas de desenvolvimento não enviem ao projeto produtivo. A famosa
+"inconsistência Linux (ADO) + Windows (dev) no mesmo projeto" é estado de <strong>pipeline/painel</strong> → <strong>não
+verificável no código</strong>.</p>
+<h3>Observação extra</h3>
+<p>É um <strong>bloqueador central</strong>: enquanto a release não estiver padronizada, o "commit suspeito", a detecção
+de regressão e a correlação picos×deploys ficam todos travados. A recomendação da auditoria é tornar a
+release <strong>explícita também no backend</strong> (hoje ele depende de adivinhação), alinhando com o Edge.</p>
+</div>
+
+<div class="etapa">
+<h2>Etapa 3 — Isolar o ambiente de desenvolvimento do de produção</h2>
+<h3>O que é essa etapa?</h3>
+<p>A máquina do desenvolvedor, rodando o sistema localmente (<code>localhost</code>), <strong>não deveria</strong> mandar seus
+erros para o mesmo lugar onde ficam os erros dos clientes reais. Quando isso acontece, o painel de
+produção fica poluído com "erros" que são apenas alguém programando. Esta etapa garante que o
+desenvolvimento e a produção fiquem <strong>separados</strong>.</p>
+<h3>Onde ela atua no código?</h3>
+<p>O cronograma descrevia o mecanismo como <code>enabled = (NODE_ENV === 'production')</code> num arquivo chamado
+<code>sentry.client.config.ts</code>. A auditoria mostrou que, na prática, é diferente:
+- O arquivo do cliente é <strong><code>src/instrumentation-client.ts</code></strong> (padrão do Next 14).
+- O "freio" real é a <strong>validação do endereço do Sentry (DSN)</strong>: se o DSN ainda contém o marcador
+  <code>#</code> (ou seja, não foi preenchido na publicação), o SDK simplesmente <strong>não liga</strong> (fica "no-op").
+- No <strong>backend</strong> e no <strong>Edge</strong>, vale a mesma ideia: quando <code>Sentry:Dsn</code> é um placeholder (<code>#{...}#</code>),
+  o monitoramento fica desativado.</p>
+<h3>O que ela afeta na prática?</h3>
+<p>Afeta a <strong>limpeza do painel de produção</strong>. Um <code>localhost</code> despejando erros no projeto produtivo
+mistura barulho de desenvolvimento com problemas reais de cliente.</p>
+<h3>Status segundo a auditoria de código (08/06/2026)</h3>
+<p><span class="badge b-warn">⚠️ Divergente (mecanismo já existe, descrito errado)</span> O isolamento <strong>já está implementado</strong> no
+código — só que por um caminho diferente do que o cronograma dizia (gate por <strong>DSN placeholder</strong>, não
+por <code>NODE_ENV</code>; arquivo <code>instrumentation-client.ts</code>, não <code>sentry.client.config.ts</code>). A auditoria
+corrigiu o nome do arquivo e o mecanismo no cronograma.</p>
+<h3>Observação extra</h3>
+<p>O cronograma marca "Não iniciado", mas o freio por DSN já existe. O que falta é <strong>garantir a
+configuração de publicação</strong>: que o ambiente de desenvolvimento receba mesmo um DSN nulo/placeholder,
+para que o freio sempre atue.</p>
+</div>
+
+<div class="etapa">
+<h2>Etapa 4 — Corrigir o "bug" do MQTT (handler de mensagens)</h2>
+<h3>O que é essa etapa?</h3>
+<p>O EdgeGateway conversa com os equipamentos de campo por um protocolo chamado <strong>MQTT</strong> (como uma
+estação de rádio em que mensagens são publicadas e ouvidas). Para ouvir, o programa "assina" um canal
+com um <em>handler</em> (um ouvinte). O cronograma afirmava que, na hora de <strong>cancelar</strong> essa assinatura, o
+código usava <code>+=</code> (que <strong>adiciona</strong> outro ouvinte) em vez de <code>-=</code> (que <strong>remove</strong>) — o que causaria
+acúmulo de ouvintes (<em>memory leak</em>) e processamento <strong>duplicado</strong> das mensagens.</p>
+<h3>Onde ela atua no código?</h3>
+<p>A auditoria abriu os dois serviços e encontrou o <strong>oposto</strong> do que o cronograma dizia:
+- <strong>Backend</strong>: <code>AutoloadV4.Domain.Operations/Services/MQTTService.cs:106</code> remove com
+  <code>ApplicationMessageReceivedAsync -= _currentHandler;</code>
+- <strong>EdgeGateway</strong>: <code>AutoloadV4.EdgeGateway/Services/MQTTService.cs:98</code> faz a mesma coisa.
+- O <code>+=</code> que aparece (<code>:91</code> / <code>:85</code>) é a <strong>assinatura</strong> normal — e, antes dela, o código já faz o
+  <code>-=</code> do ouvinte anterior. O comportamento está inclusive documentado nos comentários do código.</p>
+<h3>O que ela afeta na prática?</h3>
+<p><strong>Na prática, nada precisa ser corrigido</strong> — porque o problema apontado <strong>não existe</strong>. O código já
+faz o certo. Se existisse, seria um vazamento de memória e mensagens processadas em dobro.</p>
+<h3>Status segundo a auditoria de código (08/06/2026)</h3>
+<p><span class="badge b-done">🟦 Improcedente / já concluído</span> Esta é a constatação <strong>mais importante</strong> da auditoria. Este item
+era citado nos dois cronogramas como a correção de <strong>"custo trivial, impacto direto"</strong> — a "vitória
+fácil" da semana 1. Aberto o código, a premissa <strong>não se confirma</strong>: o <code>-=</code> já está lá. O item foi
+<strong>reclassificado como encerrado</strong> (criticidade baixa). A única ação residual sugerida é um <strong>teste de
+regressão</strong> que prove o ciclo assinar/cancelar.</p>
+<h3>Observação extra</h3>
+<p>Vale a transparência: este era o exemplo mais repetido de "quick win" da Onda 0, e ele simplesmente
+<strong>já estava feito</strong>. Confiar no cronograma sem abrir o código teria gerado retrabalho sobre um bug
+que não existe.</p>
+</div>
+
+<div class="etapa">
+<h2>Etapa 5 — Quebrar o loop ruidoso <code>EDGEGATEWAY-2V</code></h2>
+<h3>O que é essa etapa?</h3>
+<p>Existe <strong>uma única falha</strong> no EdgeGateway (uma <code>ServiceException</code> com a mensagem "A transação deve…")
+que dispara sem parar: cerca de <strong>14.686 eventos em 30 dias</strong>, vindos de <strong>um só usuário</strong>. No ritmo
+atual, isso projeta <strong>~440 mil eventos por mês</strong> saindo de <strong>um único erro</strong> — o que pode <strong>estourar a
+cota</strong> contratada do Sentry (e custar dinheiro), além de afogar o painel em barulho. Esta etapa
+investiga e estanca esse loop.</p>
+<h3>Onde ela atua no código?</h3>
+<p>Esta etapa <strong>não tem um ponto fixo no código</strong> para "consertar de imediato": é preciso primeiro
+<strong>investigar a causa-raiz</strong> da <code>ServiceException</code>. Se a raiz não puder ser corrigida rápido, o plano B
+é aplicar um <code>beforeSend</code> com <strong>amostragem de 1 a cada 100</strong> ocorrências daquele erro específico
+(<em>fingerprint</em>), abrindo um ticket de débito técnico.</p>
+<h3>O que ela afeta na prática?</h3>
+<p>Afeta <strong>custo e visibilidade</strong>. Um erro que sozinho projeta centenas de milhares de eventos/mês
+consome cota e esconde os problemas de verdade no meio da enxurrada.</p>
+<h3>Status segundo a auditoria de código (08/06/2026)</h3>
+<p><span class="badge b-conf">❓ Não verificável no código</span> A contagem de eventos, o usuário afetado e a projeção de cota são
+<strong>métricas do painel do Sentry</strong>, não coisas que o repositório prove. A auditoria não consegue
+confirmar nem o volume nem a correção pelo código — segue como <strong>pendência real de painel/investigação</strong>.</p>
+<h3>Observação extra</h3>
+<p>O cronograma marca "Não iniciado", e aqui isso provavelmente reflete a realidade: é uma das etapas em
+que <strong>a ação ainda precisa começar</strong>. Pelo risco de cota, é uma das prioridades concretas da Onda 0.</p>
+</div>
+
+<div class="etapa">
+<h2>Etapa 6 — Filtrar o que sai (<code>beforeSend</code>) e proteger dados pessoais (LGPD)</h2>
+<h3>O que é essa etapa?</h3>
+<p>Quando um erro acontece, o Sentry pode capturar dados que estavam em jogo — e no AutoLoad isso inclui
+<strong>dados sensíveis</strong>: CPF, placa de caminhão, e-mail e informações do motorista. Esta etapa instala um
+"filtro de saída" (<code>beforeSend</code>) que <strong>borra/remove</strong> esses dados <strong>antes</strong> de enviá-los, desliga o
+envio automático de informação pessoal (<code>SendDefaultPii</code>) e configura regras de limpeza também do lado
+do servidor do Sentry (Data Scrubber). Há contratos sensíveis no meio (Ultracargo, Petrobras), então o
+risco é <strong>legal</strong>, não só técnico.</p>
+<h3>Onde ela atua no código?</h3>
+<ul>
+<li><strong>Frontend</strong>: <strong>já tem</strong> um <code>beforeSend</code> que limpa chaves sensíveis
+  (<code>password|token|secret|authorization|api_key|bearer|credential</code> → <code>[REDACTED]</code>) nos três modos
+  (<code>instrumentation-client.ts</code>, <code>sentry.server.config.ts</code>, <code>sentry.edge.config.ts</code>). Porém usa
+  <strong><code>sendDefaultPii: true</code></strong> (ligado) — o oposto do que a etapa pede.</li>
+<li><strong>EdgeGateway</strong>: já tem <code>SetBeforeSend</code> com tags (<code>serviceName/siteId/gatewayId/tenantId</code>) em
+  <code>Worker/Program.cs:43-50</code> e <strong><code>SendDefaultPii: false</code></strong> no <code>appsettings.json</code>.</li>
+<li><strong>Backend</strong>: <strong>não tem</strong> <code>beforeSend</code> — captura os erros via <code>ExceptionMiddleware.cs:13-22</code>.</li>
+</ul>
+<h3>O que ela afeta na prática?</h3>
+<p>Afeta <strong>conformidade legal (LGPD/ANP) e privacidade</strong>. Documentos e dados pessoais podem estar sendo
+gravados num sistema externo. É um <strong>risco jurídico real</strong>, agravado pelos contratos com grandes clientes.</p>
+<h3>Status segundo a auditoria de código (08/06/2026)</h3>
+<p><span class="badge b-warn">⚠️ Divergente (parcialmente feito)</span> O frontend e o Edge <strong>já têm</strong> filtro de saída — então não é
+"zero". A <strong>lacuna real</strong> é dupla: (1) o <strong>backend (.NET)</strong> ainda <strong>não tem</strong> <code>beforeSend</code>; e (2) o
+scrubbing existente cobre <strong>chaves de credencial</strong>, mas <strong>não</strong> os <strong>dados de domínio</strong> (CPF, placa,
+motorista). Além disso, o <code>sendDefaultPii: true</code> do frontend precisa de <strong>revisão sob a ótica da LGPD</strong>.
+As regras de Data Scrubber na interface do Sentry são <strong>painel</strong> → não verificáveis no código.</p>
+<h3>Observação extra</h3>
+<p><strong>É a etapa mais sensível da Onda 0</strong>, pelo risco legal. Diferente do AutoChecker (onde estava tudo em
+aberto), aqui há <strong>proteção parcial</strong> já no código — mas o ponto mais perigoso (dados pessoais do
+negócio e o backend sem filtro) <strong>continua descoberto</strong>.</p>
+</div>
+
+<div class="etapa">
+<h2>Etapa 7 — Corrigir os "source maps" do Frontend</h2>
+<h3>O que é essa etapa?</h3>
+<p>O código do frontend é "embaralhado" (minificado) antes de ir para produção, para ficar leve. Quando
+um erro acontece, o que aparece no Sentry vira algo ilegível, como <code>Object.s</code> — sem dizer <strong>qual
+arquivo</strong> ou <strong>qual linha</strong>. Os <em>source maps</em> são um "dicionário de tradução" que desembaralha isso e
+mostra o erro no código original. Hoje há <strong>60 issues "Object.s"</strong> e mais uma <code>"&lt;unknown&gt;"</code> sem rastro
+legível. Esta etapa garante que o tradutor seja enviado e usado corretamente.</p>
+<h3>Onde ela atua no código?</h3>
+<p>A instrumentação <strong>já existe</strong>: <code>next.config.mjs:16-52</code> usa <code>withSentryConfig(...)</code> com
+<code>widenClientFileUpload: true</code> (<code>:31</code>) e <code>silent: !process.env.CI</code> (<code>:25</code>) — ou seja, <strong>faz o upload do
+tradutor durante a publicação no CI</strong>. O <code>hideSourceMaps</code> explícito não está setado (usa o padrão).</p>
+<h3>O que ela afeta na prática?</h3>
+<p>Afeta a <strong>legibilidade dos erros do frontend</strong>. Sem o tradutor, cada erro de tela vira um enigma e o
+time perde tempo só para descobrir <strong>onde</strong> o problema aconteceu.</p>
+<h3>Status segundo a auditoria de código (08/06/2026)</h3>
+<p><span class="badge b-warn">⚠️ Divergente (já instrumentado no código)</span> O upload dos source maps <strong>já está configurado</strong> no
+<code>next.config.mjs</code>. Portanto o sintoma <code>Object.s</code> provavelmente <strong>não é falta de configuração no
+código</strong>, e sim <strong>consistência de <code>release</code>/token de autenticação na esteira</strong> (o tradutor enviado
+precisa casar com a versão que roda em produção) — e isso é <strong>pipeline/painel</strong> → não verificável no código.</p>
+<h3>Observação extra</h3>
+<p>O cronograma marca "Não iniciado", mas no código o upload está lá. A pendência verdadeira mora na
+<strong>esteira de publicação</strong> (alinhar release e token), não no repositório do frontend.</p>
+</div>
+
+<div class="etapa">
+<h2>Etapa 8 — Fazer a faxina (triagem) do backlog de erros (349 issues)</h2>
+<h3>O que é essa etapa?</h3>
+<p>"Triagem" é como a fila de emergência de um hospital: olhar cada caso e classificar — <strong>resolvido</strong>,
+<strong>ignorar</strong> (com prazo) ou <strong>em andamento</strong> — e anotar o critério usado. Hoje há cerca de <strong>349 erros
+em aberto</strong> no Sentry e <strong>zero foram resolvidos nos últimos 30 dias</strong>. É uma caixa de entrada que
+ninguém está esvaziando. Esta etapa coloca a casa em ordem.</p>
+<h3>Onde ela atua no código?</h3>
+<p>Esta etapa <strong>não mexe no código</strong> — é trabalho de organização feito <strong>dentro do painel do Sentry</strong>
+(classificar issues, definir critérios, atribuir donos). Ela se beneficia das outras etapas: resolver
+as causas (loops, PII, source maps) é o que faz a fila diminuir de verdade.</p>
+<h3>O que ela afeta na prática?</h3>
+<p>Afeta a <strong>rotina de cuidado com o sistema</strong>. Um backlog sem dono <strong>contamina qualquer métrica</strong> que se
+queira tirar depois (não dá para medir "quantos erros novos por semana" se a base nunca é limpa).</p>
+<h3>Status segundo a auditoria de código (08/06/2026)</h3>
+<p><span class="badge b-conf">❓ Não verificável no código (processo/painel)</span> A contagem de 349 issues e o "0 resolvidas em 30
+dias" são estado do <strong>painel do Sentry</strong> — não há nada no repositório que prove ou conteste. É uma
+pendência de <strong>processo</strong>, que precisa de pessoas e critério, não de código.</p>
+<h3>Observação extra</h3>
+<p>Como no AutoChecker, a triagem <strong>ainda não começou de verdade</strong>. É a etapa mais "humana" da Onda 0 e,
+sozinha, não corrige nada — mas sem ela nenhuma métrica derivada terá valor.</p>
+</div>
+
+<h2>Resumo geral da Onda 0</h2><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Nome da etapa</th>
+<th>Status segundo a auditoria de código</th>
+<th>Risco principal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Padronizar etiqueta <code>environment</code> (4 SDKs)</td>
+<td>⚠️ Divergente (lê no código; valores <code>dev/hml/prd</code> e fonte divergem)</td>
+<td>Backend sem cobrir produção; cobertura só se prova no painel</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Release + commit suspeito + isolar esteira</td>
+<td>⚠️ Divergente (release já existe; falta padronizar/<code>set-commits</code>)</td>
+<td>Bloqueia commit suspeito, regressão e correlação picos×deploys</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Isolar desenvolvimento de produção</td>
+<td>⚠️ Divergente (gate por DSN já existe; descrito errado)</td>
+<td><code>localhost</code> pode poluir o projeto produtivo</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Corrigir "bug" do MQTT (<code>+=</code>→<code>-=</code>)</td>
+<td>🟦 Improcedente / já concluído (código já usa <code>-=</code>)</td>
+<td>Nenhum — o bug apontado não existe; falta só teste de regressão</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Quebrar o loop <code>EDGEGATEWAY-2V</code></td>
+<td>❓ Não verificável no código (métrica do painel)</td>
+<td>~440k eventos/mês de UMA issue → risco de estouro de cota</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>beforeSend</code> + proteção de PII (LGPD)</td>
+<td>⚠️ Divergente (FE/Edge ok; <strong>backend e PII de domínio em aberto</strong>)</td>
+<td><strong>Risco legal:</strong> CPF/placa/motorista; contratos sensíveis</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Corrigir source maps do Frontend</td>
+<td>⚠️ Divergente (upload já instrumentado no código)</td>
+<td>60 issues <code>Object.s</code> ilegíveis; causa está na esteira</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Triagem do backlog (349 issues)</td>
+<td>❓ Não verificável no código (processo/painel)</td>
+<td>Backlog sem dono contamina qualquer métrica; 0 resolvidas</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Contagem por situação (segundo a auditoria de código, 08/06/2026):</strong>
+- 🟦 Improcedente / já concluído: <strong>1</strong> (Etapa 4)
+- ⚠️ Divergente — já parcialmente no código, com pendência clara: <strong>5</strong> (Etapas 1, 2, 3, 6, 7)
+- ❓ Não verificável no código (depende de painel/runtime/processo): <strong>2</strong> (Etapas 5 e 8)
+- ✅ Totalmente concluída e comprovável só pelo código: <strong>0</strong></p>
+
+<h2>Conclusão</h2><div class="verdict"><strong>A Onda 0 NÃO pode ser considerada concluída, e o gate deve permanecer FECHADO — mas o quadro é mais
+favorável (e mais específico) do que o cronograma sugere.</strong></div>
+<p>A leitura honesta da auditoria é dupla. De um lado, o cronograma marca <strong>todas as 8 etapas como "Não
+iniciado"</strong>, o que é <strong>pessimista demais</strong>: ao abrir o código, várias peças <strong>já existem</strong> — a leitura
+do <code>environment</code>, a <code>release</code>, o isolamento por DSN, o <code>beforeSend</code> do frontend e do Edge, e o upload de
+source maps. E um item inteiro (o "bug" do MQTT) era <strong>improcedente</strong>: já estava correto.</p>
+<p>De outro lado, o gate <strong>não fecha</strong> porque o que falta é justamente o que <strong>não se prova só pelo
+código</strong> e os pontos realmente sensíveis: a <strong>cobertura real</strong> da etiqueta de produção (Etapa 1), o
+<strong>loop de cota</strong> <code>EDGEGATEWAY-2V</code> (Etapa 5), o <strong>buraco de LGPD</strong> no backend e nos dados de domínio
+(Etapa 6), a <strong>consistência da esteira</strong> para os source maps (Etapa 7) e a <strong>triagem</strong> que nunca começou
+(Etapa 8).</p>
+<div class="callout warn"><p><strong>Recomendação:</strong> em vez de "começar as 8 do zero", o time deveria (1) tratar com <strong>urgência</strong> a Etapa 6
+(dados pessoais — risco legal), (2) atacar o <strong>loop de cota</strong> da Etapa 5 antes que vire custo, (3)
+<strong>padronizar release + set-commits</strong> da Etapa 2 (que destrava várias outras), e (4) <strong>alinhar valores e
+fonte</strong> da etiqueta <code>environment</code> (Etapa 1), comprovando a cobertura no painel. As Etapas 3, 4 e 7 estão
+muito perto de "pronto" e pedem apenas confirmação/teste.</p></div>
+<h3>Balanço final</h3>
+<ul>
+<li><strong>Etapas já parcialmente resolvidas no código (precisam de ajuste, não de criação):</strong> <strong>5</strong>
+  (Etapas 1, 2, 3, 6 e 7).</li>
+<li><strong>Etapa improcedente (apontava um bug que não existe):</strong> <strong>1</strong> (Etapa 4).</li>
+<li><strong>Etapas que dependem de painel/processo (fora do alcance do código):</strong> <strong>2</strong> (Etapas 5 e 8).</li>
+<li><strong>Etapas totalmente concluídas e comprováveis pelo código:</strong> <strong>0</strong>.</li>
+<li><strong>O gate da Onda 0 pode ser liberado?</strong> <strong>NÃO.</strong> O portão permanece fechado — mas a lista real de
+  pendências é menor e mais precisa do que "8 etapas não iniciadas".</li>
+</ul>
+<p><em>Documento explicativo gerado em 17/06/2026. Fontes: Cronograma Revisado
+(<code>Cronograma_Observabilidade_AutoLoad_V4_Revisado_2026-06-02.xlsx</code>), Auditoria de código
+(<code>Auditoria_Codigo_Cronograma_Observabilidade_AutoLoad_V4_2026-06-08.md</code>), documentação do produto, ata
+de alinhamento e questionário do desenvolvedor. Como o AutoLoad não possui board no Azure DevOps, todos
+os status vêm da auditoria que confrontou o cronograma com o código real; onde a verdade depende do
+painel do Sentry ou do runtime, isso está registrado explicitamente como "não verificável no código".</em></p>
+
+</div>
+</body>
+</html>

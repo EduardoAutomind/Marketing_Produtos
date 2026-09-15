@@ -1,0 +1,210 @@
+trigger:
+  branches:
+    include:
+      - dev
+      - main
+  paths:
+    include:
+      - worker/*
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  ${{ if eq(variables['Build.SourceBranchName'], 'dev')}}:
+    DEPLOY_ON: "dev"
+    GITHUB_BRANCH: "dev"
+  ${{ if eq(variables['Build.SourceBranchName'], 'main')}}:
+    DEPLOY_ON: "prod"
+    GITHUB_BRANCH: "main"
+
+stages:
+  - stage: Test
+    displayName: "Run Tests"
+    jobs:
+      - job: RunTests
+        displayName: "Run Worker Tests"
+        steps:
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: "3.12"
+            displayName: "Setup Python 3.12"
+
+          - script: |
+              cd worker
+              python -m pip install --upgrade pip
+              pip install uv
+              uv pip install --system -r requirements.txt
+            displayName: "Install dependencies"
+
+          - script: |
+              cd worker
+              pytest -m "not slow and not integration" --tb=short --junitxml=test-results.xml
+            displayName: "Run pytest"
+
+          - task: PublishTestResults@2
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFiles: "worker/test-results.xml"
+              testRunTitle: "Worker Tests"
+            displayName: "Publish test results"
+
+  - stage: BuildAndDeploy
+    displayName: "Build & Deploy Worker on Docker"
+    dependsOn: Test
+    condition: succeeded()
+    jobs:
+      - job: SyncAzureAndGithub
+        displayName: Sincronizar Azure e GitHub
+        steps:
+          - script: |
+              echo "🌍 Informação do ambiente:"
+              echo "Branch: $(Build.SourceBranchName)"
+              echo "GitHub branch: $(GITHUB_BRANCH)"
+              echo "Realizando o deploy em: $(DEPLOY_ON)"
+            displayName: "Infomação do ambiente"
+
+          - script: |
+              echo "🔧 Configurando Git para GitHub push..."
+              git config --global user.email "azure-pipeline@autochecker.cloud"
+              git config --global user.name "Azure Pipeline"
+              git config --global init.defaultBranch main
+            displayName: "Configurando o Git"
+
+          - script: |
+              echo "🔄 Sincronizando código com GitHub..."
+
+              # Mostrar informações de debug
+              echo "📍 Branch atual: $(Build.SourceBranchName)"
+              echo "📍 Branch GitHub: $(GITHUB_BRANCH)"
+
+              # Criar uma cópia limpa do código atual
+              echo "📦 Criando cópia limpa do código..."
+              cd $(Agent.BuildDirectory)
+              cp -r s/. github-sync/
+              cd github-sync
+
+              # Remover .git existente e inicializar novo repositório
+              rm -rf .git
+              git init
+              git config user.email "azure-pipeline@autochecker.cloud"
+              git config user.name "Azure Pipeline"
+
+              # Adicionar todos os arquivos
+              git add .
+              git commit -m "Sincronização do Azure DevOps - Build $(Build.BuildNumber)"
+
+              # Configurar remote do GitHub
+              git remote add origin https://rochaTarcisio:$(GITHUB_TOKEN)@github.com/automindssa/AutoChecker.git
+
+              # Push forçado para sobrescrever histórico
+              git push origin HEAD:$(GITHUB_BRANCH) --force
+
+              echo "✅ Código sincronizado com sucesso!"    
+              echo "📍 Pushed clean copy to $(GITHUB_BRANCH)"
+            displayName: "Sync to GitHub"
+            env:
+              GITHUB_TOKEN: $(GITHUB_TOKEN)
+
+      - job: DeployWorkerOnDev
+        steps:
+          - task: SSH@0
+            displayName: "Acessar servidor"
+            condition: eq(variables['Build.SourceBranchName'], 'dev')
+            inputs:
+              sshEndpoint: "backend-dev"
+              runOptions: "inline"
+              failOnStdErr: false
+              inline: |
+                echo "✅ Conexão SSH realizada!"
+
+                DIR="/home/checkerdev/AutoChecker"
+                if [ -d "$DIR" ]; then
+                  echo "✅ A pasta $DIR existe"
+                else 
+                  echo "❌ A pasta $DIR não existe."
+                  exit 1 
+                fi
+
+                cd $DIR || exit 1
+
+                echo "ℹ️ Realizar o pull da branch $GITHUB_BRANCH"
+                git pull origin dev 2>&1
+
+                # Set SENTRY_RELEASE before docker build
+                COMMIT_HASH=$(git rev-parse --short HEAD)
+                echo "ℹ️ Setting SENTRY_RELEASE=worker@$COMMIT_HASH"
+                sed -i "s/^SENTRY_RELEASE=.*/SENTRY_RELEASE=worker@$COMMIT_HASH/" worker/.env.dev 2>/dev/null || echo "SENTRY_RELEASE=worker@$COMMIT_HASH" >> worker/.env.dev
+
+                echo "ℹ️ Acessar a pasta do worker"
+                cd worker
+                echo "📂 Diretório atual: $(pwd)"
+
+                echo "ℹ️ Verificando containers do Worker"
+                RUNNING=$(sudo docker compose --env-file .env.dev -f docker-compose.dev.yml ps --status running -q 2>/dev/null)
+                if [ -n "$RUNNING" ]; then
+                  echo "✅ Containers em execução, realizando restart"
+                  sudo docker compose --env-file .env.dev -f docker-compose.dev.yml restart
+                else
+                  echo "⚠️ Containers não estão em execução, subindo com build"
+                  sudo docker compose --env-file .env.dev -f docker-compose.dev.yml up -d --build
+                fi
+
+                echo "ℹ️ Remover imagens antigas"
+                sudo docker image prune -f
+
+            env:
+              DEPLOY_ON: $(DEPLOY_ON)
+              GITHUB_BRANCH: $(GITHUB_BRANCH)
+              DIR: $(DIR)
+
+      - job: DeploySSH
+        steps:
+          - task: SSH@0
+            displayName: "Acessar servidor"
+            condition: eq(variables['Build.SourceBranchName'], 'main')
+            inputs:
+              sshEndpoint: "ssh-service-connection-worker"
+              runOptions: "inline"
+              inline: |
+                echo "✅ Conexão SSH realizada!"
+
+                DIR="/home/user_pipeline/AutoChecker"
+
+                if [ -d "$DIR" ]; then
+                  echo "✅ A pasta $DIR existe"
+                else 
+                  echo "❌ A pasta $DIR não existe."
+                  exit 1 
+                fi
+                cd $DIR || exit 1
+
+                echo "ℹ️ Realizar o pull da branch $GITHUB_BRANCH"
+                git pull origin dev 2>&1
+
+                # Set SENTRY_RELEASE before docker build
+                COMMIT_HASH=$(git rev-parse --short HEAD)
+                echo "ℹ️ Setting SENTRY_RELEASE=worker@$COMMIT_HASH"
+                sed -i "s/^SENTRY_RELEASE=.*/SENTRY_RELEASE=worker@$COMMIT_HASH/" worker/.env.dev 2>/dev/null || echo "SENTRY_RELEASE=worker@$COMMIT_HASH" >> worker/.env.dev
+
+                echo "ℹ️ Acessar a pasta do worker"
+                cd worker
+                echo "📂 Diretório atual: $(pwd)"
+
+                echo "ℹ️ Verificando containers do Worker"
+                RUNNING=$(sudo docker compose --env-file .env.prod -f docker-compose.prod.yml ps --status running -q 2>/dev/null)
+                if [ -n "$RUNNING" ]; then
+                  echo "✅ Containers em execução, realizando restart"
+                  sudo docker compose --env-file .env.prod -f docker-compose.prod.yml restart
+                else
+                  echo "⚠️ Containers não estão em execução, subindo com build"
+                  sudo docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --build
+                fi
+
+                echo "ℹ️ Remover imagens antigas"
+                sudo docker image prune -f
+
+            env:
+              DEPLOY_ON: $(DEPLOY_ON)
+              GITHUB_BRANCH: $(GITHUB_BRANCH)
+              DIR: $(DIR)

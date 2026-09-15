@@ -1,0 +1,45 @@
+trigger: none
+
+pr:
+  branches:
+    include:
+      - develop
+      - master
+      - main
+      - release/*
+      - hotfix/*
+
+
+pool:
+  vmImage: ubuntu-latest
+
+name: $(date:yyyyMMdd)$(rev:.r)
+
+jobs:
+  - job: RunTests
+    displayName: "Run Frontend Unit Tests"
+    steps:
+      - task: NodeTool@0
+        inputs:
+          versionSpec: "20.x"
+        displayName: "Setup Node.js 20.x"
+
+      - script: npm install -g npm@11
+        displayName: "Upgrade npm to 11.x"
+
+      - script: |
+          cd frontend
+          npm ci
+        displayName: "Install dependencies"
+
+      - script: |
+          cd frontend
+          npm run test:run -- --reporter=junit --outputFile=test-results.xml
+        displayName: "Run vitest"
+
+      - task: PublishTestResults@2
+        condition: succeededOrFailed()
+        inputs:
+          testResultsFiles: "frontend/test-results.xml"
+          testRunTitle: "Frontend Unit Tests"
+        displayName: "Publish test results"

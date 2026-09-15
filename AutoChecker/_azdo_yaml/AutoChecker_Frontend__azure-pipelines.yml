@@ -1,0 +1,87 @@
+# Azure DevOps Pipeline - AutoChecker Frontend
+# Deploy automático para DigitalOcean App Platform
+
+trigger:
+  branches:
+    include:
+      - develop
+      - main
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  FRONTEND_PATH: "frontend"
+  # Variáveis condicionais baseadas na branch
+  ${{ if eq(variables['Build.SourceBranchName'], 'develop') }}:
+    APP_ID: $(DEV_APP_ID)
+    APP_SPEC_FILE: ".do/app-dev.yml"
+    ENVIRONMENT_NAME: "development"
+    GITHUB_BRANCH: "develop"
+  ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
+    APP_ID: $(PROD_APP_ID)
+    APP_SPEC_FILE: ".do/app-prod.yml"
+    ENVIRONMENT_NAME: "production"
+    GITHUB_BRANCH: "main"
+
+stages:
+  - stage: BuildAndDeploy
+    displayName: "Build and Deploy Frontend"
+    condition: succeeded()
+    jobs:
+      - job: DeployFrontend
+        displayName: "Build and Deploy to DigitalOcean"
+        steps:
+          # 1. Mostrar informações do ambiente
+          - script: |
+              echo "🌍 Informação do ambiente:"
+              echo "Branch: $(Build.SourceBranchName)"
+              echo "Environment: $(ENVIRONMENT_NAME)"
+              echo "App ID: $(APP_ID)"
+              echo "Spec file: $(APP_SPEC_FILE)"
+              echo "GitHub branch: $(GITHUB_BRANCH)"
+            displayName: "Environment Info"
+
+          # 2. Configurar Git para push no GitHub
+          - script: |
+              echo "🔧 Configuring Git for GitHub push..."
+              git config --global user.email "azure-pipeline@autochecker.cloud"
+              git config --global user.name "Azure Pipeline"
+              git config --global init.defaultBranch main
+            displayName: "Configure Git"
+
+          # 3. Sincronizar código com GitHub
+          - script: |
+              echo "🔄 Sincronizando código com GitHub..."
+
+              # Mostrar informações de debug
+              echo "📍 Branch atual: $(Build.SourceBranchName)"
+              echo "📍 Branch GitHub: $(GITHUB_BRANCH)"
+
+              # Criar uma cópia limpa do código atual
+              echo "📦 Criando cópia limpa do código..."
+              cd $(Agent.BuildDirectory)
+              cp -r s/. github-sync/
+              cd github-sync
+
+              # Remover .git existente e inicializar novo repositório
+              rm -rf .git
+              git init
+              git config user.email "azure-pipeline@autochecker.cloud"
+              git config user.name "Azure Pipeline"
+
+              # Adicionar todos os arquivos
+              git add .
+              git commit -m "Sincronização do Azure DevOps - Build $(Build.BuildNumber)"
+
+              # Configurar remote do GitHub
+              git remote add origin https://rochaTarcisio:$(GITHUB_TOKEN)@github.com/automindssa/AutoChecker_Frontend.git
+
+              # Push forçado para sobrescrever histórico
+              git push origin HEAD:$(GITHUB_BRANCH) --force
+
+              echo "✅ Código sincronizado com sucesso!"    
+              echo "📍 Pushed clean copy to $(GITHUB_BRANCH)"
+            displayName: "Sync to GitHub"
+            env:
+              GITHUB_TOKEN: $(GITHUB_TOKEN)

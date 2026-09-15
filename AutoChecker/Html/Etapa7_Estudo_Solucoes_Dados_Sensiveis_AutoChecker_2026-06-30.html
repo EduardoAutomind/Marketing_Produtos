@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Etapa 7 — Estudo de Soluções para Dados Sensíveis na Telemetria · AutoMind</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,400;0,500;0,700;0,900;1,400&display=swap');
+  :root{
+    --am-rosa:#FA094E; --am-magenta:#940755; --am-roxo:#44055A;
+    --am-navy:#03045E; --am-preto:#100F0F; --am-offwhite:#F3F3F0;
+    --am-gradiente-h:linear-gradient(90deg,#FA094E 0%,#03045E 100%);
+    --card:#ffffff; --line:#e4e2dd;
+    --ok:#1f8a4c; --warn:#b8860b; --crit:#FA094E;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{font-family:"Red Hat Display",system-ui,sans-serif;color:var(--am-preto);
+    background:var(--am-offwhite); margin:0; line-height:1.6; font-size:16px;}
+  .topbar{height:8px; background:var(--am-gradiente-h);}
+  header{padding:34px 7vw 22px; border-bottom:1px solid var(--line);}
+  .wordmark{font-weight:900; text-transform:uppercase; letter-spacing:.20em;
+    color:var(--am-roxo); font-size:15px;}
+  .wordmark .dot{color:var(--am-rosa);}
+  .tagline{font-size:11px; letter-spacing:.32em; text-transform:uppercase;
+    color:var(--am-navy); opacity:.7; margin-top:2px;}
+  h1{font-weight:900; color:var(--am-roxo); font-size:30px; line-height:1.2;
+    margin:18px 0 6px; letter-spacing:.01em;}
+  .sub{color:var(--am-navy); font-size:14px; opacity:.85;}
+  .pill{display:inline-block; background:var(--am-roxo); color:#fff; font-size:11px;
+    font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    padding:4px 11px; border-radius:999px; margin:8px 6px 0 0;}
+  .pill.alt{background:var(--am-rosa);}
+  main{padding:14px 7vw 60px; max-width:1080px;}
+  h2{font-weight:700; color:var(--am-roxo); font-size:21px; margin:38px 0 10px;
+    padding-top:14px; border-top:2px solid var(--am-rosa); display:inline-block;}
+  h3{font-weight:700; color:var(--am-navy); font-size:16px; margin:22px 0 6px;}
+  p{margin:10px 0;}
+  a{color:var(--am-rosa); text-decoration:none;} a:hover{text-decoration:underline;}
+  code{font-family:"SFMono-Regular",Consolas,monospace; background:#efeeea;
+    padding:1px 6px; border-radius:5px; font-size:.88em; color:var(--am-magenta);}
+  pre{background:var(--am-preto); color:#f3f3f0; padding:14px 16px; border-radius:12px;
+    overflow:auto; font-size:13px; line-height:1.55;}
+  pre code{background:none; color:inherit; padding:0;}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:18px 22px; margin:16px 0; box-shadow:0 1px 3px rgba(16,15,15,.04);}
+  .frase{background:linear-gradient(0deg,#fff,#fff) padding-box,var(--am-gradiente-h) border-box;
+    border:2px solid transparent; border-radius:16px; padding:16px 22px; font-size:17px;}
+  table{border-collapse:collapse; width:100%; margin:14px 0; font-size:14px;}
+  th,td{text-align:left; padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top;}
+  th{background:#efeeea; color:var(--am-roxo); font-weight:700; font-size:12px;
+    text-transform:uppercase; letter-spacing:.05em;}
+  tr:last-child td{border-bottom:none;}
+  td.c{text-align:center; white-space:nowrap;}
+  .flag{font-weight:700; font-size:12px; padding:2px 8px; border-radius:6px; white-space:nowrap;}
+  .f-sei{background:#e3f3e9; color:var(--ok);}
+  .f-parc{background:#fbf2da; color:var(--warn);}
+  .f-nao{background:#fde4ea; color:var(--crit);}
+  .cod{font-weight:700; color:var(--am-rosa); white-space:nowrap;}
+  .who{font-size:13px; white-space:nowrap;}
+  .prio-alta{color:var(--crit); font-weight:700;}
+  .prio-med{color:var(--warn); font-weight:700;}
+  .prio-baixa{color:var(--am-navy); opacity:.7; font-weight:600;}
+  .callout{border-left:4px solid var(--am-rosa); background:#fff; border-radius:0 12px 12px 0;
+    padding:12px 18px; margin:14px 0; font-size:14.5px;}
+  .callout.warn{border-color:var(--warn); background:#fffdf6;}
+  .callout.crit{border-color:var(--crit); background:#fff6f8;}
+  .layer{display:flex; gap:14px; align-items:flex-start; margin:12px 0; padding:12px 16px;
+    background:#fff; border:1px solid var(--line); border-radius:12px;}
+  .layer .n{flex:0 0 auto; width:34px; height:34px; border-radius:9px; background:var(--am-roxo);
+    color:#fff; font-weight:900; display:flex; align-items:center; justify-content:center; font-size:15px;}
+  .layer .t{font-size:14.5px;}
+  .layer .t b{color:var(--am-roxo);}
+  .phase{border-radius:14px; border:1px solid var(--line); background:#fff; padding:16px 20px; margin:14px 0;}
+  .phase h3{margin-top:0;}
+  .tag-p{display:inline-block; font-weight:900; color:#fff; background:var(--am-rosa);
+    border-radius:8px; padding:2px 10px; font-size:13px; margin-right:8px; letter-spacing:.04em;}
+  .tag-p.p1{background:var(--warn);} .tag-p.p2{background:var(--am-navy);}
+  ol.steps{margin:8px 0 0; padding-left:22px;} ol.steps li{margin:6px 0;}
+  footer{padding:24px 7vw 50px; color:var(--am-navy); opacity:.7; font-size:12.5px;
+    border-top:1px solid var(--line);}
+  ol.src{font-size:13.5px; line-height:1.8;}
+  .legend{font-size:13px; opacity:.85; margin:6px 0 0;}
+</style>
+</head>
+<body>
+<div class="topbar"></div>
+<header>
+  <div class="wordmark">AUTOMIND<span class="dot">.</span></div>
+  <div class="tagline">Simple · Smart · Reliable</div>
+  <h1>Etapa 7 — Estudo de Soluções para o<br>Tratamento de <span style="color:var(--am-rosa)">Dados Sensíveis</span> na Telemetria</h1>
+  <div class="sub">Cronograma de Observabilidade · AutoChecker (driver) — reflexos em AutoLoad V4 e AutoMed · gerado 2026-06-30</div>
+  <span class="pill">Onda 0 — Saneamento (GATE)</span>
+  <span class="pill alt">6 camadas de defesa</span>
+  <span class="pill">Citações revalidadas hoje</span>
+</header>
+
+<main>
+
+  <div class="frase">
+    <strong>Em uma frase —</strong> a Etapa 7 existe para <strong>impedir que dado pessoal e sensível chegue ao Sentry sem base legal</strong>. Este estudo reúne o diagnóstico (já corrigido contra o código de hoje) e abre <strong>seis camadas de defesa</strong> com soluções alternativas — separando o que <strong>você executa sozinho</strong>, o que <strong>depende do dev</strong> e o que é <strong>jurídico/arquitetural</strong> — para você escolher a combinação certa.
+  </div>
+
+  <div class="card" style="margin-top:20px">
+    <table style="margin:0">
+      <tr><th style="width:130px">Produto</th><td>AutoChecker (driver) — reflexos em AutoLoad V4 e AutoMed</td></tr>
+      <tr><th>Pergunta</th><td>Como sanar, na prática, o tratamento de dados pessoais e <strong>sensíveis</strong> (CPF/CNH/ASO) que hoje pode chegar ao Sentry? Quais são os <strong>caminhos alternativos</strong>?</td></tr>
+      <tr><th>Fontes</th><td>(1) Código real em <code>Produtos/Autochecker/**</code> (<code>arquivo:linha</code>, lido hoje) · (2) Documentos da Etapa 7 (consentimento, scrubbing, auditoria, playbook) · (3) Documentação oficial do Sentry (Replay Privacy, Server-Side Scrubbing) via MCP</td></tr>
+      <tr><th>Confiança</th><td><span class="flag f-sei">Sei</span> geral, com flags por item · citações revalidadas contra o código em 30/06/2026</td></tr>
+    </table>
+  </div>
+
+  <h2>⚠️ Correção material em relação aos docs anteriores</h2>
+  <p>Ao revalidar o código hoje (30/06), um ponto dos documentos anteriores <strong>mudou de figura</strong> e precisa ser registrado — a precisão importa mais que manter a narrativa antiga.</p>
+  <table>
+    <tr><th>O que os docs anteriores diziam</th><th>O que o código de hoje mostra</th><th>Veredito</th></tr>
+    <tr>
+      <td>"Session Replay <strong>sem máscara</strong> → grava em vídeo as telas reais com CNH/ASO/CPF"</td>
+      <td>O replay é iniciado como <code>Sentry.replayIntegration()</code> <strong>sem argumentos</strong>, e o SDK é <strong><code>@sentry/nextjs ^10.43.0</code></strong> (<code>package.json:41</code>). Na doc oficial do SDK v8+, os <strong>defaults</strong> já são <code>maskAllText:true</code>, <code>maskAllInputs:true</code> e <code>blockAllMedia:true</code>.</td>
+      <td><span class="flag f-parc">🟡 Superestimado</span> — texto <strong>já mascarado</strong> (<code>*</code>) e mídia <strong>já bloqueada</strong> antes de sair do browser. O "filme de ASO" <strong>não</strong> é o cenário default.</td>
+    </tr>
+    <tr>
+      <td>Risco máximo = "ASO em vídeo no replay → SaaS estrangeiro"</td>
+      <td>O vetor real e <strong>inequívoco</strong> é o <code>sendDefaultPii: true</code> (request bodies, headers, cookies, IP) + <strong>e-mail no <code>setUser</code></strong>. É por aí que dado sensível em trânsito chega ao Sentry.</td>
+      <td><span class="flag f-nao">🔴 Reancorar</span> o risco no <code>sendDefaultPii</code>, não no replay.</td>
+    </tr>
+  </table>
+  <div class="callout crit"><strong>Por que isso não desarma a Etapa 7 — apenas a reaponta:</strong> o dado sensível (CPF/CNH/ASO) <strong>continua podendo chegar ao Sentry</strong>, mas pelo <strong>corpo de requisição/resposta e contexto de erro</strong> que o <code>sendDefaultPii: true</code> anexa (especialmente no runtime server/edge do Next.js, que processa documentos), <strong>não</strong> pelo vídeo do replay. A inconformidade LGPD (necessidade art. 6º III, finalidade art. 6º I, dado sensível art. 11, transferência art. 33) <strong>permanece</strong> — muda o <strong>mecanismo</strong>, e portanto a <strong>prioridade das soluções</strong>.</div>
+  <p style="margin-top:16px"><strong>Ressalvas que mantêm o replay sob observação</strong> <span class="flag f-parc">Parcial — reverificar</span>:</p>
+  <ul>
+    <li><code>blockAllMedia</code> cobre <code>img/svg/video/object/picture/embed/audio</code>, <strong>mas não <code>&lt;canvas&gt;</code></strong>. Se alguma tela renderiza documento via canvas (pdf.js, visualizador de imagem), confirmar que o canvas não é gravado.</li>
+    <li>Máscara é <strong>best-effort</strong>; a própria doc do Sentry pede testar antes de produção. Conferir que <strong>não há</strong> seletores <code>unmask</code>/<code>sentry-unmask</code> liberando telas de documento.</li>
+    <li>Confirmar que a versão que <strong>builda em produção</strong> é mesmo a v10 (não um lockfile antigo).</li>
+  </ul>
+
+  <h2>1. Diagnóstico consolidado (verificado hoje)</h2>
+  <p>Os achados de código, <strong>revalidados linha a linha em 30/06</strong>:</p>
+  <table>
+    <tr><th>#</th><th>Achado</th><th>Local (revalidado hoje)</th><th>Confirma?</th></tr>
+    <tr><td class="c">1</td><td><code>sendDefaultPii: true</code> (client)</td><td><code>AutoChecker_Frontend/instrumentation-client.ts:21</code> <strong>e</strong> <code>AutoChecker/frontend/instrumentation-client.ts:21</code></td><td class="c">✅</td></tr>
+    <tr><td class="c">2</td><td><code>sendDefaultPii: true</code> (server)</td><td><code>.../sentry.server.config.ts:16</code> (nos <strong>dois</strong> frontends)</td><td class="c">✅</td></tr>
+    <tr><td class="c">3</td><td><code>sendDefaultPii: true</code> (edge)</td><td><code>.../sentry.edge.config.ts:17</code> (nos <strong>dois</strong> frontends)</td><td class="c">✅</td></tr>
+    <tr><td class="c">4</td><td><code>Sentry.setUser({ id, email })</code></td><td><code>AutoChecker_Frontend/.../useAuth.tsx:175</code> e <code>:388</code>; <code>AutoChecker/frontend/.../useAuth.tsx:196</code> e <code>:478</code></td><td class="c">✅</td></tr>
+    <tr><td class="c">5</td><td><code>sendDefaultPii: true</code> (serviço Custos)</td><td><code>AutoChecker_Custos/src/instrument.ts:12</code></td><td class="c">✅</td></tr>
+    <tr><td class="c">6</td><td>Replay com <strong>defaults de máscara</strong> (v10)</td><td><code>instrumentation-client.ts:12</code> → <code>replayIntegration()</code> + <code>package.json:41</code> (<code>^10.43.0</code>)</td><td class="c">✅ <span style="opacity:.7">(corrige doc anterior)</span></td></tr>
+    <tr><td class="c">7</td><td><strong>Dois frontends</strong> quase idênticos</td><td><code>AutoChecker_Frontend/</code> vs <code>AutoChecker/frontend/</code></td><td class="c">✅ <span style="opacity:.7">(qual é prod?)</span></td></tr>
+    <tr><td class="c">8</td><td>Backend protegido por <strong>convenção</strong> (sem linha explícita)</td><td><code>send_default_pii</code> cai em <code>False</code> por padrão</td><td class="c">✅ <span style="opacity:.7">(frágil)</span></td></tr>
+  </table>
+
+  <h3>Os quatro vetores de risco, reordenados pela severidade real</h3>
+  <table>
+    <tr><th>#</th><th>Vetor</th><th>Por quê</th></tr>
+    <tr><td class="c">1</td><td class="prio-alta">🔴 <code>sendDefaultPii: true</code> (5 pontos)</td><td>Anexa IP, cookies, headers e <strong>corpos de request/response</strong> aos eventos. É o canal por onde CPF/CNH/<strong>ASO</strong> em trânsito pode ir ao Sentry. <strong>Causa-raiz nº 1.</strong></td></tr>
+    <tr><td class="c">2</td><td class="prio-med">🟠 E-mail no <code>setUser</code></td><td>PII identificável em todo evento. Fere minimização.</td></tr>
+    <tr><td class="c">3</td><td class="prio-baixa">🟡 Session Replay</td><td><em>Largamente mitigado pelos defaults do SDK v10</em>; risco <strong>residual</strong> (canvas/unmask/versão de build). Reverificar, mas não é a manchete.</td></tr>
+    <tr><td class="c">4</td><td class="prio-alta">🔴 Transferência internacional + dado sensível</td><td>Qualquer dado que vaze (via vetor 1) vai para SaaS no exterior. Aciona <strong>art. 33</strong> e <strong>art. 11</strong>. <strong>Persiste enquanto o vetor 1 existir.</strong></td></tr>
+  </table>
+  <div class="callout"><strong>Âncoras legais</strong> (auditadas artigo-a-artigo contra a Lei nº 13.709/2018): necessidade/minimização <strong>art. 6º III</strong>; finalidade <strong>art. 6º I</strong>; dado sensível <strong>art. 5º II + art. 11</strong>; consentimento <strong>art. 5º XII + art. 8º §4º + art. 11 I</strong>; <em>privacy by design</em> <strong>art. 46 §2º</strong>; transferência internacional <strong>art. 33</strong>; eliminação do tratado em desconformidade <strong>art. 16 + art. 18 IV</strong>; incidente <strong>art. 48</strong>.</div>
+
+  <h2>2. O princípio organizador: defesa em profundidade</h2>
+  <p>Em vez de uma única correção, dado sensível em telemetria se resolve melhor com <strong>camadas</strong> — se uma falha, a outra segura. Cada solução é mapeada a uma camada e a <strong>quem executa</strong>.</p>
+  <div class="layer"><div class="n">5</div><div class="t"><b>APLICAÇÃO</b> — o dado nunca vira telemetria (logar só ID/hash)</div></div>
+  <div class="layer"><div class="n">1</div><div class="t"><b>ORIGEM (SDK)</b> — <code>sendDefaultPii:false</code>, <code>setUser</code> id, <code>beforeSend</code>, máscara</div></div>
+  <div class="layer"><div class="n">2</div><div class="t"><b>TRÂNSITO</b> — Sentry Relay escrubando antes de sair da infra</div></div>
+  <div class="layer"><div class="n">3</div><div class="t"><b>DESTINO (painel)</b> — Advanced Data Scrubbing server-side</div></div>
+  <div class="layer"><div class="n">4</div><div class="t"><b>RESIDÊNCIA</b> — self-hosted/BR → mata a transferência internacional</div></div>
+  <div class="layer"><div class="n">6</div><div class="t"><b>JURÍDICO</b> — DPA/SCC, RIPD, retenção, purga, transparência</div></div>
+
+  <h2>3. Menu de soluções alternativas (por camada)</h2>
+  <p class="legend">Para cada solução: <strong>o que resolve</strong>, <strong>esforço</strong> (P/M/G), <strong>quem executa</strong> — 🧍 você sozinho · 👨‍💻 dev · ⚖️ DPO/jurídico — e <strong>flag de confiança</strong>.</p>
+
+  <h3>Camada 1 — Na origem (SDK) · 👨‍💻 dev</h3>
+  <table>
+    <tr><th>Cód.</th><th>Solução</th><th>O que resolve</th><th>Esf.</th><th>Flag</th></tr>
+    <tr><td class="cod">A1</td><td><code>sendDefaultPii: false</code> nos <strong>5 pontos</strong> (client/server/edge dos 2 fronts + Custos)</td><td><strong>Corta o vetor nº 1</strong> — IP, cookies, headers, <strong>bodies</strong> deixam de ser anexados</td><td class="c">P</td><td><span class="flag f-sei">Sei</span></td></tr>
+    <tr><td class="cod">A2</td><td><code>Sentry.setUser({ id })</code> — sem <code>email</code></td><td>Remove PII identificável de todo evento</td><td class="c">P</td><td><span class="flag f-sei">Sei</span></td></tr>
+    <tr><td class="cod">A3</td><td>Hook <code>beforeSend</code>/<code>beforeSendTransaction</code> removendo <code>cpf/cnh/aso/laudo/...</code> <strong>antes de sair</strong> do browser/servidor</td><td>Rede de segurança <strong>na origem</strong> — vale mesmo se alguém reativar PII</td><td class="c">P–M</td><td><span class="flag f-sei">Sei</span></td></tr>
+    <tr><td class="cod">A4</td><td>Replay: <strong>manter os defaults</strong> + <code>mask</code>/<code>block</code> nas telas de documento + classes <code>sentry-block</code> no container do ASO/CNH</td><td>Blinda o residual do replay (canvas/elementos específicos)</td><td class="c">P</td><td><span class="flag f-sei">Sei</span></td></tr>
+    <tr><td class="cod">A5</td><td>Backend: fixar <code>send_default_pii=False</code> <strong>explícito</strong> ao consolidar o init (cruza <strong>Etapa 5</strong>)</td><td>Tira a proteção do "por convenção" (frágil)</td><td class="c">P</td><td><span class="flag f-sei">Sei</span></td></tr>
+    <tr><td class="cod">A6</td><td>Custos: <code>sendDefaultPii: false</code> (<code>instrument.ts:12</code>)</td><td>Mesma exposição, mesmo remédio</td><td class="c">P</td><td><span class="flag f-sei">Sei</span></td></tr>
+  </table>
+  <div class="callout"><strong>A1 é a correção de maior impacto e menor esforço de todo o estudo.</strong> Se só uma coisa for feita pelo dev, é essa.</div>
+
+  <h3>Camada 2 — No trânsito · 👨‍💻 dev + 🧍 infra/config</h3>
+  <table>
+    <tr><th>Cód.</th><th>Solução</th><th>O que resolve</th><th>Esf.</th><th>Flag</th></tr>
+    <tr><td class="cod">B1</td><td><strong>Sentry Relay</strong> (proxy <em>open-source</em> do próprio Sentry) na rede da AutoMind, com <code>pii_config</code>/datascrubbing centralizado; SDKs apontam DSN/tunnel para o Relay</td><td><strong>Política única de scrubbing</strong> para os 8 projetos, <strong>independe de cada SDK</strong>, e escruba <strong>antes de o dado sair da infra</strong>. Reduz a dependência de um PR por produto</td><td class="c">M–G</td><td><span class="flag f-parc">Parcial</span></td></tr>
+  </table>
+  <div class="callout warn"><strong>Vantagem estratégica:</strong> a regra de PII passa a ser <strong>infra/configuração</strong> (mais perto do que você controla) em vez de espalhada no código de cada produto. Custo: é um componente a <strong>operar e manter</strong>.</div>
+
+  <h3>Camada 3 — No destino (painel Sentry) · 🧍 você sozinho, sem PR</h3>
+  <table>
+    <tr><th>Cód.</th><th>Solução</th><th>O que resolve</th><th>Esf.</th><th>Flag</th></tr>
+    <tr><td class="cod">C1</td><td><strong>Advanced Data Scrubbing server-side</strong> (CPF/CNPJ/e-mail/<code>extra.**</code>/<code>$message</code>) — <em>já há playbook pronto</em></td><td>Rede de segurança na <strong>ingestão</strong>; pega o que escapar do código</td><td class="c">P–M</td><td><span class="flag f-sei">Sei</span></td></tr>
+    <tr><td class="cod">C2</td><td>"Prevent Storing of IP Addresses" + regra <code>$user.geo.**</code></td><td>Remove IP e geolocalização derivada</td><td class="c">P</td><td><span class="flag f-sei">Sei</span></td></tr>
+    <tr><td class="cod">C3</td><td><strong>Purga</strong> de eventos/issues/replays já gravados em desconformidade</td><td>Trata a exposição <strong>pretérita</strong> (art. 16 + 18 IV)</td><td class="c">M</td><td><span class="flag f-parc">Parcial</span></td></tr>
+    <tr><td class="cod">C4</td><td>Reduzir <strong>data retention</strong> da org/projeto (minimização temporal)</td><td>Menos tempo de exposição do que entrar</td><td class="c">P</td><td><span class="flag f-parc">Parcial</span></td></tr>
+  </table>
+  <div class="callout">A camada 3 é <strong>100% executável por você hoje</strong>, sem dependência de dev. É a forma de <strong>avançar a Etapa 7 sozinho</strong> enquanto a camada 1 espera o PR. <strong>Não substitui</strong> a camada 1 (não corrige a causa-raiz).</div>
+
+  <h3>Camada 4 — Residência de dados (arquitetura) · 👨‍💻 dev/infra + ⚖️</h3>
+  <table>
+    <tr><th>Cód.</th><th>Solução</th><th>O que resolve</th><th>Esf.</th><th>Flag</th></tr>
+    <tr><td class="cod">D1</td><td><strong>Sentry self-hosted</strong> (em nuvem própria/BR)</td><td>Dado <strong>não sai do país</strong> → <strong>elimina a transferência internacional</strong> (art. 33) e a dependência do DPA-exterior</td><td class="c">G</td><td><span class="flag f-parc">Parcial</span></td></tr>
+    <tr><td class="cod">D2</td><td>Sentry SaaS com <strong>região EU/US</strong> (não há região BR)</td><td>Não resolve o art. 33 (ainda é exterior), mas EU dá salvaguardas mais fáceis (cláusulas-padrão)</td><td class="c">M</td><td><span class="flag f-nao">Sei (não resolve pleno)</span></td></tr>
+    <tr><td class="cod">D3</td><td>Ferramenta <strong>compatível com SDK Sentry</strong> auto-hospedada (ex.: GlitchTip)</td><td>Mesma instrumentação, dado em BR — alternativa de menor custo que o Sentry self-hosted</td><td class="c">G</td><td><span class="flag f-parc">Parcial</span></td></tr>
+  </table>
+  <div class="callout warn">A camada 4 é a única que ataca a <strong>transferência internacional na raiz</strong>. É decisão estrutural — só vale o estudo de viabilidade se o jurídico considerar o art. 33 um bloqueio real (dado sensível eleva esse peso).</div>
+
+  <h3>Camada 5 — Na aplicação (cultura/processo) · 👨‍💻 dev + 🧍 processo</h3>
+  <table>
+    <tr><th>Cód.</th><th>Solução</th><th>O que resolve</th><th>Esf.</th><th>Flag</th></tr>
+    <tr><td class="cod">E1</td><td><strong>Política de logging</strong>: nunca pôr CPF/CNH/ASO em mensagem de erro, tag ou contexto — logar só <strong>ID interno / hash</strong></td><td>Faz o dado sensível <strong>nunca virar telemetria</strong> (a defesa mais forte)</td><td class="c">M</td><td><span class="flag f-sei">Sei</span></td></tr>
+    <tr><td class="cod">E2</td><td><strong>Denylist de URLs</strong> sensíveis para captura de body / não opt-in de bodies de endpoints de documento</td><td>Evita o body de endpoints de ASO/documento</td><td class="c">P–M</td><td><span class="flag f-sei">Sei</span></td></tr>
+    <tr><td class="cod">E3</td><td><strong>Lint/pre-commit</strong> barrando <code>sendDefaultPii: true</code> e padrões de PII em log</td><td>Impede o problema de <strong>voltar</strong> num PR futuro</td><td class="c">M</td><td><span class="flag f-sei">Sei</span></td></tr>
+  </table>
+
+  <h3>Camada 6 — Governança jurídica · ⚖️ DPO + 🧍 você (redige/aciona)</h3>
+  <table>
+    <tr><th>Cód.</th><th>Solução</th><th>O que resolve</th><th>Esf.</th><th>Flag</th></tr>
+    <tr><td class="cod">F1</td><td><strong>DPA + Cláusulas-Padrão (SCC)</strong> com o Sentry (art. 33, II, <em>b</em>)</td><td>Dá base à transferência internacional <strong>do que for legítimo</strong></td><td class="c">M</td><td><span class="flag f-parc">Parcial</span></td></tr>
+    <tr><td class="cod">F2</td><td><strong>RIPD/DPIA</strong> do tratamento de telemetria</td><td>Documenta necessidade/proporcionalidade; exigível p/ dado sensível</td><td class="c">M</td><td><span class="flag f-sei">Sei</span></td></tr>
+    <tr><td class="cod">F3</td><td><strong>Política de retenção</strong> + purga pretérita + avaliar <strong>art. 48</strong> (incidente)</td><td>Encerra a exposição passada e define o futuro</td><td class="c">M</td><td><span class="flag f-parc">Parcial</span></td></tr>
+    <tr><td class="cod">F4</td><td>Atualizar <strong>Termo/Política</strong> — <strong>depois</strong> de minimizar</td><td>Transparência do tratamento <strong>mínimo</strong></td><td class="c">P</td><td><span class="flag f-sei">Sei</span></td></tr>
+  </table>
+  <div class="callout crit"><strong>Ordem inegociável (já auditada):</strong> F4 vem <strong>por último</strong>. Documento ajusta a <em>transparência</em>; a minimização (camadas 1–3) ajusta a <em>legalidade</em>. Reescrever a política <strong>não</strong> torna lícito coletar dado excessivo/sensível.</div>
+
+  <h2>4. Matriz comparativa — qual solução ataca qual problema</h2>
+  <table>
+    <tr><th>Solução</th><th>Corta causa-raiz (vetor 1)?</th><th>Protege dado sensível/ASO?</th><th>Resolve transf. internac. (art. 33)?</th><th>Quem</th><th>Esf.</th></tr>
+    <tr><td class="cod">A1 PII off ×5</td><td class="c">✅</td><td class="c">✅ <span style="opacity:.7">(no que vaza por body)</span></td><td class="c">—</td><td class="c who">👨‍💻</td><td class="c">P</td></tr>
+    <tr><td class="cod">A2 setUser id</td><td class="c">parcial</td><td class="c">—</td><td class="c">—</td><td class="c who">👨‍💻</td><td class="c">P</td></tr>
+    <tr><td class="cod">A3 beforeSend</td><td class="c">✅ <span style="opacity:.7">(reforço)</span></td><td class="c">✅</td><td class="c">—</td><td class="c who">👨‍💻</td><td class="c">P–M</td></tr>
+    <tr><td class="cod">A4 replay mask+</td><td class="c">—</td><td class="c">✅ <span style="opacity:.7">(residual)</span></td><td class="c">—</td><td class="c who">👨‍💻</td><td class="c">P</td></tr>
+    <tr><td class="cod">B1 Relay</td><td class="c">✅ <span style="opacity:.7">(central.)</span></td><td class="c">✅</td><td class="c">parcial</td><td class="c who">👨‍💻+🧍</td><td class="c">M–G</td></tr>
+    <tr><td class="cod">C1–C4 painel</td><td class="c">❌ <span style="opacity:.7">(rede de seg.)</span></td><td class="c">✅ <span style="opacity:.7">(no destino)</span></td><td class="c">—</td><td class="c who">🧍</td><td class="c">P–M</td></tr>
+    <tr><td class="cod">D1/D3 self-host BR</td><td class="c">—</td><td class="c">✅</td><td class="c">✅ <strong>(única)</strong></td><td class="c who">👨‍💻</td><td class="c">G</td></tr>
+    <tr><td class="cod">E1–E3 app/processo</td><td class="c">✅ <span style="opacity:.7">(prevent.)</span></td><td class="c">✅</td><td class="c">—</td><td class="c who">👨‍💻+🧍</td><td class="c">M</td></tr>
+    <tr><td class="cod">F1 DPA/SCC</td><td class="c">—</td><td class="c">—</td><td class="c">✅ <span style="opacity:.7">(legaliza)</span></td><td class="c who">⚖️</td><td class="c">M</td></tr>
+    <tr><td class="cod">F2–F4 governança</td><td class="c">—</td><td class="c">—</td><td class="c">—</td><td class="c who">⚖️+🧍</td><td class="c">M</td></tr>
+  </table>
+  <div class="callout"><strong>Leitura da matriz:</strong> nenhuma solução isolada fecha tudo. A causa-raiz é <strong>A1</strong>; o dado sensível pede <strong>A1+A3+E1</strong>; a transferência internacional só morre com <strong>D1/D3</strong> <em>ou</em> se legaliza com <strong>F1</strong>; e <strong>C1–C4</strong> é o que <strong>você entrega hoje</strong> sem ninguém.</div>
+
+  <h2>5. Recomendação — a combinação ótima, em 3 fases</h2>
+
+  <div class="phase">
+    <h3><span class="tag-p">P0</span> Hoje, você sozinho (sem PR) 🧍</h3>
+    <ol class="steps">
+      <li><strong>C1–C4</strong> no painel (já há playbook): Advanced Data Scrubbing org-wide + IP/geo off + retention.</li>
+      <li><strong>C3</strong> purga do pretérito <strong>com o DPO</strong>.</li>
+      <li>Abrir os <strong>3 tickets</strong> (você executa C; dev recebe A; DPO recebe F).</li>
+      <li><strong>Resolver a ambiguidade do frontend canônico</strong> (achado #7) — destrava A1/A2/A4.</li>
+    </ol>
+    <div class="callout" style="margin-bottom:0">Comunicar honestamente: <em>"camada server-side aplicada; correção de origem ainda pendente no código."</em></div>
+  </div>
+
+  <div class="phase">
+    <h3><span class="tag-p p1">P1</span> Dev, baixo esforço / alto impacto 👨‍💻</h3>
+    <ol class="steps" start="5">
+      <li><strong>A1</strong> (<code>sendDefaultPii:false</code> ×5) — <strong>a correção nº 1</strong>.</li>
+      <li><strong>A2</strong> (setUser só id) + <strong>A6</strong> (Custos) + <strong>A5</strong> (backend explícito).</li>
+      <li><strong>A3</strong> (<code>beforeSend</code> escrubando CPF/CNH/ASO) + <strong>A4</strong> (reforço de máscara no replay).</li>
+      <li><strong>E2/E3</strong> (denylist de URL + lint) para não regredir.</li>
+    </ol>
+  </div>
+
+  <div class="phase">
+    <h3><span class="tag-p p2">P2</span> Estrutural / governança 👨‍💻⚖️</h3>
+    <ol class="steps" start="9">
+      <li>Decidir <strong>B1 (Relay)</strong> e/ou <strong>D1/D3 (residência BR)</strong> conforme o peso que o jurídico der ao art. 33.</li>
+      <li><strong>E1</strong> (política de logging) como cultura.</li>
+      <li><strong>F1</strong> (DPA/SCC), <strong>F2</strong> (RIPD), e só então <strong>F4</strong> (atualizar Termo/Política).</li>
+    </ol>
+  </div>
+
+  <h2>6. Anti-padrões (o que parece solução e não é)</h2>
+  <table>
+    <tr><th>"Solução"</th><th>Por que falha</th></tr>
+    <tr><td>Só <strong>reescrever o Termo/Política</strong></td><td>Não cura excesso (art. 6º III) nem cria base p/ dado sensível (art. 11). Auditado.</td></tr>
+    <tr><td>Só <strong>Additional Sensitive Fields</strong> por substring</td><td>Casa por pedaço de valor → <strong>over-scrub</strong> (some <code>"Unexpected"</code> se puser <code>exp</code>) ou <em>under-scrub</em>. É rede de segurança, não correção.</td></tr>
+    <tr><td><strong>Desligar o Replay</strong> achando que resolve</td><td>O replay já está mascarado por default; desligá-lo <strong>não toca</strong> o vetor real (<code>sendDefaultPii</code>). Gasta a bala no alvo errado.</td></tr>
+    <tr><td><strong>Confiar só no scrubbing do painel</strong></td><td>Age na ingestão (destino), não na origem; o dado ainda <strong>trafega</strong> ao exterior antes de ser redigido.</td></tr>
+    <tr><td>Assumir "<strong>está mascarado, então ok</strong>" sem reverificar canvas/unmask/versão de build</td><td>Máscara é best-effort; precisa de teste real (a própria Sentry avisa).</td></tr>
+  </table>
+
+  <h2>7. Flags de confiança (resumo)</h2>
+  <table>
+    <tr><th>Afirmação</th><th>Flag</th></tr>
+    <tr><td><code>sendDefaultPii:true</code> em 5 pontos é o vetor real e dominante</td><td><span class="flag f-sei">Sei</span> <span style="opacity:.7">(revalidado hoje)</span></td></tr>
+    <tr><td>Replay v10 mascara texto e bloqueia mídia por default</td><td><span class="flag f-sei">Sei</span> <span style="opacity:.7">(doc oficial + <code>package.json:41</code>)</span></td></tr>
+    <tr><td>Replay ainda tem residual (canvas/unmask/build)</td><td><span class="flag f-parc">Parcial — reverificar</span></td></tr>
+    <tr><td>A1 corta o vetor 1 com esforço P</td><td><span class="flag f-sei">Sei</span></td></tr>
+    <tr><td>Relay escruba antes de sair da infra</td><td><span class="flag f-sei">Sei (conceito)</span> / <span class="flag f-parc">Parcial (operar)</span></td></tr>
+    <tr><td>Self-host BR elimina a transferência internacional</td><td><span class="flag f-parc">Parcial (viabilidade/custo)</span></td></tr>
+    <tr><td>Não há região Sentry SaaS no Brasil</td><td><span class="flag f-sei">Sei</span></td></tr>
+    <tr><td>GlitchTip é compatível com SDK Sentry</td><td><span class="flag f-parc">Parcial (validar paridade)</span></td></tr>
+    <tr><td>Qual frontend é o de produção</td><td><span class="flag f-nao">Não sei — confirmar</span></td></tr>
+    <tr><td>Existe DPA/SCC firmado com o Sentry</td><td><span class="flag f-nao">Não sei — confirmar</span></td></tr>
+  </table>
+
+  <h2>8. Fontes</h2>
+  <ol class="src">
+    <li>Código — <code>AutoChecker_Frontend/instrumentation-client.ts:12,18,19,21</code> e <code>AutoChecker/frontend/instrumentation-client.ts</code> (idêntico) — lido 30/06/2026.</li>
+    <li>Código — <code>.../sentry.server.config.ts:16</code>, <code>.../sentry.edge.config.ts:17</code> (ambos os fronts); <code>.../modules/auth/hooks/useAuth.tsx:175,388</code> e <code>:196,478</code>; <code>AutoChecker_Custos/src/instrument.ts:12</code>.</li>
+    <li>Código — <code>AutoChecker_Frontend/package.json:41</code> e <code>AutoChecker/frontend/package.json:41</code> → <code>@sentry/nextjs ^10.43.0</code>.</li>
+    <li>Sentry Docs (MCP) — <strong>Session Replay › Privacy</strong>: defaults <code>maskAllText:true</code>, <code>maskAllInputs:true</code>, <code>blockAllMedia:true</code>; <code>beforeAddRecordingEvent</code>; bodies de rede são opt-in.</li>
+    <li>Sentry Docs — <strong>Server-Side Data Scrubbing</strong> e <strong>Advanced Data Scrubbing</strong> (base do playbook C1–C4).</li>
+    <li><code>Etapa7_Scrubbing_PII_LGPD_Frontend_AutoChecker.md</code> · <code>Etapa7_Analise_Consentimento_LGPD_Termo_vs_Sentry_AutoChecker.md</code> · <code>Etapa7_Auditoria_Conformidade_LGPD_Consentimento_vs_Scrubbing_AutoChecker.md</code> · <code>Etapa7_Playbook_DataScrubbing_Painel_Sentry_8Projetos_2026-06-30.md</code>.</li>
+    <li><code>Lgpd.md</code> — Lei nº 13.709/2018 (edição Senado, jun/2024) — âncoras legais.</li>
+    <li>Memórias do projeto — <code>autochecker-etapa7-analise-lgpd</code>, <code>sentry-token-readonly</code>, <code>autochecker-trabalho-autonomo-vs-dev</code>.</li>
+  </ol>
+
+</main>
+<footer>
+  AutoMind · Observabilidade — Etapa 7 (Onda 0 / GATE). Estudo de soluções para tratamento de dados sensíveis na telemetria. Identidade visual aplicada via skill <code>identidade-visual-automind</code>. Citações de código revalidadas em 30/06/2026; flags Sei/Parcial/Não sei por item. F4 (Termo/Política) vem por último — doc ajusta transparência, não legalidade.
+</footer>
+</body>
+</html>

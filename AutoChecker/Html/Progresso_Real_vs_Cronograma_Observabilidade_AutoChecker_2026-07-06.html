@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Progresso Real vs. Cronograma de Observabilidade · AutoChecker · AutoMind</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,400;0,500;0,700;0,900;1,400&display=swap');
+  :root{
+    --am-rosa:#FA094E; --am-magenta:#940755; --am-roxo:#44055A;
+    --am-navy:#03045E; --am-preto:#100F0F; --am-offwhite:#F3F3F0;
+    --am-gradiente-h:linear-gradient(90deg,#FA094E 0%,#03045E 100%);
+    --card:#ffffff; --line:#e4e2dd;
+    --ok:#1f8a4c; --ok-soft:#e6f4ec; --ok-line:#bfe3cd;
+    --warn:#b8860b; --warn-soft:#fbf3dc; --warn-line:#ecd79a;
+    --crit:#FA094E; --crit-soft:#fdeaef; --crit-line:#f4c2d0;
+    --mut:#6b6b6b;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{font-family:"Red Hat Display",system-ui,sans-serif;color:var(--am-preto);
+    background:var(--am-offwhite); margin:0; line-height:1.6; font-size:16px;}
+  .topbar{height:8px; background:var(--am-gradiente-h);}
+  header{padding:34px 7vw 22px; border-bottom:1px solid var(--line);}
+  .wordmark{font-weight:900; text-transform:uppercase; letter-spacing:.20em;
+    color:var(--am-roxo); font-size:15px;}
+  .wordmark .dot{color:var(--am-rosa);}
+  .tagline{font-size:11px; letter-spacing:.32em; text-transform:uppercase;
+    color:var(--am-navy); opacity:.7; margin-top:2px;}
+  h1{font-weight:900; color:var(--am-roxo); font-size:30px; line-height:1.2;
+    margin:18px 0 6px; letter-spacing:.01em;}
+  .sub{color:var(--am-navy); font-size:14px; opacity:.9; margin:2px 0;}
+  .sub code, code{font-family:"SFMono-Regular",Consolas,monospace; background:#efeeea;
+    padding:1px 6px; border-radius:5px; font-size:.86em; color:var(--am-magenta);}
+  .pill{display:inline-block; background:var(--am-roxo); color:#fff; font-size:11px;
+    font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    padding:4px 11px; border-radius:999px; margin:10px 6px 0 0;}
+  .pill.alt{background:var(--am-rosa);}
+  .pill.gho{background:transparent; color:var(--am-navy); border:1px solid var(--line);}
+  main{padding:14px 7vw 60px; max-width:1080px;}
+  h2{font-weight:700; color:var(--am-roxo); font-size:21px; margin:40px 0 10px;
+    padding-top:14px; border-top:2px solid var(--am-rosa); display:inline-block;}
+  h3{font-weight:700; color:var(--am-navy); font-size:16px; margin:22px 0 6px;}
+  p{margin:10px 0;}
+  a{color:var(--am-rosa); text-decoration:none;} a:hover{text-decoration:underline;}
+  .lead{font-size:16.5px;}
+
+  /* Veredito hero */
+  .verdict{background:linear-gradient(0deg,#fff,#fff) padding-box,var(--am-gradiente-h) border-box;
+    border:2px solid transparent; border-radius:18px; padding:20px 24px; margin:20px 0 8px;}
+  .verdict .k{font-size:12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--am-rosa);}
+  .verdict .big{font-size:22px; font-weight:900; color:var(--am-roxo); line-height:1.25; margin:6px 0;}
+  .verdict p{margin:8px 0 0; font-size:15px;}
+
+  /* KPIs */
+  .kpis{display:flex; flex-wrap:wrap; gap:12px; margin:18px 0 6px;}
+  .kpi{flex:1 1 150px; background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:15px 17px; box-shadow:0 1px 3px rgba(16,15,15,.04);}
+  .kpi .n{font-size:30px; font-weight:900; line-height:1.05; color:var(--am-roxo);}
+  .kpi .l{font-size:12px; color:var(--mut); margin-top:4px; line-height:1.35;}
+  .kpi.ok .n{color:var(--ok);} .kpi.warn .n{color:var(--warn);}
+  .kpi.crit .n{color:var(--crit);} .kpi.mut .n{color:var(--mut);}
+
+  table{border-collapse:collapse; width:100%; margin:14px 0; font-size:13.5px;}
+  th,td{text-align:left; padding:9px 11px; border-bottom:1px solid var(--line); vertical-align:top;}
+  th{background:#efeeea; color:var(--am-roxo); font-weight:700; font-size:11.5px;
+    text-transform:uppercase; letter-spacing:.05em;}
+  tr:last-child td{border-bottom:none;}
+  td.c,th.c{text-align:center; white-space:nowrap;}
+  tbody tr:hover{background:#faf9f6;}
+
+  .badge{display:inline-block; border-radius:999px; padding:2px 9px; font-size:11px; font-weight:700; white-space:nowrap;}
+  .b-ok{background:var(--ok-soft); color:var(--ok); border:1px solid var(--ok-line);}
+  .b-go{background:#eef1ff; color:var(--am-navy); border:1px solid #c9d1f5;}
+  .b-warn{background:var(--warn-soft); color:var(--warn); border:1px solid var(--warn-line);}
+  .b-no{background:#f0efec; color:var(--mut); border:1px solid var(--line);}
+  .b-crit{background:var(--crit-soft); color:var(--crit); border:1px solid var(--crit-line);}
+
+  .card{background:var(--card); border:1px solid var(--line); border-left-width:4px; border-radius:14px;
+    padding:14px 18px; margin:13px 0; box-shadow:0 1px 3px rgba(16,15,15,.04);}
+  .card.ok{border-left-color:var(--ok);} .card.go{border-left-color:var(--am-navy);}
+  .card.warn{border-left-color:var(--warn);} .card.crit{border-left-color:var(--crit);}
+  .card h3{margin:0 0 4px; font-size:15px; color:var(--am-roxo);}
+  .card .ev{font-size:12.5px; color:var(--mut); margin-top:6px;}
+  .card .ev b{color:var(--am-navy);}
+
+  .callout{border-left:4px solid var(--am-rosa); background:#fff; border-radius:0 12px 12px 0;
+    padding:13px 18px; margin:16px 0; font-size:14.5px;}
+  .callout.warn{border-color:var(--warn); background:#fffdf6;}
+  .callout.crit{border-color:var(--crit); background:#fff6f8;}
+  .callout.ok{border-color:var(--ok); background:#f5fbf7;}
+  .callout .h{font-weight:900; color:var(--am-roxo); display:block; margin-bottom:3px;}
+
+  ul{margin:8px 0 8px; padding-left:20px;} li{margin:4px 0;}
+  .cod{font-weight:700; color:var(--am-rosa);}
+  footer{padding:24px 7vw 50px; color:var(--am-navy); opacity:.75; font-size:12.5px;
+    border-top:1px solid var(--line);}
+  @media print{
+    .card,.kpi,table,.callout,.verdict{break-inside:avoid;}
+    h2{break-after:avoid;} main{padding:0 6vw;}
+    @page{margin:14mm 12mm;}
+  }
+</style>
+</head>
+<body>
+<div class="topbar"></div>
+<header>
+  <div class="wordmark">AUTOMIND<span class="dot">.</span></div>
+  <div class="tagline">Simple · Smart · Reliable</div>
+  <h1>Progresso Real vs. Cronograma de Observabilidade</h1>
+  <div class="sub">Produto: <strong>AutoChecker</strong> · Evidência: <strong>código-fonte ao vivo</strong> no Azure DevOps (org <code>automindautomacao</code>, branch <code>main</code>)</div>
+  <div class="sub">Revisão: <strong>06/07/2026</strong> · Snapshot de comparação: jun/2026 · Método: leitura do código, não dos work items</div>
+  <div>
+    <span class="pill alt">Lido do código, não do board</span>
+    <span class="pill">7 repos varridos</span>
+    <span class="pill gho">Citações arquivo:linha + commit</span>
+  </div>
+</header>
+<main>
+
+<div class="verdict">
+  <span class="k">Veredito</span>
+  <div class="big">O cronograma de observabilidade praticamente não andou entre junho e hoje.</div>
+  <p>O que se mexeu no período foi <strong>conformidade jurídica de consentimento</strong> (aceite de termos) — uma frente <em>diferente</em> da observabilidade — mais um pequeno corte de ruído no Sentry. As lacunas técnicas que o cronograma mapeou continuam <strong>todas em aberto</strong>, e todas dependem de PR de desenvolvimento que não veio.</p>
+</div>
+
+<div class="kpis">
+  <div class="kpi crit"><div class="n">0</div><div class="l">lacunas técnicas de observabilidade efetivamente fechadas no período</div></div>
+  <div class="kpi ok"><div class="n">1</div><div class="l">micro-avanço real: filtro de ruído Redis no <code>before_send</code></div></div>
+  <div class="kpi warn"><div class="n">4</div><div class="l">arquivos ainda com <code>sendDefaultPii:true</code> (vetor LGPD dominante)</div></div>
+  <div class="kpi mut"><div class="n">2</div><div class="l">serviços ainda cegos: OCR e AIAgent (zero SDK Sentry)</div></div>
+</div>
+
+<div class="callout crit">
+  <span class="h">A armadilha de leitura</span>
+  Os commits recentes têm <strong>"LGPD" no título</strong> (PRs 15302, 15192, 15196, 15301) e podem passar a impressão de que a <strong>Etapa 7</strong> (scrubbing de PII na telemetria) avançou. <strong>Não avançou.</strong> Pelo código, esse "LGPD" é o módulo <code>apps/legal</code> — gate de aceite de Termo/Política + auditoria forense do aceite (grava <code>user_cpf</code> como evidência). É a camada jurídica de <strong>consentimento</strong>, ortogonal ao problema técnico de PII vazando para o Sentry. Não confundir uma com a outra.
+</div>
+
+<h2>1. O que realmente mudou (evidência de código)</h2>
+<table>
+  <thead><tr><th>Mudança</th><th>Onde (arquivo · commit)</th><th class="c">Efeito no cronograma</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Filtro de ruído transiente de Redis</strong> no <code>before_send</code> (dropa <code>Connection refused/reset</code>, <code>Error 111</code>, etc., além de <code>/health/</code>)</td>
+      <td><code>backend/config/settings/base.py</code> · <code>_is_redis_transient_event</code> · PR&nbsp;15302 (<code>8e40d2e2</code>, 05/07)</td>
+      <td class="c"><span class="badge b-ok">Micro-avanço</span><br><span style="font-size:11px;color:var(--mut)">Onda 0 · ruído</span></td>
+    </tr>
+    <tr>
+      <td><strong>Frontend virou repo separado</strong> (<code>AutoChecker_Frontend</code>) e a pasta legada <code>/frontend</code> do monorepo foi <strong>deletada</strong> ("Remove Legacy folder frontend", 633 del)</td>
+      <td>split 14/05 (<code>0f4f8c06</code>) · deleção 29/06 (<code>dae4031c</code>)</td>
+      <td class="c"><span class="badge b-warn">Neutro</span><br><span style="font-size:11px;color:var(--mut)">reduz duplicata, não corrige</span></td>
+    </tr>
+    <tr>
+      <td><strong>Novo "Signal 6"</strong>: <code>Composition</code> também dispara integração via <code>post_save</code></td>
+      <td><code>shared/models/signals.py</code></td>
+      <td class="c"><span class="badge b-crit">Amplia risco</span><br><span style="font-size:11px;color:var(--mut)">mais log com PII</span></td>
+    </tr>
+    <tr>
+      <td>Filtros <code>entity_id/entity_type</code> no <code>IntegrationLogViewSet</code></td>
+      <td><code>apps/integrations/views.py</code> · PR&nbsp;15213 (<code>3ba42612</code>, 29/06)</td>
+      <td class="c"><span class="badge b-crit">Amplia risco</span><br><span style="font-size:11px;color:var(--mut)">mais consulta, sem scrub</span></td>
+    </tr>
+  </tbody>
+</table>
+<p class="callout ok"><span class="h">Detalhe positivo que o código revelou</span> O <code>ApiRequestLoggingMiddleware</code> (<code>backend/config/middleware/api_logging.py</code>) <strong>já faz scrub por chave</strong> nos logs de API (<code>password|token|secret|cpf|cnpj</code> → <code>***</code>). Existe, portanto, <em>algum</em> scrubbing de PII — mas só no log de request, <strong>não</strong> no pipeline do Sentry e <strong>não</strong> no IntegrationLog.</p>
+
+<h2>2. O que continua igual — gates fechados</h2>
+
+<h3>Etapa 7 / LGPD na telemetria — 0 progresso</h3>
+<div class="card crit">
+  <h3><code>sendDefaultPii: true</code> segue vivo em 4 arquivos <span class="badge b-crit">Não iniciado</span></h3>
+  Vetor de risco LGPD dominante (envia headers, cookies, IP, request body ao SaaS estrangeiro). Continua <code>true</code>, intacto desde o split de maio, em:
+  <ul>
+    <li><code>AutoChecker_Frontend/instrumentation-client.ts</code> · <code>sentry.server.config.ts</code> · <code>sentry.edge.config.ts</code> (commit <code>0f4f8c06</code>, 14/05)</li>
+    <li><code>AutoChecker_Custos/src/instrument.ts:12</code> (congelado desde 11/03, PR 13548)</li>
+  </ul>
+  <div class="ev"><b>Nuance:</b> o snapshot falava em "5 pontos"; caiu para 4 porque a cópia legada <code>/frontend</code> foi <b>deletada</b> — por remoção da duplicata, não por correção. Nenhum ponto foi para <code>false</code>.</div>
+</div>
+<div class="card crit">
+  <h3><code>email</code> no <code>Sentry.setUser</code> ainda enviado <span class="badge b-crit">Não iniciado</span></h3>
+  <code>AutoChecker_Frontend/modules/auth/hooks/useAuth.tsx</code> — linha <code>192</code> (login) e <code>401</code> (selectTenant) passam <code>{ id, email }</code>. Não foi reduzido a só <code>id</code>. (<code>logout</code> em <code>:236</code> já limpa com <code>setUser(null)</code>.)
+</div>
+<div class="card ok">
+  <h3>Session Replay — sem regressão <span class="badge b-ok">Seguro</span></h3>
+  <code>replayIntegration()</code> sem argumentos → mantém os defaults v10 que mascaram (<code>maskAllText</code>, <code>maskAllInputs</code>, <code>blockAllMedia</code>). Ninguém adicionou <code>unmask</code>. <code>@sentry/nextjs ^10.43.0</code> inalterado. Este é o único lado que já estava correto.
+</div>
+
+<h3>Onda 4 (tracing / performance / logs) — 0 progresso</h3>
+<div class="card crit">
+  <h3>N+1 do <code>/api/tenants/all-tenants-switcher/</code> intacto <span class="badge b-crit">Não iniciado</span></h3>
+  <code>backend/apps/tenants/views.py · list_all_tenants_for_switcher</code>: para usuário não-superadmin, um <code>User.objects.get()</code> + um <code>TenantMembership.objects.get()</code> <strong>por tenant</strong>, dentro de <code>schema_context</code>. Sem <code>select_related/prefetch_related</code>. (issue BACKEND-5)
+</div>
+<div class="card crit">
+  <h3>Sem <code>LoggingIntegration</code> e sem <code>trace_id</code> em log algum <span class="badge b-crit">Não iniciado</span></h3>
+  Busca org-wide por <code>trace_id</code> e <code>LoggingIntegration</code> = <strong>0 resultados</strong>. Os logs de task (<code>worker/config/celery_logging.py</code>) e de request (<code>api_logging.py</code>) carregam <code>tenant</code>, nunca <code>trace_id</code>. Logo, logs e erros seguem <strong>sem correlação por trace</strong>.
+</div>
+<div class="card crit">
+  <h3>OCR e AIAgent continuam pontos cegos totais <span class="badge b-crit">Não iniciado</span></h3>
+  <code>AutoChecker_OCR</code> e <code>AutoChecker_AIAgent</code> (ambos Python): <strong>nenhum <code>sentry-sdk</code></strong> no <code>requirements.txt</code>, zero <code>Sentry.init</code>, zero recepção de <code>sentry-trace/baggage</code>. A cadeia de trace <strong>quebra</strong> ao entrar neles. O AIAgent tem só logging local em texto (<code>agent/config/logging.py</code>); o OCR, nem isso.
+  <div class="ev"><b>Hop confirmado:</b> a integração dispara de <code>shared/models/signals.py</code> (<code>post_save</code> de <code>NodeDocument</code>), sem propagação explícita de trace para esses serviços.</div>
+</div>
+
+<h3>IntegrationLog (achado LGPD) — 0 progresso</h3>
+<div class="card crit">
+  <h3>Payload cru, sem TTL, ainda exposto na UI <span class="badge b-crit">Não iniciado</span></h3>
+  <code>shared/models/integrations.py · IntegrationLog</code> ainda persiste <code>request_payload</code> (JSON) e <code>response_body</code> na íntegra — <strong>sem retenção/expurgo</strong> (nenhuma task de limpeza no beat de <code>celery.py</code>) e <strong>sem mascaramento</strong> de CPF/CNH/token. O <code>IntegrationLogDetailSerializer</code> continua expondo ambos; a action <code>retry</code> reusa o payload persistido.
+  <div class="ev"><b>Piorou a superfície:</b> o PR 15213 adicionou formas de <em>consultar</em> o log (filtros por entidade) e o novo Signal 6 gera <em>mais</em> logs — nenhum dos dois adiciona retenção ou scrub.</div>
+</div>
+
+<h2>3. Painel de checkpoints — código vs. cronograma</h2>
+<table>
+  <thead><tr><th>Checkpoint técnico</th><th class="c">Onda / Etapa</th><th class="c">Estado no código (06/07)</th><th>Evidência</th></tr></thead>
+  <tbody>
+    <tr><td>Filtro de ruído (<code>before_send</code>)</td><td class="c">Onda 0 · Item 6</td><td class="c"><span class="badge b-go">Avançou</span></td><td><code>settings/base.py</code> (Redis + health)</td></tr>
+    <tr><td>Consolidar init do Sentry no helper</td><td class="c">Onda 0 · Etapa 5 (#55421)</td><td class="c"><span class="badge b-no">Não feito</span></td><td>init ainda inline em 3 lugares; <code>shared/observability/sentry.py</code> não é usado</td></tr>
+    <tr><td>Scrubbing de PII na telemetria (<code>sendDefaultPii</code>)</td><td class="c">Onda 6 · Etapa 7</td><td class="c"><span class="badge b-crit">Aberto</span></td><td>4 arquivos <code>true</code> + <code>email</code> no <code>setUser</code></td></tr>
+    <tr><td>Resolver N+1 <code>all-tenants-switcher</code></td><td class="c">Onda 4 · Item 22</td><td class="c"><span class="badge b-crit">Aberto</span></td><td><code>tenants/views.py</code> sem <code>prefetch</code></td></tr>
+    <tr><td>Propagação de trace p/ OCR e AIAgent</td><td class="c">Onda 4 · Item 23</td><td class="c"><span class="badge b-crit">Aberto</span></td><td>0 SDK nesses repos; hop sem <code>sentry-trace</code></td></tr>
+    <tr><td><code>trace_id</code> nos logs + <code>LoggingIntegration</code></td><td class="c">Onda 4 · Item 24</td><td class="c"><span class="badge b-crit">Aberto</span></td><td>0 resultados no repo; logs só com <code>tenant</code></td></tr>
+    <tr><td>Retenção + scrub do IntegrationLog</td><td class="c">LGPD in-app</td><td class="c"><span class="badge b-crit">Aberto</span></td><td>payload cru, sem TTL, exposto no serializer</td></tr>
+    <tr><td>Aceite de termos + auditoria forense</td><td class="c">Consentimento (fora do escopo obs.)</td><td class="c"><span class="badge b-ok">Feito</span></td><td>módulo <code>apps/legal</code>, PRs 15302/15196/15301</td></tr>
+  </tbody>
+</table>
+
+<h2>4. Em uma frase</h2>
+<p class="lead">O repositório mostra que o time avançou em <strong>consentimento/aceite legal</strong> e cortou um pouco de ruído do Sentry, mas <strong>nenhuma</strong> das lacunas técnicas de observabilidade do cronograma — correlação por trace, N+1, ponto-cego de OCR/AIAgent, minimização de PII na telemetria e no IntegrationLog — foi tocada. Todas dependem de PR de desenvolvimento que não veio.</p>
+
+<footer>
+  <strong>Metodologia:</strong> leitura do código-fonte ao vivo dos 7 repositórios do projeto <code>AutoChecker</code> no Azure DevOps (org <code>automindautomacao</code>), branch default <code>main</code>, via MCP oficial, em 06/07/2026. Cada achado é citado por <code>arquivo:linha</code> e/ou commit. Comparação contra o snapshot documentado de junho/2026. Este relatório reflete o estado do <em>código</em>, não dos work items do board — a pedido.<br>
+  Identidade visual AutoMind · <em>Simple · Smart · Reliable</em>
+</footer>
+
+</main>
+</body>
+</html>

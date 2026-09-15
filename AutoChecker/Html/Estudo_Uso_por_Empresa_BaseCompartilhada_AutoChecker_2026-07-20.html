@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Estudo de Uso por Empresa — AutoChecker (Base Compartilhada)</title>
+<style>
+@font-face{font-family:"Red Hat Display";src:url("../../../Id_visual/Fontes/Red Hat Display/RedHatDisplay-Regular.ttf") format("truetype");font-weight:400;font-display:swap}
+@font-face{font-family:"Red Hat Display";src:url("../../../Id_visual/Fontes/Red Hat Display/RedHatDisplay-Medium.ttf") format("truetype");font-weight:500;font-display:swap}
+@font-face{font-family:"Red Hat Display";src:url("../../../Id_visual/Fontes/Red Hat Display/RedHatDisplay-Bold.ttf") format("truetype");font-weight:700;font-display:swap}
+:root{
+  --am-rosa:#FA094E; --am-magenta:#940755; --am-roxo:#44055A; --am-navy:#03045E;
+  --am-preto:#100F0F; --am-offwhite:#F3F3F0;
+  --am-gradiente-h:linear-gradient(90deg,#FA094E 0%,#03045E 100%);
+  --fonte:"Red Hat Display",system-ui,sans-serif;
+  --surf:#FFFFFF; --linha:#E2E2DC; --mut:#5C5C66;
+  --ok:#1B7F4B; --alerta:#B4801A; --erro:#C0173C;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--fonte);background:var(--am-offwhite);color:var(--am-preto);line-height:1.6;font-size:15px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 80px}
+
+/* Cabeçalho */
+header{background:var(--am-offwhite);border-bottom:1px solid var(--linha)}
+.topbar{height:5px;background:var(--am-gradiente-h)}
+.hd{max-width:1180px;margin:0 auto;padding:26px 24px 22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.hd img{height:34px;width:auto;display:block}
+.hd .t h1{margin:0;font-size:25px;font-weight:700;color:var(--am-roxo);letter-spacing:.02em;line-height:1.25}
+.hd .t p{margin:4px 0 0;color:var(--mut);font-size:13.5px}
+
+h2{font-size:19px;font-weight:700;color:var(--am-roxo);letter-spacing:.03em;margin:44px 0 14px;padding-bottom:9px;border-bottom:2px solid var(--linha);position:relative}
+h2::after{content:"";position:absolute;left:0;bottom:-2px;width:56px;height:2px;background:var(--am-rosa)}
+h3{font-size:15.5px;font-weight:700;color:var(--am-navy);margin:26px 0 8px}
+
+/* Avisos */
+.pii{margin:22px 0 0;background:#FFF3F5;border:1px solid #F5C6D2;border-left:4px solid var(--am-rosa);border-radius:10px;padding:13px 16px;font-size:13.5px}
+.nota{background:#FFFBF0;border:1px solid #EBDCB4;border-left:4px solid var(--alerta);border-radius:10px;padding:13px 16px;font-size:13.8px;margin:14px 0}
+
+/* KPIs */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:14px;margin:22px 0 6px}
+.kpi{background:var(--surf);border:1px solid var(--linha);border-radius:14px;padding:16px 18px}
+.kpi .v{font-size:27px;font-weight:700;color:var(--am-roxo);line-height:1.1;letter-spacing:-.01em}
+.kpi .l{font-size:11.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.10em;margin-top:6px;font-weight:500}
+.kpi.acc .v{color:var(--am-rosa)}
+
+/* Leituras */
+.leituras{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px;margin-top:18px}
+.card{background:var(--surf);border:1px solid var(--linha);border-radius:14px;padding:18px 20px}
+.card .n{display:inline-flex;align-items:center;justify-content:center;width:25px;height:25px;border-radius:8px;background:var(--am-gradiente-h);color:#fff;font-weight:700;font-size:13px;margin-bottom:10px}
+.card h4{margin:0 0 6px;font-size:15px;color:var(--am-navy);font-weight:700}
+.card p{margin:0;font-size:13.8px;color:#33333B}
+
+/* Tabelas */
+.tw{overflow-x:auto;border:1px solid var(--linha);border-radius:14px;background:var(--surf);margin-top:6px}
+table{width:100%;border-collapse:collapse;font-size:13.8px;min-width:820px}
+th{background:#EDEDE7;color:var(--am-roxo);font-weight:700;text-align:left;padding:11px 13px;font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap;border-bottom:1px solid var(--linha)}
+td{padding:10px 13px;border-bottom:1px solid #EFEFEA;vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:#FAFAF7}
+.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.emp{font-weight:700;color:var(--am-navy);white-space:nowrap}
+tr.tot{background:#F7F7F3;font-weight:700}
+tr.tot td{border-top:2px solid var(--linha)}
+.rk{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:7px;background:#EDEDE7;color:var(--mut);font-size:12px;font-weight:700}
+.rk.top{background:var(--am-gradiente-h);color:#fff}
+
+/* Barra de tempo */
+.bar{position:relative;height:7px;background:#EAEAE4;border-radius:4px;overflow:hidden;min-width:90px}
+.bar i{position:absolute;inset:0 auto 0 0;background:var(--am-gradiente-h);border-radius:4px}
+
+.tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11.5px;font-weight:500;white-space:nowrap;background:#EDEDE7;color:#44444C}
+.err-ok{color:var(--ok);font-weight:500}
+.err-bad{color:var(--erro);font-weight:700}
+
+/* Perfis */
+.perfis{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:15px;margin-top:8px}
+.perfil{background:var(--surf);border:1px solid var(--linha);border-left:3px solid var(--am-magenta);border-radius:12px;padding:15px 18px}
+.perfil h4{margin:0 0 5px;font-size:14.5px;color:var(--am-roxo);font-weight:700}
+.perfil .meta{font-size:11.5px;color:var(--mut);margin-bottom:7px;letter-spacing:.03em}
+.perfil p{margin:0;font-size:13.6px;color:#33333B}
+
+ul.lim{margin:8px 0 0;padding-left:20px;font-size:13.8px}
+ul.lim li{margin-bottom:5px}
+.flag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.06em;padding:1px 7px;border-radius:5px;margin-right:6px;text-transform:uppercase}
+.f-sei{background:#DFF0E6;color:var(--ok)}
+.f-parc{background:#FBF0D8;color:var(--alerta)}
+.f-nao{background:#F7DDE3;color:var(--erro)}
+
+footer{margin-top:52px;padding-top:18px;border-top:1px solid var(--linha);font-size:12.5px;color:var(--mut);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.wm{text-transform:uppercase;letter-spacing:.20em;font-weight:700;color:var(--am-roxo)}
+@media print{body{background:#fff}.card,.kpi,.tw,.perfil{break-inside:avoid}}
+</style>
+</head>
+<body>
+
+<div class="topbar"></div>
+<header>
+  <div class="hd">
+    <img src="../../../Central/am-mark.png" alt="AutoMind">
+    <div class="t">
+      <h1>Estudo de Uso por Empresa — AutoChecker</h1>
+      <p>Base Compartilhada · 20/06 a 20/07/2026 (30 dias) · produção · fonte: Grafana/Loki</p>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="pii">
+    <strong>Confidencial — contém dados pessoais.</strong> O estudo agrega por domínio de e-mail e cita e-mails de usuários finais. Uso interno restrito.
+  </div>
+
+  <h2>1. Resumo executivo</h2>
+  <p>Em 30 dias, <strong>12 empresas clientes</strong> (24 usuários) usaram o AutoChecker pela Base Compartilhada.</p>
+
+  <div class="kpis">
+    <div class="kpi"><div class="v">12</div><div class="l">Empresas clientes</div></div>
+    <div class="kpi"><div class="v">24</div><div class="l">Usuários ativos</div></div>
+    <div class="kpi"><div class="v">97.682</div><div class="l">Requisições</div></div>
+    <div class="kpi"><div class="v">~905 h</div><div class="l">Tempo de uso (est.)</div></div>
+    <div class="kpi acc"><div class="v">385</div><div class="l">Uploads no período</div></div>
+    <div class="kpi acc"><div class="v">89,5%</div><div class="l">Do tráfego é polling</div></div>
+  </div>
+
+  <div class="leituras">
+    <div class="card">
+      <div class="n">1</div>
+      <h4>A Base Compartilhada é, na prática, a Copercana</h4>
+      <p>Sozinha ela responde por <strong>~60% do tráfego</strong> e <strong>~56% do tempo de uso</strong> de todos os clientes. As outras 11 empresas somadas usam menos que ela.</p>
+    </div>
+    <div class="card">
+      <div class="n">2</div>
+      <h4>89,5% de tudo que trafega é polling</h4>
+      <p>De 122.248 requisições, só <strong>12.860 (10,5%)</strong> são ações deliberadas. O resto é o app "respirando" — custo de infra sem valor de negócio.</p>
+    </div>
+    <div class="card">
+      <div class="n">3</div>
+      <h4>Usam como consulta, não como esteira</h4>
+      <p>Apenas <strong>385 uploads</strong> em 30 dias. A função campeã é <em>listar/buscar documentos</em>: as pessoas entram para <strong>olhar</strong> documentos que chegaram por outra via.</p>
+    </div>
+  </div>
+
+  <h2>2. Ranking de empresas — 30 dias</h2>
+  <p style="margin:0 0 12px;color:var(--mut);font-size:13.5px">Ordenado por tempo de uso (proxy de janelas de 30 min ativas — ver §5).</p>
+  <div class="tw">
+  <table>
+    <thead><tr>
+      <th>#</th><th>Empresa</th><th class="num">Tempo de uso</th><th style="width:110px">&nbsp;</th>
+      <th class="num">Dias</th><th class="num">Usuários</th><th class="num">Requisições</th>
+      <th class="num">Uploads</th><th>Função mais usada<sup>1</sup></th><th class="num">Erro</th>
+    </tr></thead>
+    <tbody>
+      <tr><td><span class="rk top">1</span></td><td class="emp">Copercana</td><td class="num"><strong>503,0 h</strong></td><td><div class="bar"><i style="width:100%"></i></div></td><td class="num">29</td><td class="num">6</td><td class="num">58.462</td><td class="num">135</td><td><span class="tag">Listar/buscar documentos</span></td><td class="num err-ok">0,70%</td></tr>
+      <tr><td><span class="rk top">2</span></td><td class="emp">Rede Petro</td><td class="num">119,0 h</td><td><div class="bar"><i style="width:23.7%"></i></div></td><td class="num">19</td><td class="num">4</td><td class="num">15.280</td><td class="num">68</td><td><span class="tag">Listar/buscar documentos</span></td><td class="num err-ok">0,04%</td></tr>
+      <tr><td><span class="rk top">3</span></td><td class="emp">Flexpetro</td><td class="num">84,5 h</td><td><div class="bar"><i style="width:16.8%"></i></div></td><td class="num">20</td><td class="num">1</td><td class="num">5.803</td><td class="num">62</td><td><span class="tag">Listar/buscar documentos</span></td><td class="num err-ok">0,09%</td></tr>
+      <tr><td><span class="rk">4</span></td><td class="emp">Setta Combustíveis</td><td class="num">45,5 h</td><td><div class="bar"><i style="width:9.0%"></i></div></td><td class="num">6</td><td class="num">1</td><td class="num">3.713</td><td class="num">22</td><td><span class="tag">Consultar processados</span></td><td class="num err-ok">0,00%</td></tr>
+      <tr><td><span class="rk">5</span></td><td class="emp">Larco Petróleo</td><td class="num">40,5 h</td><td><div class="bar"><i style="width:8.1%"></i></div></td><td class="num">13</td><td class="num">2</td><td class="num">4.091</td><td class="num">16</td><td><span class="tag">Listar/buscar documentos</span></td><td class="num err-bad">5,89%</td></tr>
+      <tr><td><span class="rk">6</span></td><td class="emp">Biopetro</td><td class="num">39,0 h</td><td><div class="bar"><i style="width:7.8%"></i></div></td><td class="num">15</td><td class="num">2</td><td class="num">4.387</td><td class="num">24</td><td><span class="tag">Visualizar documento</span></td><td class="num err-ok">0,82%</td></tr>
+      <tr><td><span class="rk">7</span></td><td class="emp">Small</td><td class="num">38,0 h</td><td><div class="bar"><i style="width:7.6%"></i></div></td><td class="num">9</td><td class="num">1</td><td class="num">3.058</td><td class="num">19</td><td><span class="tag">Listar/buscar documentos</span></td><td class="num err-ok">0,29%</td></tr>
+      <tr><td><span class="rk">8</span></td><td class="emp">GP Combustíveis</td><td class="num">14,5 h</td><td><div class="bar"><i style="width:2.9%"></i></div></td><td class="num">11</td><td class="num">2</td><td class="num">1.188</td><td class="num">23</td><td><span class="tag">Upload de documentos</span></td><td class="num err-ok">0,25%</td></tr>
+      <tr><td><span class="rk">9</span></td><td class="emp">Midas Combustíveis</td><td class="num">10,5 h</td><td><div class="bar"><i style="width:2.1%"></i></div></td><td class="num">3</td><td class="num">2</td><td class="num">1.096</td><td class="num">3</td><td><span class="tag">Consultar processados</span></td><td class="num err-ok">0,00%</td></tr>
+      <tr><td><span class="rk">10</span></td><td class="emp">Petronac</td><td class="num">4,5 h</td><td><div class="bar"><i style="width:0.9%"></i></div></td><td class="num">5</td><td class="num">1</td><td class="num">256</td><td class="num">10</td><td><span class="tag">Upload de documentos</span></td><td class="num err-ok">0,00%</td></tr>
+      <tr><td><span class="rk">11</span></td><td class="emp">Argemil Distribuidora</td><td class="num">3,5 h</td><td><div class="bar"><i style="width:0.7%"></i></div></td><td class="num">2</td><td class="num">1</td><td class="num">242</td><td class="num">3</td><td><span class="tag">Listar/buscar documentos</span></td><td class="num err-ok">0,00%</td></tr>
+      <tr><td><span class="rk">12</span></td><td class="emp">BP</td><td class="num">2,5 h</td><td><div class="bar"><i style="width:0.5%"></i></div></td><td class="num">2</td><td class="num">1</td><td class="num">106</td><td class="num">0</td><td><span class="tag">Config. de notificações</span></td><td class="num err-ok">0,00%</td></tr>
+      <tr class="tot"><td></td><td>Total clientes</td><td class="num">905,0 h</td><td></td><td class="num">—</td><td class="num">24</td><td class="num">97.682</td><td class="num">385</td><td>—</td><td class="num">0,72%</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p style="font-size:12.5px;color:var(--mut);margin-top:9px"><sup>1</sup> Excluindo notificações e rotas de polling — ver §5.</p>
+
+  <h3>Contas não-cliente (fora do ranking)</h3>
+  <div class="tw">
+  <table style="min-width:600px">
+    <thead><tr><th>Conta</th><th class="num">Tempo</th><th class="num">Requisições</th><th>O que é</th></tr></thead>
+    <tbody>
+      <tr><td class="emp">basecompartilhada.com.br <span style="font-weight:400;color:var(--mut)">(6 usuários)</span></td><td class="num">143,0 h</td><td class="num">15.413</td><td>Operadores da própria Base — administram usuários, permissões e integrações</td></tr>
+      <tr><td class="emp">superadmin@autochecker.cloud</td><td class="num">69,5 h</td><td class="num">9.146</td><td>AutoMind (suporte/admin) — único perfil que usa <em>Integrações</em> e <em>Cadastros</em></td></tr>
+      <tr><td class="emp">tarcisiosalviano@gmail.com</td><td class="num">0,5 h</td><td class="num">7</td><td>Conta avulsa, uso residual</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2>3. Perfil de cada empresa</h2>
+  <div class="perfis">
+    <div class="perfil"><h4>Copercana</h4><div class="meta">503 h · 29/30 dias · 6 usuários</div><p>A operação de verdade: 1.702 buscas, 2.006 checagens de cota, 135 uploads. <strong>Risco de concentração:</strong> <code>administrativodist@</code> sozinho fez 35.759 requisições — <strong>61% da empresa</strong>.</p></div>
+    <div class="perfil"><h4>Rede Petro</h4><div class="meta">119 h · 19 dias · 4 usuários</div><p>Time mais distribuído da base (8.280/3.602/3.353, sem dominante). Melhor saúde técnica: <strong>6 erros em 15.280 requisições</strong>. Uso intenso de configuração de notificações (347) — time engajado.</p></div>
+    <div class="perfil"><h4>Flexpetro</h4><div class="meta">84,5 h · 20 dias · 1 usuário</div><p>Uso constante e solitário por <code>faturamentoribeiraopreto@</code>, com 62 uploads. Cliente saudável, mas com <strong>dependência total de uma pessoa</strong>.</p></div>
+    <div class="perfil"><h4>Setta Combustíveis</h4><div class="meta">45,5 h · apenas 6 dias · 1 usuário</div><p>Padrão atípico: uso <strong>em rajada</strong> (provável fechamento), não rotina. 96,2% de polling — o maior da base: deixa a tela aberta muito tempo sem agir.</p></div>
+    <div class="perfil" style="border-left-color:var(--erro)"><h4>Larco Petróleo</h4><div class="meta">40,5 h · 13 dias · 2 usuários</div><p><strong>5,89% de erro — o pior da base</strong> (241 erros), ~7× a média. Nenhuma outra empresa passa de 0,82%. Merece investigação.</p></div>
+    <div class="perfil"><h4>Biopetro</h4><div class="meta">39 h · 15 dias · 2 usuários</div><p>Único cliente cujo topo é <em>visualizar</em> (169) acima de <em>listar</em> (150), com 96 etiquetagens e 37 reprocessamentos. Perfil de <strong>conferência/auditoria</strong>.</p></div>
+    <div class="perfil"><h4>Small</h4><div class="meta">38 h · 9 dias · 1 usuário</div><p>Uso equilibrado entre listar, visualizar e etiquetar. Também dependente de usuário único.</p></div>
+    <div class="perfil"><h4>GP Combustíveis · Petronac</h4><div class="meta">14,5 h e 4,5 h · 2 e 1 usuários</div><p>As <strong>únicas duas empresas cuja função principal é upload</strong>. São produtoras de documento, não consumidoras — perfil inverso ao resto da base.</p></div>
+    <div class="perfil"><h4>Midas Combustíveis</h4><div class="meta">10,5 h · só 3 dias · 2 usuários</div><p>Topo é <em>consultar processados</em> (153). Entra pontualmente para conferir resultado de lote.</p></div>
+    <div class="perfil" style="border-left-color:var(--alerta)"><h4>Argemil Distribuidora · BP</h4><div class="meta">3,5 h e 2,5 h · 2 dias cada</div><p>Uso residual. <strong>BP não fez nenhum upload</strong> e sua única atividade real foi mexer em configuração de notificação — conta nova ou abandonada. Candidatas a ação comercial.</p></div>
+  </div>
+
+  <h2>4. Achados que valem ação</h2>
+  <div class="tw">
+  <table>
+    <thead><tr><th>#</th><th>Achado</th><th>Por quê importa</th><th>Ação sugerida</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td><strong>89,5% do tráfego é polling</strong> (109.388 de 122.248 req); só <code>unread_count</code> são ~69 mil</td><td>Custo de infra e ruído puro. Copercana sozinha gera 39.119 <code>unread_count</code></td><td>Trocar por push/WebSocket ou subir o intervalo. <strong>Maior ganho de FinOps disponível hoje</strong></td></tr>
+      <tr><td class="num">2</td><td><strong>Larco com 5,89% de erro</strong> (241/4.091), ~7× a média</td><td>Cliente com experiência degradada e ninguém notou</td><td>Cruzar com Sentry e abrir ticket</td></tr>
+      <tr><td class="num">3</td><td><strong>Concentração em pessoa única</strong>: Copercana 61% num usuário; Flexpetro, Small, Setta e Petronac com 1 usuário só</td><td>Risco de continuidade do cliente — férias/desligamento derruba o uso</td><td>Sinalizar ao comercial: ampliar base de usuários</td></tr>
+      <tr><td class="num">4</td><td><strong>Só 385 uploads</strong> contra ~98 mil requisições</td><td>O valor central do produto quase não é exercido pela web</td><td>Confirma o ponto cego: o volume real entra por <strong>integração/API</strong>, invisível no <code>api.log</code></td></tr>
+      <tr><td class="num">5</td><td><strong>BP e Argemil praticamente inativas</strong>; Midas e Setta usam em rajada</td><td>Sinal precoce de churn</td><td>Régua de ativação por uso</td></tr>
+      <tr><td class="num">6</td><td><code>superadmin@autochecker.cloud</code> gasta <strong>69,5 h dentro do tenant do cliente</strong></td><td>É a AutoMind operando manualmente pelo cliente — 2,54% de erro nessas ações</td><td>Avaliar quanto é suporte recorrente que poderia virar autosserviço</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2>5. Empresas em trial</h2>
+  <div class="nota" style="background:#F2F0F7;border-color:#D8D2E4;border-left-color:var(--am-roxo)">
+    <strong>Escopo:</strong> os trials rodam em <strong>tenants próprios</strong>, fora da Base Compartilhada. Entram aqui como anexo comercial porque "quem está avaliando o AutoChecker" complementa "quem está usando".
+  </div>
+
+  <div class="tw">
+  <table>
+    <thead><tr><th>Empresa</th><th>Tenant</th><th>Usuário</th><th>Expira</th><th class="num">Uploads</th><th>Última atividade</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="emp">Tecab</td><td><code>tecab_2cf34e0a</code></td><td><code>cadastro@tecab.srv.br</code></td>
+        <td>02/08/2026</td><td class="num err-bad">0 de 50</td><td>13/07 <span style="color:var(--mut)">(7 dias atrás)</span></td>
+      </tr>
+      <tr>
+        <td class="emp">Petroserra</td><td><code>petroserra_f7c70c21</code></td><td><code>transportes04@petroserra.com</code></td>
+        <td class="err-bad"><strong>22/07/2026 — em 2 dias</strong></td><td class="num err-bad">1 de 50</td>
+        <td class="err-bad"><strong>22/06 (28 dias atrás)</strong></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <p style="font-size:13px;color:var(--mut)">Também aparecem com <code>is_trial: true</code> os tenants <code>automind_2_dc8b63db</code> e <code>automind_teste_fcc16395</code> — contas da própria AutoMind, não prospects.</p>
+
+  <p><strong>Fonte:</strong> a rota <code>/api/trial/status/</code> devolve um corpo que fica gravado no <code>api.log</code>:</p>
+  <pre style="background:var(--surf);border:1px solid var(--linha);border-radius:10px;padding:12px 14px;overflow-x:auto;font-size:12.5px;margin:8px 0"><code>{"is_trial":"true","days_remaining":"20","days_total":"30",
+ "uploads_used":"0","uploads_limit":"50",
+ "alert_level":"normal","expiration_date":"2026-08-02"}</code></pre>
+
+  <h3>Os dois trials estão parados</h3>
+  <ul class="lim">
+    <li><strong>Petroserra</strong> entrou em 22/06, fez <strong>1 upload</strong> e nunca mais voltou — 28 dias de silêncio num trial de 30, que vence em 22/07. Vai expirar sem que a empresa tenha experimentado o produto.</li>
+    <li><strong>Tecab</strong> está com <strong>0 uploads em 20 dias</strong>. E no tenant dela a conta da AutoMind (<code>autochecker.cloud</code>) fez <strong>1.895 requisições contra 962 do cliente</strong> — quem mais mexeu no trial da Tecab foi a AutoMind, não a Tecab.</li>
+    <li>Nenhum dos dois chegou perto do limite de 50 uploads: o gargalo não é o plano, é que ninguém está usando.</li>
+    <li><strong><code>provision_trial_tenant_task</code> teve zero execuções em 30 dias</strong> — mas <strong>dois trials começaram nesse período</strong> (Petroserra em 22/06, Tecab em 03/07). Ou seja, os trials <strong>não nascem por essa task</strong>: estão sendo provisionados por outro caminho, provavelmente manual pelo admin. O funil não está vazio; o que não existe é o fluxo self-service.</li>
+  </ul>
+
+  <div class="nota" style="background:#EFF7F1;border-color:#C6E2D0;border-left-color:var(--ok)">
+    <strong>✓ Ação já tomada.</strong> <strong>Eduardo notificou a equipe de marketing do AutoChecker sobre a expiração do trial da Petroserra</strong> (20/07/2026). O caso da Tecab (0 uploads, vence 02/08) ainda não tem tratativa registrada.
+  </div>
+
+  <div class="nota">
+    <strong>⚠️ Ressalva sobre a atualidade destes números.</strong> Os valores vêm da <strong>última vez que alguém abriu o app</strong> — o endpoint só responde quando há acesso. Para a Petroserra, o retrato é de <strong>22/06</strong>; não dá para ver o valor de hoje porque ninguém entrou desde então. O <code>expiration_date</code> é fixo e confiável; já <code>days_remaining</code> e <code>uploads_used</code> são "último observado", não ao vivo.<br><br>
+    O <code>alert_level</code> estava <code>normal</code> nos dois casos. Existe mecanismo de alerta de trial no produto, mas um trial a 2 dias do fim com 1 upload não está sendo escalado por ele — vale checar em que limiar esse campo muda.
+  </div>
+
+  <h2>6. Método e limitações</h2>
+  <p><strong>Como foi medido.</strong> LogQL sobre <code>job="autochecker-backend"</code>, <code>environment="prod"</code>, filtrando <code>tenant_schema="base_compartilhada"</code> e <code>user_email != ""</code>. A empresa vem do domínio do e-mail via <code>label_format domain={{ regexReplaceAll "^.*@" .user_email "" }}</code> — a soma dos usuários de um mesmo domínio é tratada como a empresa.</p>
+
+  <div class="nota">
+    <strong>⚠️ "Tempo de uso" é estimativa, não medição.</strong> O AutoChecker <strong>não registra evento de login/logout nem duração de sessão</strong>. O número é um proxy: contam-se as <strong>janelas de 30 minutos com ao menos 1 requisição</strong>, × 0,5 h. Isso <strong>superestima</strong> quem deixa a aba aberta (o polling mantém a janela "ativa") e arredonda para cima quem entra por 2 minutos. Trate como <strong>ordem de grandeza e ranking</strong>, não como hora faturável. O tempo de processamento real no backend — esse medido — está em <code>duration_ms</code>: 3.593 s (Copercana), 992 s (Rede Petro).
+  </div>
+
+  <div class="nota">
+    <strong>⚠️ "Ler notificações" foi excluído do topo.</strong> O endpoint <code>/api/notifications/inbox/</code> aparecia como função nº 1 em 11 das 15 contas, mas é chamado junto com o carregamento do sino — não só por ação deliberada. A coluna do ranking usa a maior função <strong>depois</strong> de notificações e polling. Classificadas como polling: <code>unread_count</code>, <code>core/permissions</code>, <code>trial/status</code>, <code>upload-usage</code>, <code>legal/acceptances/status</code>, <code>all-tenants-switcher</code>, <code>accounts/me</code>, <code>site-monitoring</code>.
+  </div>
+
+  <h3>O que este estudo NÃO responde (lacunas de instrumentação — dependem do dev)</h3>
+  <ul class="lim">
+    <li><strong>Tipo de documento</strong> por empresa — não é logado, só schema + UUID.</li>
+    <li><strong>Tempo de sessão real</strong> — não existe evento de sessão.</li>
+    <li><strong>Uso via mobile/API/integração</strong> — não registra tenant no <code>api.log</code>; quem processa por integração fica invisível.</li>
+    <li><strong>Erros por usuário</strong> — o backend não envia <code>user.email</code> ao Sentry.</li>
+  </ul>
+
+  <h3>Confiabilidade</h3>
+  <p>
+    <span class="flag f-sei">Sei</span> requisições, usuários distintos, rotas, uploads, erros, dias ativos.<br>
+    <span class="flag f-parc">Parcial</span> tempo de uso (proxy), função mais usada (depende da classificação de polling).<br>
+    <span class="flag f-nao">Não sei</span> tipo de documento, uso não-web.
+  </p>
+
+  <h2>7. Próximos passos sugeridos</h2>
+  <ol style="font-size:14px">
+    <li><strong>Quantificar o custo do polling</strong> — traduzir os 109 mil requests em R$ de infra. É o argumento mais forte para priorizar a correção.</li>
+    <li><strong>Investigar os 5,89% de erro da Larco</strong> cruzando com o Sentry.</li>
+    <li><strong>Pedir ao dev 3 instrumentações</strong> que destravam tudo que está em "Não sei": evento de sessão, <code>document_type</code> no log e <code>tenant</code> nas chamadas de integração/mobile.</li>
+    <li><strong>Levar o ranking ao comercial</strong> — concentração em usuário único e contas inativas são conversa de CS, não de engenharia.</li>
+    <li><strong>Tratar o trial da Tecab</strong> (0 uploads, vence 02/08) — a Petroserra já foi escalada por Eduardo ao marketing em 20/07; a Tecab segue sem tratativa. E entender por que <strong>nenhum trial novo foi provisionado em 30 dias</strong>.</li>
+  </ol>
+
+  <footer>
+    <div><span class="wm">AutoMind</span> · Observabilidade · AutoChecker</div>
+    <div>Gerado em 20/07/2026 · Fonte: Grafana/Loki (30 dias) · Documento interno confidencial</div>
+  </footer>
+</div>
+</body>
+</html>

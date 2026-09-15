@@ -1,0 +1,1084 @@
+<!doctype html><html lang="pt-br"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Detalhamento das Ondas 0–4 — AutoChecker</title><style>
+:root{
+  --bg:#ffffff; --ink:#1c2330; --muted:#5b6678; --line:#e3e7ee;
+  --card:#ffffff; --accent:#2b5cff; --accent-soft:#eef2ff;
+  --ok:#1a7f4b; --ok-soft:#e7f6ee; --ok-line:#bfe6cf;
+  --warn:#9a6700; --warn-soft:#fff7e0; --warn-line:#e9cf8a;
+  --bad:#b4232a; --bad-soft:#fff1f1; --bad-line:#f2c4c4;
+  --info:#1e6fb8; --info-soft:#eaf3fb; --info-line:#bcdcf2;
+}
+*{box-sizing:border-box}
+html{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:13.5px/1.62 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+.wrap{max-width:1000px;margin:0 auto;padding:0 30px 60px;}
+
+/* Capa / hero */
+header.hero{background:linear-gradient(135deg,#1c2330,#2b3a55);color:#fff;
+  border-radius:0 0 18px 18px;padding:38px 40px 30px;margin-bottom:30px;}
+header.hero .eyebrow{text-transform:uppercase;letter-spacing:.14em;font-size:11px;
+  opacity:.75;margin-bottom:10px;}
+header.hero h1{margin:0 0 8px;font-size:30px;line-height:1.18;font-weight:700;}
+header.hero .sub{font-size:15px;opacity:.9;}
+header.hero .meta{margin-top:16px;font-size:12px;opacity:.7;border-top:1px solid rgba(255,255,255,.18);padding-top:12px;}
+
+h1{font-size:22px;margin:34px 0 12px;padding-bottom:8px;border-bottom:2px solid var(--line);}
+h2{font-size:17px;margin:24px 0 10px;color:#243049;}
+h3{font-size:14.5px;margin:18px 0 8px;color:#2b3a55;}
+p{margin:9px 0;} ul,ol{margin:9px 0 9px 6px;padding-left:20px;} li{margin:4px 0;}
+a{color:var(--accent);text-decoration:none;} a:hover{text-decoration:underline;}
+strong{color:#101826;} code{background:#f1f3f8;border:1px solid var(--line);
+  border-radius:5px;padding:1px 5px;font:12px/1.4 "SF Mono",Consolas,monospace;}
+pre{background:#0f1623;color:#e7ecf5;border-radius:10px;padding:14px 16px;overflow:auto;}
+pre code{background:none;border:none;color:inherit;padding:0;}
+
+/* Tabelas */
+table{border-collapse:collapse;width:100%;margin:14px 0;font-size:12.5px;}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top;}
+th{background:#f4f6fb;font-weight:600;color:#243049;}
+tr:nth-child(even) td{background:#fafbfd;}
+
+/* KPIs (grid de cartoes) — gere com a convencao .kpis no HTML */
+.kpis{display:flex;flex-wrap:wrap;gap:12px;margin:16px 0;}
+.kpi{flex:1 1 150px;border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--card);}
+.kpi .n{font-size:26px;font-weight:700;line-height:1;}
+.kpi .l{font-size:11.5px;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:.04em;}
+.kpi.ok .n{color:var(--ok);} .kpi.warn .n{color:var(--warn);} .kpi.bad .n{color:var(--bad);}
+
+/* Callouts a partir de blockquotes */
+blockquote{margin:14px 0;padding:12px 16px;border-radius:10px;border:1px solid var(--line);
+  background:#f7f8fa;}
+blockquote p{margin:4px 0;}
+blockquote.bad{background:var(--bad-soft);border-color:var(--bad-line);}
+blockquote.warn{background:var(--warn-soft);border-color:var(--warn-line);}
+blockquote.ok{background:var(--ok-soft);border-color:var(--ok-line);}
+blockquote.info{background:var(--info-soft);border-color:var(--info-line);}
+
+/* Pills de status */
+.pill{display:inline-block;padding:1px 9px;border-radius:999px;font-size:11px;font-weight:600;border:1px solid;}
+.pill.ok{color:var(--ok);background:var(--ok-soft);border-color:var(--ok-line);}
+.pill.warn{color:var(--warn);background:var(--warn-soft);border-color:var(--warn-line);}
+.pill.bad{color:var(--bad);background:var(--bad-soft);border-color:var(--bad-line);}
+
+footer.rodape{margin-top:40px;padding-top:14px;border-top:1px solid var(--line);
+  font-size:11px;color:var(--muted);}
+
+@page{size:A4;margin:14mm 12mm;}
+@media print{
+  header.hero{border-radius:0;}
+  h1,h2,h3{break-after:avoid;} table,blockquote,pre,.kpi{break-inside:avoid;}
+}
+</style></head><body>
+<header class="hero"><div class="eyebrow">Observabilidade · Automind</div>
+<h1>Detalhamento das Ondas 0–4 — AutoChecker</h1><div class="sub">Como resolver cada etapa · Cronograma de Observabilidade · atualizado 2026-06-17</div><div class="meta">Fonte: codigo real + documentacao + Sentry ao vivo (automind-qd) · Ondas 0–3 em 2026-06-12 · Onda 4 ao vivo em 2026-06-17 · Eduardo / Observabilidade · Automind</div></header>
+<div class="wrap"><h1 id="detalhamento-das-ondas-0-a-4-como-resolver-cada-etapa-cronograma-de-observabilidade-autochecker">Detalhamento das Ondas 0 a 4 — Como resolver cada etapa (Cronograma de Observabilidade · AutoChecker)</h1>
+<blockquote>
+<p><strong>Estudo fundamentado em 3 fontes (sem informação inventada):</strong> código real, documentação e Sentry ao vivo.
+Onde as 3 fontes não bastam, está marcado <strong>Parcial</strong> ou <strong>Não sei</strong>.</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Data da análise</strong></td>
+<td>2026-06-12 (Ondas 0–3) · <strong>2026-06-17 (Onda 4, ao vivo)</strong></td>
+</tr>
+<tr>
+<td><strong>Escopo</strong></td>
+<td>Onda 0 (1–8) · Onda 1 (9–13) · Onda 2 (14–16) · Onda 3 (17–21) · <strong>Onda 4 (22–24)</strong></td>
+</tr>
+<tr>
+<td><strong>Produto</strong></td>
+<td>AutoChecker — SaaS multi-tenant de validação documental (Django 4.2 + DRF · Celery 5.3 · Next.js 14 · OCR/AIAgent/APP/Custos)</td>
+</tr>
+<tr>
+<td><strong>Ferramenta</strong></td>
+<td>Sentry — org <code>automind-qd</code> · projetos <code>autochecker-backend</code> / <code>-worker</code> / <code>-frontend</code></td>
+</tr>
+<tr>
+<td><strong>Cronograma-base</strong></td>
+<td><code>Cronograma_Observabilidade_AutoChecker_2026-06-03.xlsx</code> (REV pós-auditoria 10/06)</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="fontes-consultadas">Fontes consultadas</h2>
+<table>
+<thead>
+<tr>
+<th>Fonte</th>
+<th>Localização</th>
+<th>Uso nesta análise</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Código real</strong></td>
+<td><code>C:\Projetos\automind-obs\Produtos\Autochecker\</code> → monorepo <code>AutoChecker\</code> (<code>backend\</code>, <code>worker\</code>, <code>shared\</code>, <code>frontend\</code>) + serviços <code>AutoChecker_Frontend\</code>, <code>AutoChecker_OCR\</code>, <code>AutoChecker_AIAgent\</code>, <code>AutoChecker_APP\</code>, <code>AutoChecker_Custos\</code>, <code>Scrapping\</code></td>
+<td>Citações <code>arquivo:linha</code> verificadas em 12/06</td>
+</tr>
+<tr>
+<td><strong>Documentação</strong></td>
+<td><code>Estudo de melhoria de observabilidade\</code> → <code>AutoChecker-documentacao.md</code> (§ citadas), <code>Oportunidades de Melhoria…AutoChecker.md</code> (ESTÁTICO 14/04, 11 itens), <code>Roadmap_Observabilidade_AutoChecker.md</code>, <code>Questionario_Sentry_Respostas_Dev_2026-05.md</code></td>
+<td>Corroboração técnica</td>
+</tr>
+<tr>
+<td><strong>Sentry (MCP)</strong></td>
+<td>org <code>automind-qd</code> (regionUrl <code>https://us.sentry.io</code>)</td>
+<td>Validação ao vivo (12/06)</td>
+</tr>
+<tr>
+<td><strong>Análises por etapa já existentes</strong></td>
+<td><code>Etapa2_Release_SetCommits_Pipelines_AutoChecker.md</code>, <code>Etapa3_PeriodicTask_Orfa_Beat_AutoChecker.md</code></td>
+<td>Itens 2 e 3 (incorporados aqui de forma resumida)</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="ressalvas-globais-valem-para-todos-os-itens">Ressalvas globais (valem para todos os itens)</h2>
+<ol>
+<li><strong>Doc de auditoria citado no xlsx não existe como arquivo.</strong> O cronograma atribui as revisões "REV 10/06" a <code>Auditoria_Cronograma_vs_Codigo_AutoChecker_2026-06-10</code>, <strong>que não está em nenhum dos repositórios</strong> (só existe a <code>Auditoria_Observabilidade_AutoChecker_2026-06-03</code>). As notas REV estão dentro do próprio xlsx e foram revalidadas direto no código nesta análise.</li>
+<li><strong>Dois frontends coexistem</strong> com config Sentry idêntica: <code>AutoChecker_Frontend\</code> (repo dedicado) e <code>AutoChecker\frontend\</code> (monorepo). Diferem em ~7 linhas do <code>next.config.js</code> (bloco <code>compiler.removeConsole</code>). <strong>Qual está em produção precisa ser confirmado com o time</strong> (afeta itens 1, 2, 7, 11). Toda correção de frontend deve ir no que faz deploy.</li>
+<li><strong>Semanas relativas</strong> (Sem 1–16), sem datas-âncora; <strong>responsáveis "A definir"</strong> em todos os itens.</li>
+<li><strong>Snapshot × ao vivo:</strong> os percentuais de <code>environment</code> do xlsx vêm do snapshot 04/05→03/06 sobre <em>todos os eventos</em>; a checagem ao vivo (12/06) é <em>errors/30d</em> — janela/métrica diferente, não contradição.</li>
+</ol>
+<h3 id="legenda">Legenda</h3>
+<ul>
+<li><strong>Status (cronograma):</strong> o que o xlsx declara.</li>
+<li><strong>Veredito (situação real):</strong> Cumprida / Parcial / <strong>Não cumprida</strong>, com base no código.</li>
+<li><strong>Confiança:</strong> <strong>Sei</strong> (3 fontes concordam) · <strong>Parcial</strong> (parte não verificável/divergente) · <strong>Não sei</strong>.</li>
+<li><strong>Esforço:</strong> P (≤1 dia) · M (2–5 dias) · G (&gt;5 dias).</li>
+</ul>
+<hr>
+<h1 id="onda-0-saneamento-da-base">ONDA 0 — Saneamento da Base</h1>
+<p><strong>GATE: nada de ampliação antes disto · Sem 1–2</strong></p>
+<hr>
+<h2 id="item-1-padronizar-tag-environment-nos-3-sdks-isolar-devprd">Item 1 — Padronizar tag <code>environment</code> nos 3 SDKs + isolar DEV/PRD</h2>
+<p><code>Camada: Frontend/Worker · Esforço: M · Status: Concluído · Veredito: Parcial · Confiança: Parcial</code></p>
+<h3 id="o-que-a-etapa-exige">O que a etapa exige</h3>
+<p>Garantir <code>environment ∈ {production, staging, development}</code> em backend, worker e frontend; isolar o ambiente dev local do projeto produtivo. <strong>KPI:</strong> ≥99% dos eventos com environment correto em 7 dias.</p>
+<h3 id="o-que-cada-fonte-mostrou">O que cada fonte mostrou</h3>
+<ul>
+<li><strong>Código (CONFIRMADO):</strong> os 3 SDKs leem env var com fallback <code>"development"</code>:</li>
+<li>Backend → <code>backend/config/settings/base.py:730</code> → <code>environment=os.environ.get("SENTRY_ENVIRONMENT", "development")</code></li>
+<li>Worker → <code>worker/config/celery.py:24</code> → idem</li>
+<li>Frontend → <code>instrumentation-client.ts:9</code>, <code>sentry.server.config.ts:9</code>, <code>sentry.edge.config.ts:10</code> → <code>process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT || "development"</code></li>
+<li>Isolamento por <strong>guard de DSN</strong>: backend/worker <code>shared/observability/sentry.py:16-18</code> (<code>if not dsn: return</code>); frontend <code>enabled: !!NEXT_PUBLIC_SENTRY_DSN</code>. Não há DSN diferente "hard-coded" por ambiente — depende da env var bem setada no deploy.</li>
+<li><strong>Documentação:</strong> §7 confirma a causa do problema no frontend ("fallback <code>development</code> → DEV poluindo prod") e os percentuais do snapshot (backend 96%, frontend 15%, worker 65%).</li>
+<li><strong>Sentry ao vivo (12/06, dataset errors / 30d):</strong>
+  | Projeto | production | staging | development |
+  |---|---|---|---|
+  | backend | 11.458 | 54 | — |
+  | worker | 725 | 28 | — |
+  | frontend | 27 | 8 | — |</li>
+</ul>
+<p>Ou seja, ao vivo (só erros, 30d) os 3 projetos aparecem majoritariamente em <code>production</code> e <strong>sem</strong> <code>development</code> no dataset de errors — diferente do snapshot.</p>
+<h3 id="veredito">Veredito</h3>
+<p><strong>Parcial.</strong> O <strong>código já padroniza</strong> environment com fallback — o lado de código da etapa está feito (condiz com "Concluído"). Mas o <strong>isolamento real depende do deploy</strong> setar <code>*_SENTRY_ENVIRONMENT</code> corretamente, e o fallback <code>development</code> continua sendo a porta de poluição se a env var faltar. O ganho só "fecha" quando o KPI ≥99% for medido na janela produtiva.</p>
+<h3 id="plano-de-resolucao">Plano de resolução</h3>
+<ol>
+<li>Garantir nos 4 pipelines Azure que <code>SENTRY_ENVIRONMENT</code> (backend/worker) e <code>NEXT_PUBLIC_SENTRY_ENVIRONMENT</code> (frontend) sejam <strong>sempre</strong> setados — nunca cair no fallback. Considerar <strong>falhar o build</strong> se a var estiver vazia em prod.</li>
+<li>Confirmar <strong>qual frontend</strong> faz deploy (ressalva global #2) e aplicar lá.</li>
+<li>Bloquear máquina dev de enviar ao projeto produtivo: DSN de dev separado (ou <code>enabled:false</code>/sem DSN em dev).</li>
+<li>Medir o KPI ≥99% sobre <strong>todos os eventos</strong> na janela de 7 dias, por projeto.</li>
+</ol>
+<h3 id="ressalva">Ressalva</h3>
+<p>O número "15% production" do xlsx <strong>não foi reproduzido</strong> ao vivo via MCP no dataset de <strong>errors/30d</strong> — para reproduzir seria preciso a distribuição de <strong>todos os eventos</strong> (transactions/replay) na janela do snapshot, que o dataset de errors não entrega diretamente. Logo, o "como está hoje" do frontend fica <strong>Parcial</strong>.</p>
+<hr>
+<h2 id="item-2-padronizar-release-comphash-set-commits-isolar-pipelines-azure">Item 2 — Padronizar release <code>&lt;comp&gt;@&lt;hash&gt;</code> + set-commits + isolar pipelines Azure</h2>
+<p><code>Camada: AutoChecker · Esforço: M · Status: Em andamento · Veredito: Não cumprida · Confiança: Sei</code>
+<em>(Detalhe longo em <code>Etapa2_Release_SetCommits_Pipelines_AutoChecker.md</code>.)</em></p>
+<h3 id="o-que-a-etapa-exige_1">O que a etapa exige</h3>
+<p>Quatro entregas: (1) release consistente <code>&lt;componente&gt;@&lt;hash&gt;</code> nos 3 serviços; (2) <code>set-commits --auto</code> (suspect commits); (3) isolar as 4 pipelines Azure (backend, frontend, worker, tests) — dev não publica no projeto produtivo; (4) corrigir o org/project default do <code>withSentryConfig</code> no frontend.</p>
+<h3 id="o-que-cada-fonte-mostrou_1">O que cada fonte mostrou</h3>
+<ul>
+<li><strong>Código (CONFIRMADO):</strong> os <strong>dois</strong> <code>next.config.js</code> (<code>AutoChecker_Frontend\next.config.js</code> e <code>AutoChecker\frontend\next.config.js</code>) usam <code>withSentryConfig</code> com defaults <strong>errados</strong>:</li>
+<li><code>org: process.env.SENTRY_ORG || "automind-teste"</code></li>
+<li><code>project: process.env.SENTRY_PROJECT || "javascript-nextjs"</code></li>
+<li><strong>sem</strong> chave <code>release</code>; <strong>sem</strong> <code>setCommits</code>.</li>
+<li>Única diferença real entre os dois arquivos: bloco <code>compiler.removeConsole</code> (presente só no <code>AutoChecker_Frontend</code>, linhas 8-13). O resto é cópia.</li>
+<li>Correto (pelo próprio cronograma): org <code>automind-qd</code>, project <code>autochecker-frontend</code>.</li>
+<li>Isolamento de pipelines → vive no Azure DevOps; <strong>não</strong> atestável por estes arquivos.</li>
+<li><strong>Documentação:</strong> §4 confirma os defaults de teste (<code>automind-teste</code>/<code>javascript-nextjs</code>). <code>CLAUDE.md</code> indica <code>AutoChecker/frontend/</code> como diretório oficial → <code>AutoChecker_Frontend/</code> é provavelmente cópia antiga.</li>
+<li><strong>Sentry:</strong> sem <code>SENTRY_ORG</code>/<code>SENTRY_PROJECT</code> no CI, source maps e releases vão para o <strong>projeto errado</strong> — e suspect commits / correlação picos×deploys ficam bloqueados.</li>
+</ul>
+<h3 id="discrepancia-dois-nextconfigjs-divergentes">🔎 Discrepância — dois <code>next.config.js</code> divergentes</h3>
+<p>Manter dois configs divergentes permite buildar a partir do diretório errado e mandar telemetria para o lugar errado. Decidir o canônico é pré-requisito (cruza a ressalva global dos "dois frontends").</p>
+<h3 id="veredito_1">Veredito</h3>
+<p><strong>Não cumprida.</strong> Apesar do status "Em andamento" no cronograma, o código mostra a etapa <strong>intocada</strong>: org/project ainda de teste, sem release, sem set-commits. (A parte de isolamento de pipelines não é verificável pelos arquivos de frontend, mas o status global é não iniciado.)</p>
+<h3 id="plano-de-resolucao_1">Plano de resolução</h3>
+<ol>
+<li><strong>Passo 0 — diretório canônico:</strong> confirmar que <code>AutoChecker/frontend/</code> é o de produção e arquivar/deletar o duplicado (<strong>precisa OK explícito — apaga pasta</strong>).</li>
+<li><strong>Passo 1 — <code>withSentryConfig</code>:</strong> trocar para <code>org:"automind-qd"</code>, <code>project:"autochecker-frontend"</code>, adicionar <code>release.name=$SENTRY_RELEASE</code> e <code>setCommits:{auto:true}</code>; <strong>preservar</strong> <code>hideSourceMaps:true</code> e <code>widenClientFileUpload:true</code>.</li>
+<li><strong>Passo 2 — pipeline frontend:</strong> definir <code>SENTRY_RELEASE = autochecker-frontend@&lt;git-hash&gt;</code>; garantir <code>ORG/PROJECT/AUTH_TOKEN</code> vindos do CI (não do default). Isso já isola o frontend: <strong>só o CI tem o token.</strong></li>
+<li><strong>Passo 3 — backend/worker:</strong> replicar release <code>&lt;comp&gt;@&lt;hash&gt;</code> (Python SDK) — conecta com o item 5.</li>
+<li><strong>Passo 4 — Azure:</strong> isolar as 4 pipelines (bloquear envio de máquinas dev; separar ambientes).</li>
+</ol>
+<h3 id="ressalva_1">Ressalva</h3>
+<p>Confirmar 100% os valores <code>automind-qd</code>/<code>autochecker-frontend</code> antes de aplicar (errar = telemetria some). Isolamento de pipelines não é atestável por estes arquivos.</p>
+<hr>
+<h2 id="item-3-limpar-periodictask-orfa-do-beat-keyerror-process_scheduled_notifications">Item 3 — Limpar PeriodicTask órfã do Beat (<code>KeyError process_scheduled_notifications</code>)</h2>
+<p><code>Camada: Backend/Worker · Esforço: P · Status: Pendente · Veredito: Não cumprida · Confiança: Sei</code>
+<em>(Detalhe longo em <code>Etapa3_PeriodicTask_Orfa_Beat_AutoChecker.md</code>.)</em></p>
+<h3 id="o-que-a-etapa-exige_2">O que a etapa exige</h3>
+<p>Remover/migrar a entrada órfã persistida e alinhar o schedule persistido com o do código. Era o <strong>maior ruído do produto</strong>: ~1.640 ev (clusters BACKEND-1H / WORKER-1F).</p>
+<h3 id="o-que-cada-fonte-mostrou_2">O que cada fonte mostrou</h3>
+<ul>
+<li><strong>Código (CONFIRMADO):</strong></li>
+<li>Task <code>process_scheduled_notifications</code> <strong>comentada</strong> em <code>worker/apps/notifications/tasks/notification_tasks.py:49-67</code> (e <code>cleanup_old_notification_logs</code> em 70-87) → fora de qualquer <code>beat_schedule</code>.</li>
+<li><code>worker/config/celery.py:69</code> define o <code>beat_schedule</code> no código e <strong>não</strong> contém a task.</li>
+<li><code>backend/config/celery.py:23-25</code> deliberadamente <strong>não</strong> define <code>beat_schedule</code>.</li>
+<li><strong>Bug colateral:</strong> o worker redefine <code>retry_failed_notifications</code> localmente (<code>worker/apps/notifications/tasks/notification_tasks.py:90</code>) chamando <code>process_notification_task.delay(notification.id)</code> com <strong>1 argumento</strong> (linha ~110), enquanto a assinatura exige <code>(notification_log_id, tenant_schema_name, tenant_id)</code> → <code>TypeError</code> em runtime. A versão correta está no <code>shared</code>.</li>
+<li><strong>Documentação:</strong> §7 — <code>KeyError …process_scheduled_notifications</code> ~1.640 ev: task comentada → entrada órfã ainda agenda → KeyError no dispatch.</li>
+<li><strong>Sentry:</strong> snapshot — clusters BACKEND-1H / WORKER-1F (~1.640 ev).</li>
+</ul>
+<h3 id="discrepancia-a-orfa-provavelmente-nao-esta-no-db">🔎 Discrepância — a órfã provavelmente NÃO está no DB</h3>
+<p>O xlsx assume a órfã no DB do <code>django-celery-beat</code> (<code>PeriodicTask</code>). Mas o Beat real roda com <strong>PersistentScheduler</strong> (arquivo shelve): <code>celery -A config beat --schedule=/tmp/celerybeat-schedule</code> (docker-compose.prod.yml:135 / dev.yml:120). <strong>Não há</strong> flag <code>--scheduler django_celery_beat.schedulers:DatabaseScheduler</code> nem setting <code>CELERY_BEAT_SCHEDULER</code>. <code>django_celery_beat</code> está em <code>INSTALLED_APPS</code> (<code>worker/config/settings/base.py:49</code>) mas <strong>não é usado</strong> como scheduler. O volume <code>/tmp:/tmp</code> torna o arquivo persistente entre restarts. → A órfã muito provavelmente vive no <strong>arquivo <code>/tmp/celerybeat-schedule</code></strong>, não no DB. <strong>Verificar os dois.</strong></p>
+<h3 id="veredito_2">Veredito</h3>
+<p><strong>Não cumprida</strong> (no máximo parcial — lado código). Comentar a task foi o que <em>criou</em> a órfã; o código já está limpo, falta o <strong>expurgo runtime/ops</strong>, que nenhum arquivo-fonte faz (nem poderia).</p>
+<h3 id="plano-de-resolucao_2">Plano de resolução</h3>
+<ol>
+<li><strong>Diagnosticar onde a órfã vive:</strong> inspecionar <code>/tmp/celerybeat-schedule*</code> (shelve) no container do beat <strong>e</strong> <code>PeriodicTask.objects.filter(task__icontains='process_scheduled_notifications')</code> no DB.</li>
+<li><strong>Expurgar:</strong> se for o arquivo (mais provável), parar o beat, <code>rm -f /tmp/celerybeat-schedule*</code> e subir (recria do <code>beat_schedule</code> do código); se houver linha no DB, <strong>data migration idempotente</strong> (<code>PeriodicTask…filter(task__endswith='process_scheduled_notifications').delete()</code>).</li>
+<li><strong>Travar a fonte de verdade:</strong> não misturar file scheduler com <code>DatabaseScheduler</code> (a mistura gera órfãs).</li>
+<li><strong>Corrigir o bug colateral:</strong> remover a <code>retry_failed_notifications</code> local/bugada do worker e reexportar a do <code>shared</code> (como o backend faz).</li>
+<li><strong>Validar:</strong> sem mais <code>KeyError: process_scheduled_notifications</code> no dispatch; queda dos clusters BACKEND-1H / WORKER-1F (~1.640 ev → ~0). Adicionar teste de guarda: cada task do <code>beat_schedule</code> registrada no app Celery.</li>
+</ol>
+<h3 id="ressalva_2">Ressalva</h3>
+<p>O expurgo é <strong>runtime</strong> (não versiona em código). Apagar arquivo de ambiente ou rodar migration de delete → <strong>confirmar antes</strong>. Confirmar se algum host já rodou com <code>DatabaseScheduler</code> (decide se a migration é necessária).</p>
+<hr>
+<h2 id="item-4-corrigir-migracoes-faltando-em-schemas-de-tenant-relation-does-not-exist">Item 4 — Corrigir migrações faltando em schemas de tenant (<code>relation does not exist</code>)</h2>
+<p><code>Camada: Worker · Esforço: M · Status: Não iniciado · Veredito: Não cumprida · Confiança: Sei</code></p>
+<h3 id="o-que-a-etapa-exige_3">O que a etapa exige</h3>
+<p>Trocar o <code>migrate</code> simples do deploy por <code>migrate_schemas</code> e adicionar <strong>gate</strong> que falha o deploy se houver migração pendente em <strong>qualquer</strong> schema. O gap real é o <strong>drift de tenants PRÉ-EXISTENTES</strong>.</p>
+<h3 id="o-que-cada-fonte-mostrou_3">O que cada fonte mostrou</h3>
+<ul>
+<li><strong>Código (CONFIRMADO):</strong></li>
+<li>Deploy roda <code>migrate</code> simples: <code>backend/scripts/deploy.sh:97</code> (<code>python manage.py migrate --settings=config.settings.production</code>) e <code>backend.azure-pipelines.yml:148</code> (<code>migrate --plan</code>) / <code>:157</code> (<code>migrate</code>).</li>
+<li><code>migrate_schemas</code> só aparece em: <code>backend/apps/tenants/signals.py:12</code> <strong>e <code>worker/apps/tenants/signals.py:12</code></strong> (migra tenant <strong>novo</strong> na criação, dentro de <code>if created:</code>) e <code>backend/scripts/reset_db_django.py:126</code> (<code>migrate_schemas --shared</code>, fora do deploy regular).</li>
+<li><strong>Não há</strong> management command de "check drift" nem gate de migração pendente no deploy → tenants pré-existentes ficam órfãos de migração.</li>
+<li><strong>Documentação:</strong> §2.2 confirma textualmente ("deploy roda <code>migrate</code>/<code>migrate --plan</code> … nunca <code>migrate_schemas</code> … não há gate de migração por schema").</li>
+<li><strong>Sentry ao vivo (12/06):</strong> <code>WORKER-1G</code> <em>relation "notifications_notificationlog" does not exist</em> <strong>544 ev</strong> (culprit <code>shared.tasks.notification_tasks.retry_failed_notifications</code>); <code>WORKER-C</code> <em>relation "notifications_reportpreference" does not exist</em> <strong>153 ev</strong>. Snapshot: ~57 issues / ~1.267 ev.</li>
+</ul>
+<h3 id="veredito_3">Veredito</h3>
+<p><strong>Não cumprida</strong> (confere com "Não iniciado"). Premissa correta e confirmada nas 3 fontes; correção REV 10/06 (<code>migrate_schemas</code> também em <code>signals.py</code>) validada — e existe nas <strong>duas</strong> cópias (backend e worker).</p>
+<h3 id="plano-de-resolucao_3">Plano de resolução</h3>
+<ol>
+<li>No deploy (<code>deploy.sh:97</code> + <code>backend.azure-pipelines.yml:148/157</code>) trocar <code>migrate</code> por <strong><code>migrate_schemas</code></strong>. Avaliar <code>--executor multiprocessing</code> pelo tempo de deploy.</li>
+<li><strong>Gate de drift:</strong> passo no pipeline com <code>migrate_schemas --check</code> (ou <code>migrate --check</code> por schema) que <strong>falha</strong> se houver migração não aplicada em qualquer schema.</li>
+<li><strong>Backfill</strong> único nos tenants pré-existentes em drift (rodar <code>migrate_schemas</code> controlado antes de ligar o gate).</li>
+<li>Excluir o schema <code>public</code> dos alertas que medem esse erro (cruza item 8).</li>
+</ol>
+<h3 id="ressalva_3">Ressalva</h3>
+<p><code>migrate_schemas</code> em produção multi-tenant é operação pesada/long-running — planejar janela e idempotência.</p>
+<hr>
+<h2 id="item-5-consolidar-init-do-sentry-no-helper-init_sentry-celeryintegration-no-backend">Item 5 — Consolidar init do Sentry no helper <code>init_sentry</code> (+ CeleryIntegration no backend)</h2>
+<p><code>Camada: Backend/Worker · Esforço: P · Status: Não iniciado · Veredito: Não cumprida · Confiança: Sei</code></p>
+<h3 id="o-que-a-etapa-exige_4">O que a etapa exige</h3>
+<p>Backend e worker fazem <code>sentry_sdk.init</code> <strong>direto</strong> e divergem; o helper <code>shared/observability/sentry.py</code> existe mas ninguém chama. Migrar ambos para <code>init_sentry(service)</code>. <strong>Atenção (REV 10/06):</strong> o helper só dá <code>CeleryIntegration</code> quando <code>service=='worker'</code> — <strong>trocar só a chamada não dá CeleryIntegration ao backend</strong>; é preciso alterar o helper.</p>
+<h3 id="o-que-cada-fonte-mostrou_4">O que cada fonte mostrou</h3>
+<ul>
+<li><strong>Código (CONFIRMADO):</strong></li>
+<li>Backend init inline <code>base.py:728-736</code>: integrations <code>[DjangoIntegration(), RedisIntegration()]</code> (<strong>sem Celery</strong>), <code>before_send=_sentry_before_send</code> (filtra <code>/health/</code> e ruído transiente de Redis via <code>_is_redis_transient_event</code>, <code>:713-723</code>).</li>
+<li>Worker init inline <code>worker/config/celery.py:22-32</code>: <code>[DjangoIntegration(), CeleryIntegration(), RedisIntegration()]</code>, <code>before_send</code> = lambda que <strong>só</strong> filtra <code>/health/</code> (<strong>sem</strong> scrubbing de breadcrumb).</li>
+<li>Helper <code>shared/observability/sentry.py:9-38</code>: adiciona <code>CeleryIntegration</code> <strong>apenas</strong> se <code>service_name == "worker"</code> (<code>:25-26</code>); <code>before_send_filter</code> (<code>:41-51</code>) faz <strong>scrubbing de query nos breadcrumbs</strong> (<code>:46-49</code>) — proteção que o init inline do worker <strong>não</strong> tem.</li>
+<li><code>init_sentry(</code> <strong>nunca é chamado</strong> em produção — só em <code>shared/observability/tests/test_sentry.py</code>. Confirmado por busca global.</li>
+<li><strong>Documentação:</strong> §6 ("helper… não é chamado por ninguém → config duplicada e drift") e confirma os dois inits + ausência de Celery no backend.</li>
+<li><strong>Sentry:</strong> não aplicável diretamente (questão de configuração de SDK).</li>
+</ul>
+<h3 id="veredito_4">Veredito</h3>
+<p><strong>Não cumprida</strong> (confere com "Não iniciado"). A correção REV 10/06 do xlsx está <strong>certa</strong>: o helper hoje <strong>não daria</strong> CeleryIntegration ao backend.</p>
+<h3 id="plano-de-resolucao_4">Plano de resolução</h3>
+<ol>
+<li><strong>Alterar o helper</strong> <code>init_sentry</code> para dar CeleryIntegration ao backend também (o backend Django enfileira tasks → eventos de Celery são úteis), ou parametrizar as integrations explicitamente por serviço.</li>
+<li>Migrar <code>base.py:728</code> e <code>celery.py:22</code> para <code>init_sentry("backend")</code> / <code>init_sentry("worker")</code>, <strong>preservando</strong> o que hoje só existe inline: filtro de <strong>Redis transiente</strong> (backend); o worker ganha o <strong>scrubbing de breadcrumb</strong> de brinde ao usar o helper.</li>
+<li>Fixar <code>send_default_pii=False</code> explicitamente (cruza item 7). Teste de guarda afirmando o conjunto de integrations esperado por serviço.</li>
+</ol>
+<h3 id="ressalva_4">Ressalva</h3>
+<p>Não perder o <code>_is_redis_transient_event</code> do backend ao consolidar — hoje ele só existe no init inline.</p>
+<hr>
+<h2 id="item-6-beforesend-inbound-filters-scanner-ruido-de-auth-e-filtro-de-health-morto">Item 6 — beforeSend / Inbound Filters: scanner, ruído de auth e filtro de health morto</h2>
+<p><code>Camada: Backend · Esforço: M · Status: Em andamento (parcial) · Veredito: Parcialmente cumprida · Confiança: Sei</code></p>
+<h3 id="o-que-a-etapa-exige_5">O que a etapa exige</h3>
+<p>Filtrar <code>DisallowedHost</code> (scanner de IP) via ALLOWED_HOSTS/Inbound Filter; <strong>não</strong> dropar auth em bloco (são incidentes reais — reclassificar por endpoint/causa); e <strong>corrigir o caminho de health nos dois filtros mortos</strong> (<code>before_send</code> em <code>base.py:716</code> e middleware <code>api_logging.py:18</code>).</p>
+<h3 id="o-que-cada-fonte-mostrou_5">O que cada fonte mostrou</h3>
+<ul>
+<li><strong>Código (CONFIRMADO):</strong></li>
+<li><code>before_send</code> <code>base.py:713-723</code> casa <code>event…url.endswith("/health/")</code>.</li>
+<li>Middleware <code>api_logging.py:18</code> → <code>EXCLUDED_PATHS = {"/api/health/", "/health/"}</code>.</li>
+<li><strong>Endpoint real = <code>/api/core/healthcheck/</code></strong>: <code>apps/core/urls.py:12</code> define <code>healthcheck/</code>, montado em <code>api/core/</code> por <code>config/urls_public.py:45</code> e <code>config/urls_tenant.py:76</code>. View trivial <code>apps/core/views.py:21</code> → <code>Response({"status": "ok"})</code> (<strong>não</strong> checa DB/Redis/broker; <strong>não</strong> usa <code>django-health-check</code>). Doc §3 confirma e diz que <strong>não existe</strong> rota <code>/health/</code>.</li>
+<li><strong>Conclusão:</strong> os dois filtros casam <code>/health/</code> (inexistente) → <strong>filtro morto</strong>; e nenhum exclui <code>/healthcheck/</code>.</li>
+<li><code>DisallowedHost</code>: <strong>sem tratamento dedicado para Sentry</strong>; <code>ALLOWED_HOSTS</code> em <code>production.py:14-20</code> (e wildcard <code>*</code> em <code>development.py</code>). Não há Inbound Filter/<code>before_send</code> para <code>DisallowedHost</code>.</li>
+<li>Tags de tenant: <code>api_logging.py:25-33</code> chama <code>set_tenant_context</code> (<code>tenant_id</code>/<code>schema_name</code>) — relevante ao item 9.</li>
+<li><strong>Documentação:</strong> §3 e §7 confirmam (healthcheck real; <code>DisallowedHost</code> = scanner/ruído 127 ev; auth ~275 ev como falhas "esperadas" logadas como error).</li>
+<li><strong>Sentry:</strong> snapshot — <code>DisallowedHost</code> (BACKEND-1A) 127 ev; auth ~275 ev. (Não re-medido ao vivo nesta rodada.)</li>
+</ul>
+<h3 id="veredito_5">Veredito</h3>
+<p><strong>Parcialmente cumprida</strong> (reavaliado ao vivo em 2026-06-15). A <strong>fundação avançou</strong>, mas <strong>nenhum dos 3 entregáveis nomeados</strong> está concluído:</p>
+<table>
+<thead>
+<tr>
+<th>Sub-item</th>
+<th>Status</th>
+<th>Evidência (conferida 2026-06-15)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fundação: <code>before_send</code> ativo + filtro de Redis transiente</td>
+<td>🟢 backend / 🟠 worker</td>
+<td><code>base.py:713</code> ativo; Redis transiente filtrado em <code>base.py:720</code> (<code>_is_redis_transient_event</code>). Worker (<code>worker/config/celery.py</code>) tem só <code>/health/</code>, <strong>sem</strong> filtro de Redis.</td>
+</tr>
+<tr>
+<td>(1) Corrigir filtro de health morto</td>
+<td>🔴 ainda morto</td>
+<td><code>base.py:716</code> segue casando <code>.endswith("/health/")</code>; endpoint real é <code>/api/core/healthcheck/</code> (<code>apps/core/urls.py:12</code>, confirmado). O filtro "opera" mas <strong>nunca casa</strong> o health.</td>
+</tr>
+<tr>
+<td>(2) <code>DisallowedHost</code> (scanner)</td>
+<td>🔴 não feito</td>
+<td>Ainda fluindo ao vivo: <code>BACKEND-1A</code> (128 ev) + <code>BACKEND-17</code> (41 ev). Sem Inbound Filter dedicado.</td>
+</tr>
+<tr>
+<td>(3) Reclassificar ruído de auth por endpoint</td>
+<td>🔴 não feito (<strong>piorou</strong>)</td>
+<td><code>token.py:94</code> ainda loga <code>ERROR</code> para anônimo esperado; <code>JWT_SKIP_PATHS</code> segue com 4 rotas. Ruído <strong>expandiu</strong> para rotas novas (legal/documents, reset-password, mobile/*), lastSeen ~37 min.</td>
+</tr>
+</tbody>
+</table>
+<blockquote class="warn">
+<p>⚠️ A frase do relatório semanal "o filtro de ruído de infraestrutura entrou em operação" refere-se à <strong>ativação do <code>before_send</code></strong> (que de fato descarta blips de Redis) — não à filtragem de health, que continua apontando para o caminho errado.</p>
+</blockquote>
+<h3 id="plano-de-resolucao_5">Plano de resolução</h3>
+<ol>
+<li><strong>Corrigir os filtros de health:</strong> trocar <code>"/health/"</code> por <code>"/api/core/healthcheck/"</code> no <code>before_send</code> (<code>base.py:716</code>) e em <code>EXCLUDED_PATHS</code> (<code>api_logging.py:18</code>). Cruza com item 20 (tornar o healthcheck um readiness real).</li>
+<li><strong><code>DisallowedHost</code>:</strong> filtrar via <strong>Inbound Filter</strong> no painel Sentry (mais simples que código) e/ou ajustar <code>ALLOWED_HOSTS</code>. Remover o wildcard <code>*</code> de <code>development.py</code> se vaza para prod.</li>
+<li><strong>Auth: NÃO dropar em bloco.</strong> Reclassificar por endpoint/causa (a análise viva de 09/06 mostra incidentes reais — Ultracargo em <code>/api/token/</code>, trial JWT em <code>/api/trial/public-config/</code>, fluxo de convite, forgot-password). Dropar só o que for comprovadamente scanner/ruído.</li>
+</ol>
+<h3 id="ressalva_5">Ressalva</h3>
+<p>A reclassificação de auth depende de análise por endpoint (não é regra única) — é trabalho de triagem, não só um filtro.</p>
+<hr>
+<h2 id="item-7-scrubbing-de-piilgpd-no-frontend-data-scrubber-server-side">Item 7 — Scrubbing de PII/LGPD no Frontend + Data Scrubber server-side</h2>
+<p><code>Camada: Frontend · Esforço: M · Status: Não iniciado · Veredito: Não cumprida · Confiança: Sei</code></p>
+<h3 id="o-que-a-etapa-exige_6">O que a etapa exige</h3>
+<p>Backend já tem <code>send_default_pii=False</code>. No frontend: pôr <code>sendDefaultPii:false</code>, masking/seletores de bloqueio no replay, e regras de Advanced Data Scrubbing na UI.</p>
+<h3 id="o-que-cada-fonte-mostrou_6">O que cada fonte mostrou</h3>
+<ul>
+<li><strong>Código (CONFIRMADO):</strong></li>
+<li><code>sendDefaultPii: true</code> em <code>instrumentation-client.ts:21</code>, <code>sentry.server.config.ts:16</code>, <code>sentry.edge.config.ts:17</code>.</li>
+<li><code>Sentry.setUser({ id, email })</code> em <code>modules/auth/hooks/useAuth.tsx:175</code> (login) e <code>:388</code> (selectTenant); <code>setUser(null)</code> no logout <code>:224</code>.</li>
+<li>Session Replay <code>replaysSessionSampleRate: 0.1</code> / <code>replaysOnErrorSampleRate: 1.0</code> (<code>instrumentation-client.ts:18-19</code>), <strong>sem</strong> <code>maskAllText</code>/<code>blockAllMedia</code>/seletores — usa defaults do SDK.</li>
+<li>Backend <strong><code>send_default_pii</code> não setado → default <code>False</code></strong> (ok) — <code>base.py:728-736</code> não menciona PII.</li>
+<li>Custos <code>AutoChecker_Custos/src/instrument.ts:12</code> → <code>sendDefaultPii: true</code>.</li>
+<li><strong>Documentação:</strong> §8 confirma tudo (inclui <code>.env.example</code> expondo <code>NEXT_PUBLIC_JWT_SECRET</code>; CPF/CNPJ em texto puro no DB).</li>
+<li><strong>Sentry:</strong> não há o que medir por API; é configuração de SDK + regras de scrubbing no painel.</li>
+</ul>
+<h3 id="veredito_6">Veredito</h3>
+<p><strong>Não cumprida</strong> (confere). Premissa confirmada integralmente.</p>
+<h3 id="plano-de-resolucao_6">Plano de resolução</h3>
+<ol>
+<li>Frontend: <code>sendDefaultPii:false</code> nos 3 configs; <strong>masking do replay</strong> (<code>maskAllText:true</code>, <code>blockAllMedia:true</code>, e seletores específicos nas telas de CNH/ASO/CPF). Confirmar qual frontend é o produtivo e aplicar nos dois se ambos forem deployados.</li>
+<li>Reavaliar <code>Sentry.setUser</code> para enviar só <code>id</code> (sem <code>email</code>) — ou anonimizar.</li>
+<li><strong>Advanced Data Scrubbing</strong> (server-side, painel Sentry) como rede de segurança: regras para CPF/CNPJ/e-mail.</li>
+<li>Corrigir <code>sendDefaultPii:true</code> do Custos.</li>
+<li>(Compliance, fora do escopo de obs.) avaliar criptografia de CPF/CNPJ em repouso — cruza item 31.</li>
+</ol>
+<h3 id="ressalva_6">Ressalva</h3>
+<p>O <code>default False</code> do backend é por convenção do <code>sentry-sdk</code> (não há linha explícita) — correto, mas frágil; vale fixar <code>send_default_pii=False</code> explicitamente ao consolidar o init (item 5).</p>
+<hr>
+<h2 id="item-8-triagem-zero-do-backlog-152-issues">Item 8 — Triagem ZERO do backlog (152 issues)</h2>
+<p><code>Camada: AutoChecker · Esforço: M · Status: Não iniciado · Veredito: Não cumprida · Confiança: Sei (total: Parcial)</code></p>
+<h3 id="o-que-a-etapa-exige_7">O que a etapa exige</h3>
+<p>Classificar todas as issues (Resolved / Ignored com prazo / In Progress), documentar critério, excluir o schema público dos alertas. Hoje <strong>0 issues resolvidas em 30 dias</strong>.</p>
+<h3 id="o-que-cada-fonte-mostrou_7">O que cada fonte mostrou</h3>
+<ul>
+<li><strong>Código:</strong> nada a auditar — regras/alertas e status de issue <strong>vivem só no painel Sentry</strong> (busca por <code>alert</code>/<code>rule</code> no repo só achou componentes de UI).</li>
+<li><strong>Documentação:</strong> §7 — "3 projetos · 152 issues · 0 resolvidas. Worker 94, backend 56, frontend 2."</li>
+<li><strong>Sentry ao vivo (12/06):</strong></li>
+<li><code>is:resolved</code> na org retorna <strong>8 issues — todas do AutoLoad V4</strong> (<code>AUTOLOADV4-EDGEGATEWAY-*</code>). <strong>Nenhuma do AutoChecker.</strong> → a afirmação "0 resolvidas no AutoChecker" <strong>continua verdadeira hoje</strong>.</li>
+<li>Backlog do worker segue cheio e ativo (top por frequência): <code>WORKER-9 Task failed</code> <strong>689 ev</strong> (visto há ~29 min — subindo, bate com a sessão de hoje no FollowUp), <code>WORKER-1G relation…notificationlog</code> 544, <code>WORKER-5 site check</code> 314, <code>WORKER-K/N relatório/preferência</code> 242/241, <code>WORKER-2/1 Firebase/FCM</code> 171/169, <code>WORKER-C relation…reportpreference</code> 153, <code>WORKER-1R/1Q webhook 404</code> 135/135.</li>
+</ul>
+<h3 id="veredito_7">Veredito</h3>
+<p><strong>Não cumprida</strong> (confere). A triagem <strong>não começou</strong>: 0 resolvidas no AutoChecker até hoje.</p>
+<h3 id="plano-de-resolucao_7">Plano de resolução</h3>
+<ol>
+<li>Definir <strong>critério escrito</strong> de triagem (quando Resolve / Ignore-com-prazo / In Progress) e dono por projeto.</li>
+<li>Passar issue a issue (começar pelos top ofensores, que cruzam com itens 3/4/15/22/27/28): resolver as já corrigidas, <strong>Ignore com prazo</strong> o ruído (UNAVAILABLE, auth esperada), atribuir o resto.</li>
+<li><strong>Excluir o schema <code>public</code></strong> dos alertas/queries (cruza itens 4 e 18).</li>
+<li>Meta: backlog com dono e tendência de "resolved/30d" &gt; 0.</li>
+</ol>
+<h3 id="ressalva_7">Ressalva</h3>
+<p>O total "152 issues" é do snapshot 04/05→03/06; o número exato de issues abertas <strong>hoje</strong> não foi recontado por API (o MCP lista issues, não devolve um total agregado simples). O que <strong>foi</strong> confirmado ao vivo é o fato crítico: <strong>0 resolvidas no AutoChecker</strong>.</p>
+<hr>
+<h3 id="resumo-onda-0">Resumo — Onda 0</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Etapa</th>
+<th>Status cronograma</th>
+<th>Veredito (situação real)</th>
+<th>Confiança</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>environment nos 3 SDKs + isolar DEV/PRD</td>
+<td>Concluído</td>
+<td><strong>Parcial</strong> — código pronto; isolamento depende do deploy/KPI</td>
+<td>Parcial</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Release <code>&lt;comp&gt;@&lt;hash&gt;</code> + set-commits + pipelines</td>
+<td>Em andamento</td>
+<td><strong>Não cumprida</strong> — org/project default errado; sem release/set-commits</td>
+<td>Sei</td>
+</tr>
+<tr>
+<td>3</td>
+<td>PeriodicTask órfã do Beat</td>
+<td>Pendente</td>
+<td><strong>Não cumprida</strong> — código limpo; falta expurgo runtime (órfã provável em <code>/tmp/celerybeat-schedule</code>)</td>
+<td>Sei</td>
+</tr>
+<tr>
+<td>4</td>
+<td>migrate_schemas + gate de drift</td>
+<td>Não iniciado</td>
+<td><strong>Não cumprida</strong> — confirmada (ao vivo WORKER-1G 544 ev)</td>
+<td>Sei</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Consolidar init no <code>init_sentry</code></td>
+<td>Não iniciado</td>
+<td><strong>Não cumprida</strong> — helper nunca chamado; precisa alterar o helper</td>
+<td>Sei</td>
+</tr>
+<tr>
+<td>6</td>
+<td>beforeSend / filtros / health morto</td>
+<td>Em andamento (parcial)</td>
+<td><strong>Parcial</strong> (reav. 15/06) — <code>before_send</code> ativo (filtra Redis); health ainda casa <code>/health/</code> (real <code>/api/core/healthcheck/</code>), <code>DisallowedHost</code> e auth não feitos (auth piorou)</td>
+<td>Sei</td>
+</tr>
+<tr>
+<td>7</td>
+<td>PII/LGPD no Frontend</td>
+<td>Não iniciado</td>
+<td><strong>Não cumprida</strong> — <code>sendDefaultPii:true</code>×3 + setUser(email) + replay sem mask</td>
+<td>Sei</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Triagem ZERO do backlog</td>
+<td>Não iniciado</td>
+<td><strong>Não cumprida</strong> — 0 resolvidas no AutoChecker (confirmado ao vivo)</td>
+<td>Sei (total: Parcial)</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h1 id="onda-1-fundacao-dos-sdks">ONDA 1 — Fundação dos SDKs</h1>
+<p><strong>Django + Celery + Next.js · Sem 3–4</strong></p>
+<hr>
+<h2 id="item-9-enriquecer-contextotags-no-backend-django-42-drf">Item 9 — Enriquecer contexto/tags no Backend (Django 4.2 + DRF)</h2>
+<p><code>Camada: Backend · Esforço: M · Status: Não iniciado · Veredito: Parcial · Confiança: Sei</code></p>
+<h3 id="o-que-a-etapa-exige_8">O que a etapa exige</h3>
+<p>Sobre o init consolidado (item 5): garantir tags globais coerentes (<code>tenant_id</code>, <code>schema_name</code> já existem no middleware) e <strong>captura no ExceptionMiddleware sem duplicar eventos</strong>.</p>
+<h3 id="o-que-cada-fonte-mostrou_8">O que cada fonte mostrou</h3>
+<ul>
+<li><strong>Código (CONFIRMADO):</strong></li>
+<li>ExceptionMiddleware = <code>ApiRequestLoggingMiddleware.process_exception</code> (<code>api_logging.py:35-40</code>): <code>sentry_sdk.capture_exception(exception)</code> na linha <strong>40</strong> — único ponto explícito de captura no backend.</li>
+<li>Tags via <code>set_tenant_context</code> (<code>api_logging.py:25-33</code>; definição <code>shared/observability/sentry.py:54-57</code> → <code>set_tag("tenant_id"…)</code>, <code>set_tag("schema_name"…)</code>).</li>
+<li>Masking de chaves sensíveis: <code>SENSITIVE_KEYS = re.compile(r"password|token|secret|cpf|cnpj", IGNORECASE)</code> (<code>api_logging.py:8-9</code>), aplicado em <code>_sanitize_payload</code> (<code>:107-117</code>). Também em <code>audit.py:6</code>.</li>
+<li><strong>Documentação:</strong> §3/§6 — <code>api_logging</code> é o único ponto com <code>capture_exception</code>; tags por request.</li>
+<li><strong>Sentry:</strong> não aplicável diretamente.</li>
+</ul>
+<h3 id="achado-novo-risco-de-duplicacao-confirmado">🔎 Achado novo — risco de duplicação CONFIRMADO</h3>
+<p><code>DjangoIntegration</code> já captura exceções automaticamente <strong>e</strong> o middleware chama <code>capture_exception</code> <strong>sem re-raise</strong> (loga e segue o pipeline). → o mesmo erro pode ir ao Sentry <strong>2×</strong>. É exatamente o "sem duplicar eventos" que o item 9 pede — o risco é real.</p>
+<h3 id="veredito_8">Veredito</h3>
+<p><strong>Parcial</strong> — as tags já existem (parte feita), mas há duplicação a resolver, e a etapa depende do init consolidado (item 5).</p>
+<h3 id="plano-de-resolucao_8">Plano de resolução</h3>
+<ol>
+<li><strong>Deduplicar:</strong> escolher <strong>um</strong> caminho — deixar o <code>DjangoIntegration</code> capturar e remover o <code>capture_exception</code> do middleware, <strong>ou</strong> manter só o middleware e desligar a captura automática dessas exceções.</li>
+<li>Padronizar DSN/environment/release no init consolidado (depende do item 5).</li>
+<li>Teste: uma exceção de view gera <strong>1</strong> evento, não 2.</li>
+</ol>
+<hr>
+<h2 id="item-10-enriquecer-contextotags-no-worker-celery-53">Item 10 — Enriquecer contexto/tags no Worker (Celery 5.3)</h2>
+<p><code>Camada: Worker · Esforço: M · Status: Não iniciado · Veredito: Parcial · Confiança: Sei</code></p>
+<h3 id="o-que-a-etapa-exige_9">O que a etapa exige</h3>
+<p>Tags globais por task: <code>task_name</code>, <code>queue</code>, <code>tenant_id</code>, <code>document_id</code>; reclassificar retries esperados (backoff em 429/5xx) para não inflarem como erro.</p>
+<h3 id="o-que-cada-fonte-mostrou_9">O que cada fonte mostrou</h3>
+<ul>
+<li><strong>Código:</strong></li>
+<li><code>task_prerun</code> (<code>worker/config/celery_logging.py:72-97</code>) já seta <code>task_name</code> (<code>sender.name</code>), <code>queue</code> (<code>_get_queue_from_delivery_info</code>), <code>tenant_id</code>/<code>schema_name</code> (via <code>set_tenant_context</code>, linha 83) e <code>retries</code>. <strong>Falta <code>document_id</code></strong> — não é extraído de args/kwargs (cada task recebe <code>document_id</code>, ex. <code>entry.py:12</code>).</li>
+<li><strong>11 filas</strong> roteadas em <code>worker/config/settings/celery_settings.py:68-105</code> (<code>validation_entry</code>, <code>ocr_heavy</code>, <code>ai_processing</code>, <code>data_processing</code>, <code>auth_selenium</code>, <code>admin_tasks</code>, <code>monitoring</code>, <code>notifications</code>, <code>notifications_retry</code>, <code>reports</code>, <code>integrations</code>).</li>
+<li><strong>2 pools</strong> em <code>docker-compose.prod.yml</code>: <strong>heavy</strong> (<code>ocr_heavy, ai_processing, auth_selenium</code>, autoscale 2,1) e <strong>light</strong> (demais filas, autoscale 4,1).</li>
+<li><strong>Retries:</strong> <code>classification.py:295-324</code> trata <code>openai.RateLimitError</code> (429) corretamente — <code>logger.warning</code> + <code>self.retry()</code> com backoff, marca <code>ai_quota_exhausted</code>, <strong>sem</strong> <code>capture_exception</code>. <code>ocr.py</code> (404/419/498) e <code>entry.py:54</code> fazem retry <strong>genérico</strong> sem discriminar 429/5xx. Handler <code>task_retry</code> (<code>celery_logging.py:162-180</code>) loga <code>warning</code>.</li>
+<li><strong>Documentação:</strong> §2.3 — 11 filas; limites de task via <code>CELERY_TASK_ANNOTATIONS</code> (<code>celery_settings.py:108-122</code>, não no decorator).</li>
+<li><strong>Sentry ao vivo:</strong> <code>WORKER-9 Task failed</code> <strong>689 ev</strong> (culprit <code>apps.validation.tasks.extract.extract_data</code>) ilustra a falta de contexto por task.</li>
+</ul>
+<h3 id="veredito_9">Veredito</h3>
+<p><strong>Parcial</strong> — boa base (task_name/queue/tenant via <code>task_prerun</code>), mas falta <code>document_id</code> e a reclassificação de retry não é uniforme (boa em classification, genérica em ocr/entry).</p>
+<h3 id="plano-de-resolucao_9">Plano de resolução</h3>
+<ol>
+<li>Extrair <code>document_id</code> de args/kwargs no <code>task_prerun</code> e setar como tag.</li>
+<li>Replicar o padrão de <code>classification.py</code> (try/except específico → warning + retry, sem <code>capture_exception</code>) em <code>ocr.py</code> e <code>entry.py</code> para 429/5xx.</li>
+<li>Garantir que retry não vire evento de erro (revisar <code>before_send</code> e o handler <code>task_retry</code>).</li>
+</ol>
+<hr>
+<h2 id="item-11-revisar-modulo-sentrynextjs-no-frontend">Item 11 — Revisar módulo <code>@sentry/nextjs</code> no Frontend</h2>
+<p><code>Camada: Frontend · Esforço: M · Status: Não iniciado · Veredito: Não cumprida · Confiança: Sei</code></p>
+<h3 id="o-que-a-etapa-exige_10">O que a etapa exige</h3>
+<p>Adicionar <code>beforeSend</code>/<code>ignoreErrors</code>/<code>denyUrls</code> (hoje inexistentes), reduzir PII no Session Replay e remover as páginas de exemplo do wizard.</p>
+<h3 id="o-que-cada-fonte-mostrou_10">O que cada fonte mostrou</h3>
+<ul>
+<li><strong>Código (CONFIRMADO):</strong></li>
+<li><strong>Sem</strong> <code>beforeSend</code> / <code>ignoreErrors</code> / <code>denyUrls</code> nos <strong>dois</strong> frontends (grep = 0 ocorrências).</li>
+<li>Páginas de exemplo <strong>presentes</strong> em ambos: <code>pages/sentry-example-page.tsx</code> + <code>pages/api/sentry-example-api.ts</code> (org hardcoded <code>automind-teste</code>, ex. linha 54; a rota API lança <code>SentryExampleAPIError</code>).</li>
+<li><code>next.config.js</code> org/project default <code>automind-teste</code>/<code>javascript-nextjs</code> (<code>AutoChecker_Frontend:40-42</code>, <code>AutoChecker/frontend:34-36</code>). <code>@sentry/nextjs ^10.43.0</code>.</li>
+<li>Sem filtro de extensão de browser nem de 401/403.</li>
+<li><strong>Documentação:</strong> §4/§8 (sub-instrumentado; defaults de teste).</li>
+<li><strong>Sentry ao vivo (12/06):</strong> frontend tem <strong>6 issues</strong> unresolved (snapshot dizia 2) — e são <strong>exatamente ruído filtrável</strong>:
+  | Issue | Mensagem | Eventos | Culprit |
+  |---|---|---|---|
+  | FRONTEND-3 | FirebaseError: Messaging…unsupported-browser | 18 (18 users) | <code>/login</code> |
+  | FRONTEND-4 | FirebaseError: Messaging…unsupported-browser | 17 | <code>/external/register</code> |
+  | FRONTEND-2 | <code>t.with</code> | 9 | <code>getInitialProps (/_error)</code> |
+  | FRONTEND-6 | Invariant: attempted to hard navigate to the same URL | 1 | <code>/</code> |
+  | FRONTEND-5 | Object Not Found Matching Id…MethodName:update | 1 | <code>/aceitar-convite/complete</code> |
+  | FRONTEND-1 | Failed to connect to MetaMask | 1 | <code>/admin</code> |</li>
+</ul>
+<h3 id="veredito_10">Veredito</h3>
+<p><strong>Não cumprida</strong> (confere). Confirmado nas 3 fontes — e o ruído atual do frontend prova a necessidade dos filtros.</p>
+<h3 id="plano-de-resolucao_10">Plano de resolução</h3>
+<ol>
+<li><strong><code>ignoreErrors</code>:</strong> <code>FirebaseError …unsupported-browser</code>, <code>Failed to connect to MetaMask</code>, <code>Object Not Found Matching Id</code> (ruído real medido). <strong><code>denyUrls</code>:</strong> extensões de browser. <strong><code>beforeSend</code>:</strong> descartar 401/403 esperados.</li>
+<li>Remover <code>sentry-example-page.tsx</code> e <code>api/sentry-example-api.ts</code> dos dois frontends.</li>
+<li>Reduzir PII no replay (cruza item 7) e corrigir org/project default de teste (cruza item 2). Aplicar no frontend produtivo.</li>
+</ol>
+<hr>
+<h2 id="item-12-estender-cobertura-sentry-aos-servicos-sem-instrumentacao">Item 12 — Estender cobertura Sentry aos serviços sem instrumentação</h2>
+<p><code>Camada: AutoChecker · Esforço: G · Status: Não iniciado · Veredito: Não cumprida · Confiança: Sei</code></p>
+<h3 id="o-que-a-etapa-exige_11">O que a etapa exige</h3>
+<p>Instrumentar OCR (FastAPI/Textract), AIAgent (FastAPI + Celery próprio) e APP (Expo/RN); corrigir o Custos; decidir projeto próprio vs tag.</p>
+<h3 id="o-que-cada-fonte-mostrou_11">O que cada fonte mostrou</h3>
+<ul>
+<li><strong>Código (CONFIRMADO):</strong></li>
+<li><strong>OCR</strong> (<code>AutoChecker_OCR</code>): sem Sentry (requirements sem <code>sentry-sdk</code>; nenhum init).</li>
+<li><strong>AIAgent</strong> (<code>AutoChecker_AIAgent</code>): sem Sentry; <strong>Celery próprio</strong> isolado (<code>agent/config/celery_config.py:14</code> → <code>Celery("autochecker_agent", …)</code>), broker Redis próprio — não é o <code>autochecker-worker</code>.</li>
+<li><strong>APP</strong> (<code>AutoChecker_APP</code>): sem <code>@sentry/react-native</code> no <code>package.json</code>; <strong>push é mock</strong> (<code>src/features/notifications/hooks/useNotifications.ts</code>) → as issues de push <strong>não vêm do APP</strong>.</li>
+<li><strong>Custos</strong> (<code>AutoChecker_Custos</code>): tem <code>@sentry/nestjs ^10.43.0</code>; <code>src/instrument.ts:10</code> lê <code>SENTRY_DSN</code> (<strong>correto</strong>); typo <code>SENTRY_DNS</code> está <strong>só na doc</strong> <code>CLAUDE.md:98</code>; <code>sendDefaultPii:true</code> (<code>instrument.ts:12</code>); <strong>sem projeto Sentry dedicado</strong> (org/project vêm de env, não hardcoded).</li>
+<li><strong>Documentação:</strong> §1/§5 confirmam (OCR/AIAgent/APP sem Sentry; Custos com DSN ambíguo/sem projeto).</li>
+<li><strong>Sentry ao vivo (12/06):</strong> <code>find_projects("autochecker")</code> na org <code>automind-qd</code> retorna <strong>apenas 3 projetos</strong> — <code>autochecker-backend</code>, <code>autochecker-frontend</code>, <code>autochecker-worker</code>. <strong>Nenhum</strong> para OCR/AIAgent/APP/Custos. Lacuna confirmada.</li>
+</ul>
+<h3 id="veredito_11">Veredito</h3>
+<p><strong>Não cumprida</strong> (confere). Confirmado nas 3 fontes; a correção REV 10/06 (typo do Custos é de doc, não de código) está certa.</p>
+<h3 id="plano-de-resolucao_11">Plano de resolução</h3>
+<ol>
+<li>Decidir <strong>projeto Sentry dedicado vs tag</strong> em projeto existente, por serviço.</li>
+<li>Instrumentar OCR (<code>sentry-sdk[fastapi]</code>), AIAgent (FastAPI + <code>CeleryIntegration</code> do worker próprio), APP (<code>@sentry/react-native</code>).</li>
+<li>Custos: <strong>corrigir a doc</strong> <code>CLAUDE.md:98</code> (<code>SENTRY_DNS</code>→<code>SENTRY_DSN</code>), criar projeto dedicado, <code>sendDefaultPii:false</code>.</li>
+</ol>
+<hr>
+<h2 id="item-13-documentar-politica-de-envio-de-eventos-por-camada">Item 13 — Documentar política de envio de eventos por camada</h2>
+<p><code>Camada: AutoChecker · Esforço: P · Status: Não iniciado · Veredito: Não cumprida · Confiança: Parcial</code></p>
+<h3 id="o-que-a-etapa-exige_12">O que a etapa exige</h3>
+<p>Critério de captura por camada (backend/worker/frontend) e nível mínimo por ambiente (DEV info+debug, STG info+warning+error, PRD warning+error); definir o que é erro vs evento esperado.</p>
+<h3 id="o-que-cada-fonte-mostrou_12">O que cada fonte mostrou</h3>
+<ul>
+<li><strong>Código:</strong> cross-check — o frontend do AutoChecker <strong>não tem</strong> <code>beforeSend</code> (grep = 0 nos dois frontends) → não copiar config do Questionário.</li>
+<li><strong>Documentação:</strong> <strong>(REV 10/06)</strong> <code>Questionario_Sentry_Respostas_Dev_2026-05.md</code> é multi-produto e descreve o <strong>AutoLoad V4/EdgeGateway</strong> (MQTTWorker, gatewayId, <code>api.ts</code> com beforeSend) — usar só para pendências transversais (release, alertas no painel); <strong>não</strong> copiar níveis/config do V4.</li>
+<li><strong>Sentry:</strong> não aplicável.</li>
+</ul>
+<h3 id="veredito_12">Veredito</h3>
+<p><strong>Não cumprida</strong>. É entrega <strong>documental</strong> (não há artefato de código a "consertar"); a base já existe (reclassificações mapeadas nas Ondas 0–2).</p>
+<h3 id="plano-de-resolucao_12">Plano de resolução</h3>
+<ol>
+<li>Escrever 1 doc de política: captura por camada (backend/worker/frontend), níveis por ambiente, e a definição "erro vs evento esperado".</li>
+<li>Ancorar nas reclassificações já mapeadas: retries (item 10), auth por endpoint (item 6), UNAVAILABLE de sites (item 27).</li>
+<li><strong>Não</strong> copiar níveis/config do AutoLoad V4 (Questionário) — usá-lo só para pendências transversais.</li>
+</ol>
+<h3 id="ressalva_8">Ressalva</h3>
+<p>Os níveis exatos enviáveis por ambiente (o que é "info/debug" que vale enviar) dependem de <strong>decisão do time</strong> → essa parte fica <strong>Parcial</strong> até a política ser acordada.</p>
+<hr>
+<h3 id="resumo-onda-1">Resumo — Onda 1</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Etapa</th>
+<th>Veredito (situação real)</th>
+<th>Confiança</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>9</td>
+<td>Tags + captura no Backend</td>
+<td><strong>Parcial</strong> — tags existem; <strong>duplicação confirmada</strong> (DjangoIntegration + middleware) a resolver</td>
+<td>Sei</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Tags + retries no Worker</td>
+<td><strong>Parcial</strong> — <code>task_prerun</code> seta quase tudo; falta <code>document_id</code> e reclassificação uniforme de retry</td>
+<td>Sei</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Revisar @sentry/nextjs</td>
+<td><strong>Não cumprida</strong> — sem beforeSend/ignoreErrors/denyUrls; páginas de exemplo em prod; 6 issues de ruído ao vivo</td>
+<td>Sei</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Estender cobertura</td>
+<td><strong>Não cumprida</strong> — só 3 projetos na org; OCR/AIAgent/APP/Custos cegos</td>
+<td>Sei</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Política por camada</td>
+<td><strong>Não cumprida</strong> — entrega documental; não copiar do V4</td>
+<td>Parcial</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h1 id="onda-2-contexto-e-agrupamento">ONDA 2 — Contexto e Agrupamento</h1>
+<p><strong>Pipeline de documentos · Sem 4–6</strong></p>
+<hr>
+<h2 id="item-14-instrumentar-o-pipeline-de-documentos-6-estagios-com-breadcrumbs-tags">Item 14 — Instrumentar o pipeline de documentos (6 estágios) com breadcrumbs + tags</h2>
+<p><code>Camada: Worker · Esforço: G · Status: Não iniciado · Veredito: Não cumprida · Confiança: Sei</code></p>
+<h3 id="o-que-a-etapa-exige_13">O que a etapa exige</h3>
+<p>Adicionar tags <code>document.id</code>/<code>document.type</code>/<code>stage</code> e breadcrumbs por etapa do pipeline (Entry → OCR → Classificação → Extração → Autenticação → Integração) para saber <strong>onde</strong> travou e <strong>quanto</strong> cada etapa levou.</p>
+<h3 id="o-que-cada-fonte-mostrou_13">O que cada fonte mostrou</h3>
+<ul>
+<li><strong>Código (CONFIRMADO):</strong></li>
+<li><strong>5 estágios encadeados</strong> via <code>transaction.on_commit</code> + <code>apply_async</code>:<ul>
+<li>entry → ocr: <code>entry.py:35-40</code></li>
+<li>ocr → classification: <code>ocr.py:445-450</code></li>
+<li>classification → extract: <code>classification.py:286-291</code></li>
+<li>extract → authenticate: <code>extract.py:409-414</code></li>
+</ul>
+</li>
+<li>A <strong>Integração não é um 6º <code>apply_async</code></strong>: é disparada <strong>dentro</strong> da task de auth via <code>_send_document_processed_webhook(doc)</code> (<code>authenticator.py:201</code>) + <code>EntityWebhookService.notify_entity_on_authentication_complete(doc, doc.tenant)</code> (<code>authenticator.py:154/203</code>; função em <code>:566-680</code>) — <strong>síncrono</strong> ao fim da autenticação.</li>
+<li><strong>Instrumentação Sentry no pipeline: ZERO.</strong> 0 <code>sentry_sdk.add_breadcrumb</code>, 0 <code>set_tag('stage'/'document.id'/'document.type')</code>, 0 <code>set_context</code> nas tasks de <code>validation/tasks/</code>. Só <code>logger.info</code> (<code>entry.py:25,42</code>; <code>ocr.py:74-79,441-443</code>; <code>classification.py:170,349</code>; <code>authenticator.py:216-217</code>).</li>
+<li><code>Document.TYPE_CHOICES</code> em <code>shared/models/upload.py:324-342</code> — <strong>17 tipos</strong>.</li>
+<li><strong>Documentação:</strong> §2.3 — 6 estágios encadeados, 11 filas, 17 tipos de documento.</li>
+<li><strong>Sentry ao vivo:</strong> <code>WORKER-9 Task failed</code> <strong>689 ev</strong> é o sintoma — hoje não dá para saber em qual etapa o documento parou.</li>
+</ul>
+<h3 id="achado-novo-a-autenticacao-nao-e-100-scraping-selenium">🔎 Achado novo — a autenticação NÃO é 100% scraping Selenium</h3>
+<p>A nota REV 10/06 do xlsx diz "auth = scraping Selenium (não provider OAuth SERPRO)". No código, isso vale para CIV/CIPP/CTPP/CVV/Cronotacógrafo/CR/MR (via <code>scraping_call</code> → <code>SCRAPING_URL</code>, ex. <code>scraper_client.py:48</code>), mas a <strong>CNH usa SERPRO OAuth2</strong>: <code>cnh.py:18</code> → <code>SERPRO_DECODE_URL = "https://gateway.apiserpro.serpro.gov.br/viodec/v1/decode"</code>; <code>cnh.py:33</code> → <code>_call_serpro_decode(qr_payload)</code>. Ao instrumentar a etapa de autenticação, tratar os <strong>dois</strong> caminhos (scraping e SERPRO) como spans/sub-etapas distintas.</p>
+<h3 id="veredito_13">Veredito</h3>
+<p><strong>Não cumprida</strong> (confere com "Não iniciado"). O pipeline existe e é rastreável no código, mas <strong>nenhuma</strong> instrumentação Sentry por etapa.</p>
+<h3 id="plano-de-resolucao_13">Plano de resolução</h3>
+<ol>
+<li>Setar <code>document.id</code> e <code>document.type</code> como tags no <code>task_prerun</code> (cruza item 10) e <code>stage</code> por task.</li>
+<li><code>sentry_sdk.add_breadcrumb</code> no início/fim de cada estágio (com duração) — entry, ocr, classification, extract, authenticate.</li>
+<li><strong>Instrumentar a Integração à parte</strong> (não está na cadeia <code>on_commit</code>; é síncrona dentro da auth) — span próprio no webhook/dispatcher.</li>
+<li>Tratar CNH (SERPRO) e demais tipos (scraping) como sub-etapas distintas da autenticação.</li>
+</ol>
+<hr>
+<h2 id="item-15-fingerprint-customizado-para-issues-genericas-e-de-alta-cardinalidade">Item 15 — Fingerprint customizado para issues genéricas e de alta cardinalidade</h2>
+<p><code>Camada: Worker · Esforço: M · Status: Não iniciado · Veredito: Não cumprida · Confiança: Sei</code></p>
+<h3 id="o-que-a-etapa-exige_14">O que a etapa exige</h3>
+<p>Agrupar <code>Task failed</code> (sem contexto) por <strong>task+causa</strong>; remover o UUID do título de "Erro na geração do relatório <uuid>" e "Preferência <uuid> não encontrada" via fingerprint estável.</p>
+<h3 id="o-que-cada-fonte-mostrou_14">O que cada fonte mostrou</h3>
+<ul>
+<li><strong>Código (CONFIRMADO):</strong></li>
+<li><strong>Nenhum fingerprint customizado</strong> no código (os <code>before_send</code> não mexem em <code>fingerprint</code>; grep = 0).</li>
+<li>"Task failed" é título <strong>literal fixo</strong> em <code>worker/config/celery_logging.py:145</code> (handler <code>task_failure</code> <code>:130-159</code>) — enriquece com <code>extra</code> (task_name, exception), mas o título é sempre o mesmo → agrupamento ruim.</li>
+<li>UUID interpolado no título: <code>shared/tasks/report_tasks.py:392</code> → <code>"❌ Erro crítico na geração do relatório {preference_id}: {str(exc)}"</code>; <code>:143</code> → <code>"❌ Preferência {preference_id} não encontrada em nenhum tenant"</code> (+ <code>:139</code> debug). Cada <code>preference_id</code> único vira uma issue → alta cardinalidade.</li>
+<li><strong>Documentação:</strong> §7 — WORKER-9 (Task failed) e os títulos com UUID listados como alta cardinalidade.</li>
+<li><strong>Sentry ao vivo:</strong> <code>WORKER-9</code> <strong>689 ev</strong>; <code>WORKER-K</code> <em>relatório <uuid></em> <strong>242 ev</strong>; <code>WORKER-N</code> <em>Preferência <uuid></em> <strong>241 ev</strong>.</li>
+</ul>
+<h3 id="veredito_14">Veredito</h3>
+<p><strong>Não cumprida</strong>. Bom que não há fingerprint "errado"; ruim que a fragmentação (UUID no título) e a genérica ("Task failed") continuam.</p>
+<h3 id="plano-de-resolucao_14">Plano de resolução</h3>
+<ol>
+<li><code>Task failed</code>: fingerprint estável por <code>[task_name, exception_type]</code> no <code>before_send</code> (ou no handler), em vez do título único.</li>
+<li>Relatório/Preferência: fingerprint fixo (ex.: <code>["report-generation-error"]</code>) e mover o UUID para <strong>tag/context</strong>, não para o título. Idealmente também ajustar as mensagens em <code>report_tasks.py:392/143</code> para não interpolar o UUID no título.</li>
+</ol>
+<hr>
+<h2 id="item-16-capturar-erros-silenciosos-composition-service-webhooks-e-expiracao-de-tenants">Item 16 — Capturar erros silenciosos: composition service, webhooks e expiração de tenants</h2>
+<p><code>Camada: Backend/Worker · Esforço: M · Status: Não iniciado · Veredito: Não cumprida · Confiança: Sei</code></p>
+<h3 id="o-que-a-etapa-exige_15">O que a etapa exige</h3>
+<p>Adicionar <code>sentry_sdk.capture_exception</code> nos blocos de <code>composition.py</code>, nos 3 webhooks de composição e na task <code>check_expired_tenants</code> (billing/suspensão). Fora do middleware HTTP, nenhum except de negócio reporta ao Sentry hoje.</p>
+<h3 id="o-que-cada-fonte-mostrou_15">O que cada fonte mostrou</h3>
+<ul>
+<li><strong>Código (CONFIRMADO):</strong></li>
+<li><code>shared/services/composition.py</code>: <strong>17 except / 17 logger.error(.exception) / 0 capture</strong> — confere a REV 10/06 (14 <code>except Exception</code> + 2 <code>requests.exceptions.*</code> + 1 <code>(TypeError, ValueError)</code>). Exemplos: <code>:147</code>, <code>:276</code>, <code>:432</code>, <code>:1425-1435</code> (webhooks de entidade com <code>Timeout</code>/<code>ConnectionError</code>).</li>
+<li>3 webhooks em <code>backend/apps/composition/views.py</code>: <code>_send_composition_created_webhook</code> (<code>:874</code>; <code>logger.error</code> <code>:941</code>), <code>_send_composition_updated_webhook</code> (<code>:991</code>; <code>logger.error</code> <code>:1056-1058</code> + <code>logger.exception</code> <code>:1059</code>), <code>_send_composition_deleted_webhook</code> (<code>:1109</code>; <code>logger.error</code> <code>:1175-1176</code>) — todos <strong>só logam</strong>, nenhum manda ao Sentry. (As linhas do xlsx 940/1055/1174 batem com os <code>logger.error</code> reais 941/1056/1175.)</li>
+<li><code>check_expired_tenants</code> em <code>backend/apps/tenants/tasks.py:10-38</code>: <code>except</code> <code>:34</code>, <code>logger.error</code> <code>:35</code>, <strong>sem</strong> capture.</li>
+<li><strong>Busca global:</strong> <code>sentry_sdk.capture_exception</code> existe em <strong>1 só lugar</strong> — <code>backend/config/middleware/api_logging.py:40</code>. Worker e shared: 0.</li>
+<li><strong>Documentação:</strong> §6 — "fora do middleware HTTP, <strong>nenhum</strong> except de negócio chama <code>capture_exception</code>".</li>
+<li><strong>Sentry ao vivo:</strong> falhas de webhook que hoje só logam aparecem como <code>WORKER-1R/1Q</code> (HTTP 404, ~135 ev cada) por virem da task de notificação (<code>process_notification_task</code>), não dos webhooks de composição.</li>
+</ul>
+<h3 id="veredito_15">Veredito</h3>
+<p><strong>Não cumprida</strong>. Premissa confirmada nas 3 fontes (1 único <code>capture_exception</code> em toda a base).</p>
+<h3 id="plano-de-resolucao_15">Plano de resolução</h3>
+<ol>
+<li>Adicionar <code>capture_exception</code> (com tags de contexto) nos except relevantes de <code>composition.py</code>, nos 3 webhooks (<code>views.py:941/1056/1175</code>) e em <code>check_expired_tenants</code> (<code>tenants/tasks.py:35</code>).</li>
+<li>Distinguir erro de negócio <strong>permanente</strong> (capturar) de <strong>transiente esperado</strong> (warning/retry) para não inflar.</li>
+<li><strong>Cuidado com item 9:</strong> não recapturar o que o middleware HTTP já pega — evitar dupla contagem.</li>
+</ol>
+<hr>
+<h3 id="resumo-onda-2">Resumo — Onda 2</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Etapa</th>
+<th>Veredito (situação real)</th>
+<th>Confiança</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>14</td>
+<td>Instrumentar pipeline (breadcrumbs+tags)</td>
+<td><strong>Não cumprida</strong> — 0 instrumentação por etapa; integração fora da cadeia <code>on_commit</code>; <strong>CNH usa SERPRO</strong>, não scraping</td>
+<td>Sei</td>
+</tr>
+<tr>
+<td>15</td>
+<td>Fingerprint customizado</td>
+<td><strong>Não cumprida</strong> — sem fingerprint; "Task failed" genérico (689 ev) + UUID no título (K/N ~240 ev cada)</td>
+<td>Sei</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Capturar erros silenciosos</td>
+<td><strong>Não cumprida</strong> — <code>composition.py</code> 17 except / 0 capture; único <code>capture_exception</code> da base é <code>api_logging.py:40</code></td>
+<td>Sei</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h1 id="onda-3-alertas-health-checks">ONDA 3 — Alertas + Health Checks</h1>
+<p><strong>Beat e filas · Sem 6–8</strong></p>
+<hr>
+<h2 id="item-17-definir-niveis-n1n2n3-e-responsaveis-por-alerta">Item 17 — Definir níveis N1/N2/N3 e responsáveis por alerta</h2>
+<p><code>Camada: AutoChecker · Esforço: M · Status: Não iniciado · Veredito: Não cumprida · Confiança: Parcial</code></p>
+<h3 id="o-que-a-etapa-exige_16">O que a etapa exige</h3>
+<p>Mapear quem recebe qual alerta por nível (N1 = triagem, N2 = técnico, N3 = especialista/engenharia) <strong>antes</strong> de ativar qualquer notificação. É o <strong>gate</strong> da política de alertas.</p>
+<h3 id="o-que-cada-fonte-mostrou_16">O que cada fonte mostrou</h3>
+<ul>
+<li><strong>Código:</strong> nada a auditar — decisão organizacional, não vive em código.</li>
+<li><strong>Documentação:</strong> <code>Roadmap_Observabilidade_AutoChecker.md</code> (Etapa 17) marca o mapeamento como <strong>[PENDENTE: organização]</strong> ("o mapeamento N1/N2/N3 não existe nas fontes"); manda "espelhar a decisão do AutoLoad", mas <strong>essa decisão do AutoLoad também está pendente</strong>. Nenhuma outra doc (<code>AutoChecker-documentacao.md</code>, <code>Questionario_…</code>, <code>Oportunidades…</code>) define os níveis.</li>
+<li><strong>Sentry:</strong> não aplicável.</li>
+</ul>
+<h3 id="veredito_16">Veredito</h3>
+<p><strong>Não cumprida.</strong> É um <strong>bloqueio organizacional</strong>: sem o mapa N1/N2/N3, os itens 18 (regras) e 21 (roteamento) não têm destinatário.</p>
+<h3 id="plano-de-resolucao_16">Plano de resolução</h3>
+<ol>
+<li>Decidir e documentar o mapa: quem é N1/N2/N3 por produto e qual nível recebe qual classe de alerta.</li>
+<li>Tratar como pré-requisito (gate) dos itens 18 e 21.</li>
+</ol>
+<h3 id="ressalva_9">Ressalva</h3>
+<p>O "como resolver" depende de <strong>decisão do time</strong> — não é dado extraível do código. Confiança <strong>Parcial</strong> (a inexistência está confirmada; o conteúdo da decisão, não).</p>
+<hr>
+<h2 id="item-18-configurar-regras-de-alerta-com-filtro-environmentproduction">Item 18 — Configurar regras de alerta com filtro <code>environment:production</code></h2>
+<p><code>Camada: AutoChecker · Esforço: M · Status: Não iniciado · Veredito: Não cumprida · Confiança: Sei (live: Parcial)</code></p>
+<h3 id="o-que-a-etapa-exige_17">O que a etapa exige</h3>
+<p>Threshold (ex.: 50 ocorrências/5min), ciclo de supressão, alerta de regressão (resolved→unresolved) e roteamento por nível. Excluir o schema público. Hoje há só 1 regra default, sem filtro de ambiente.</p>
+<h3 id="o-que-cada-fonte-mostrou_17">O que cada fonte mostrou</h3>
+<ul>
+<li><strong>Código:</strong> nada — regras vivem só no painel Sentry.</li>
+<li><strong>Documentação:</strong> <code>AutoChecker-documentacao.md</code> §6 — "Apenas 1 regra default (<em>high priority issues</em>), <strong>sem filtro de ambiente</strong> (<code>env=None</code>)".</li>
+<li><strong>Sentry:</strong> o MCP disponível <strong>não expõe tool de regras de alerta</strong> → o estado da regra não foi verificável ao vivo; baseado na doc/snapshot. Depende do <code>environment</code> saneado (Onda 0/item 1).</li>
+</ul>
+<h3 id="veredito_17">Veredito</h3>
+<p><strong>Não cumprida.</strong> Uma regra sem filtro de ambiente equivale, na prática, a não ter alerta acionável.</p>
+<h3 id="plano-de-resolucao_17">Plano de resolução</h3>
+<ol>
+<li>Criar regras com filtro <code>environment:production</code>, threshold (ex.: 50/5min), ciclo de supressão e <strong>alerta de regressão</strong> (resolved→unresolved).</li>
+<li>Roteamento por nível (depende do item 17). Excluir o schema <code>public</code> (cruza itens 4 e 8).</li>
+</ol>
+<h3 id="ressalva_10">Ressalva</h3>
+<p>Pré-requisito: o <code>environment</code> tem de estar confiável (item 1) — alertar sobre base não saneada gera falso-positivo.</p>
+<hr>
+<h2 id="item-19-garantir-softtimelimitexceeded-no-sentry-timeout-no-microservico-ocr">Item 19 — Garantir <code>SoftTimeLimitExceeded</code> no Sentry + timeout no microserviço OCR</h2>
+<p><code>Camada: Worker · Esforço: P · Status: Não iniciado · Veredito: Não cumprida · Confiança: Sei</code></p>
+<h3 id="o-que-a-etapa-exige_18">O que a etapa exige</h3>
+<p>Os limites Celery já existem; garantir que <code>SoftTimeLimitExceeded</code> seja <strong>capturado</strong> no Sentry, cobrir tasks sem annotation, e tratar o microserviço OCR (FastAPI) que faz polling do Textract em <code>while True</code> <strong>sem timeout</strong>.</p>
+<h3 id="o-que-cada-fonte-mostrou_18">O que cada fonte mostrou</h3>
+<ul>
+<li><strong>Código (CONFIRMADO):</strong></li>
+<li>Limites globais: <code>CELERY_TASK_TIME_LIMIT = 1200</code> / <code>CELERY_TASK_SOFT_TIME_LIMIT = 900</code> (<code>worker/config/settings/celery_settings.py:18-19</code>).</li>
+<li><code>CELERY_TASK_ANNOTATIONS</code> (<code>celery_settings.py:107-143</code>): <code>run_textract</code> 600/480, <code>authenticate</code> 900/720, <code>classify_document</code> 300/240, <code>reprocess_document(s)</code> 600/480, <code>generate_user_scheduled_report</code> 600/480, <code>collect_sites_availability</code> 600/480.</li>
+<li><strong><code>SoftTimeLimitExceeded</code> NÃO é tratado</strong> em lugar nenhum (grep = 0); o handler <code>task_failure</code> (<code>worker/config/celery_logging.py:129-159</code>) o trata como exceção qualquer (passa batido).</li>
+<li><strong>~10 tasks sem annotation</strong> rodam só no limite global: <code>entry.process_document_validation</code>, <code>extract.extract_data</code>, <code>check_expired_tenants</code>, <code>recalculate_document_validity</code>, <code>process_notification_task</code>, <code>retry_failed_notifications</code>, <code>generate_scheduled_reports</code>, <code>process_integration_task</code>, etc.</li>
+<li><strong>OCR:</strong> <code>AutoChecker_OCR/ocr_service.py:85-104</code> — <code>while True</code> chamando <code>textract.get_document_text_detection(...)</code> <strong>sem <code>timeout=</code></strong> (boto3 sem <code>botocore.config.Config</code> de read/connect timeout) → request pendura indefinidamente.</li>
+<li><strong>Documentação:</strong> §2.3 (limites via <code>CELERY_TASK_ANNOTATIONS</code>, não no decorator); §5 (OCR polling em <code>while True</code> sem timeout; backoff fixo <code>sleep(5–20s)</code>).</li>
+<li><strong>Sentry ao vivo (12/06):</strong> busca por <code>SoftTimeLimitExceeded</code> no worker → <strong>nenhuma issue</strong>. Ou não dispara, ou é absorvida no genérico <code>WORKER-9 Task failed</code> (sem fingerprint, item 15).</li>
+</ul>
+<h3 id="veredito_18">Veredito</h3>
+<p><strong>Não cumprida.</strong> Os limites existem, mas falta a <strong>captura explícita</strong> do soft-timeout e o OCR tem polling sem teto.</p>
+<h3 id="plano-de-resolucao_18">Plano de resolução</h3>
+<ol>
+<li>Tratar <code>SoftTimeLimitExceeded</code> explicitamente (capturar com tag de <code>task_name</code>/etapa) no handler <code>task_failure</code> ou nas tasks críticas.</li>
+<li>Adicionar annotation (ou limite explícito) às ~10 tasks que hoje só caem no global.</li>
+<li>Pôr <strong>timeout</strong> no polling do OCR: <code>botocore.config.Config(read_timeout=…, connect_timeout=…)</code> + teto de tempo/iterações no <code>while True</code>.</li>
+</ol>
+<hr>
+<h2 id="item-20-health-checks-uptime-cron-monitors-beat-e-filas">Item 20 — Health checks + Uptime + Cron Monitors (Beat e filas)</h2>
+<p><code>Camada: Backend/Worker · Esforço: M · Status: Não iniciado · Veredito: Não cumprida · Confiança: Sei</code></p>
+<h3 id="o-que-a-etapa-exige_19">O que a etapa exige</h3>
+<p>Tornar <code>/api/core/healthcheck/</code> um readiness <strong>real</strong> (usar o <code>django-health-check</code> já instalado) <strong>antes</strong> de criar o Uptime Monitor; Cron Monitors para o Beat e heartbeat das 11 filas.</p>
+<h3 id="o-que-cada-fonte-mostrou_19">O que cada fonte mostrou</h3>
+<ul>
+<li><strong>Código (CONFIRMADO):</strong></li>
+<li>Healthcheck <strong>trivial</strong>: <code>apps/core/views.py:19-22</code> → <code>Response({"status": "ok"})</code> (não checa DB/Redis/broker).</li>
+<li><code>django-health-check==3.17.0</code> em <code>backend/requirements.txt:23</code>, mas <strong>fora</strong> de <code>INSTALLED_APPS</code> e <strong>não</strong> plugado na rota (a rota <code>apps/core/urls.py:12</code> aponta para a view trivial).</li>
+<li><strong>Beat divergente:</strong> <code>worker/config/celery.py:69-111</code> define <strong>8 jobs</strong> e <strong>sobrescreve</strong> o <code>beat_schedule</code> de <code>worker/config/settings/celery_settings.py:31-63</code> (<strong>6 jobs — mortos</strong>). 2 jobs existem <strong>só</strong> em <code>celery.py</code> (notify subscribers / non-subscribers expiring documents). Divergências: <code>recalculate-document-validity</code> 00:15 (celery.py) vs 00:00 (settings); <code>collect_sites_availability</code> 60min vs <code>crontab(minute=0)</code>.</li>
+<li><strong>11 filas</strong> (<code>celery_settings.py:68-105</code>).</li>
+<li><strong>Documentação:</strong> §2.1 (<code>django-health-check</code> instalado), §6 (health "falsa"), §2.3 (divergência beat 8 vs 6; 11 filas).</li>
+<li><strong>Sentry:</strong> Uptime/Cron Monitors não verificáveis pelo MCP disponível.</li>
+</ul>
+<h3 id="achados-health-falsa-dois-beat-schedules">🔎 Achados — health "falsa" + dois beat schedules</h3>
+<p>(1) O healthcheck retorna <code>ok</code> sem checar dependências — um Uptime Monitor sobre ele daria "verde" mesmo com DB/Redis fora. (2) Há <strong>dois</strong> <code>beat_schedule</code>; o de <code>celery.py</code> (8 jobs) vence e o de <code>celery_settings.py</code> (6) fica morto — risco de job fantasma conforme qual settings carrega.</p>
+<p><strong>Jobs do beat efetivo (8):</strong> <code>check-expired-tenants-daily</code> (00:00), <code>recalculate-document-validity-daily</code> (00:15), <code>notify-subscribers-expiring-documents-daily</code> (08:00), <code>notify-non-subscribers-expiring-documents-daily</code> (08:30), <code>check-scheduled-reports</code> (hora cheia), <code>reprocess-failed-documents-nightly</code> (00:30), <code>collect_sites_availability</code> (60min), <code>integration-reauth</code> (*/5min).</p>
+<h3 id="veredito_19">Veredito</h3>
+<p><strong>Não cumprida.</strong> A base de health/monitoring está frágil (health falsa, beat duplicado).</p>
+<h3 id="plano-de-resolucao_19">Plano de resolução</h3>
+<ol>
+<li>Tornar o healthcheck um <strong>readiness real</strong> com <code>django-health-check</code> (DB/Redis/broker) e só então criar o <strong>Uptime Monitor</strong>.</li>
+<li>Consolidar o <code>beat_schedule</code> em um único lugar (matar o de settings) para acabar com jobs fantasma.</li>
+<li><strong>Cron Monitors</strong> para os 8 jobs efetivos (intervalos acima).</li>
+<li><strong>Heartbeat</strong> das 11 filas.</li>
+</ol>
+<hr>
+<h2 id="item-21-integracao-de-alertas-em-canal-slackteams-ticket-codeowners">Item 21 — Integração de alertas em canal (Slack/Teams) + ticket + CODEOWNERS</h2>
+<p><code>Camada: AutoChecker · Esforço: M · Status: Não iniciado · Veredito: Não cumprida · Confiança: Sei</code></p>
+<h3 id="o-que-a-etapa-exige_20">O que a etapa exige</h3>
+<p>Plugar as regras num canal (Slack/Teams) e criar ticket automático; configurar CODEOWNERS por projeto Sentry. Hoje o único destino é e-mail genérico aos owners → o N1 não recebe nada automaticamente.</p>
+<h3 id="o-que-cada-fonte-mostrou_20">O que cada fonte mostrou</h3>
+<ul>
+<li><strong>Código (CONFIRMADO):</strong> <strong>sem arquivo <code>CODEOWNERS</code></strong> no repo (raiz/<code>.github/</code>/<code>.azuredevops/</code>/<code>docs/</code>). <strong>Sem</strong> integração Slack/Teams versionada — <code>backend.azure-pipelines.yml</code> (1–247) não tem; os hits de <code>webhook</code> no código são de negócio (composição/notificação), não de alerta Sentry.</li>
+<li><strong>Documentação:</strong> §6/§7 + Roadmap (Etapa 21): "o único destino de alerta é e-mail genérico aos owners — o N1 não recebe nada automaticamente". CODEOWNERS por projeto = item novo (gap G10, Alta).</li>
+<li><strong>Sentry:</strong> integração de canal vive só no painel — não versionada.</li>
+</ul>
+<h3 id="veredito_20">Veredito</h3>
+<p><strong>Não cumprida.</strong> Confirmado nas 3 fontes (sem canal, sem CODEOWNERS).</p>
+<h3 id="plano-de-resolucao_20">Plano de resolução</h3>
+<ol>
+<li>Definir o canal oficial (Slack <strong>ou</strong> Teams), plugar as regras e criar ticket automático.</li>
+<li>Criar <code>CODEOWNERS</code> por projeto Sentry para rotear a issue ao dono.</li>
+<li>Depende do item 17 (gate N1/N2/N3) e do item 18 (regras com filtro de ambiente).</li>
+</ol>
+<hr>
+<h3 id="resumo-onda-3">Resumo — Onda 3</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Etapa</th>
+<th>Veredito (situação real)</th>
+<th>Confiança</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>17</td>
+<td>Níveis N1/N2/N3 + responsáveis</td>
+<td><strong>Não cumprida</strong> — bloqueio organizacional; mapa não existe (Roadmap [PENDENTE]); AutoLoad também pendente</td>
+<td>Parcial</td>
+</tr>
+<tr>
+<td>18</td>
+<td>Regras de alerta com filtro de ambiente</td>
+<td><strong>Não cumprida</strong> — 1 regra default, <code>env=None</code> (regras não consultáveis via MCP)</td>
+<td>Sei (live: Parcial)</td>
+</tr>
+<tr>
+<td>19</td>
+<td>SoftTimeLimitExceeded + timeout OCR</td>
+<td><strong>Não cumprida</strong> — limites existem; sem captura de SoftTimeLimit; OCR <code>while True</code> sem timeout; ~10 tasks sem annotation</td>
+<td>Sei</td>
+</tr>
+<tr>
+<td>20</td>
+<td>Health + Uptime + Cron Monitors</td>
+<td><strong>Não cumprida</strong> — health falsa; django-health-check instalado mas fora; beat 8 vencem / 6 mortos; 11 filas</td>
+<td>Sei</td>
+</tr>
+<tr>
+<td>21</td>
+<td>Canal (Slack/Teams) + ticket + CODEOWNERS</td>
+<td><strong>Não cumprida</strong> — sem CODEOWNERS, sem canal versionado; só e-mail genérico → N1 não recebe</td>
+<td>Sei</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h1 id="onda-4-logs-correlacionados-tracing">ONDA 4 — Logs Correlacionados + Tracing</h1>
+<p><strong>Performance, trace distribuído e correlação de logs · Sem 8–11</strong></p>
+<hr>
+<h2 id="item-22-resolver-o-n1-e-padronizar-a-amostragem-de-performance">Item 22 — Resolver o N+1 e padronizar a amostragem de performance</h2>
+<p><code>Camada: Backend · Esforço: M · Status: Não iniciado · Veredito: Parcial · Confiança: Sei (live)</code></p>
+<h3 id="o-que-a-etapa-exige_21">O que a etapa exige</h3>
+<p>O tracing <strong>já está ativo</strong> — não é "ligar" performance. O que falta é (a) atacar a issue <strong>N+1 Query</strong> (<code>BACKEND-5</code>) e (b) padronizar a <code>traces_sample_rate</code> por ambiente.</p>
+<h3 id="o-que-cada-fonte-mostrou_21">O que cada fonte mostrou</h3>
+<ul>
+<li><strong>Código (CONFIRMADO):</strong></li>
+<li><code>traces_sample_rate</code> lido de env nos <strong>3 serviços Python</strong>, sempre default <strong>0.2</strong>: backend <code>backend/config/settings/base.py:733</code>, worker <code>worker/config/celery.py:27</code>, helper <code>shared/observability/sentry.py:33-35</code> (<code>float(os.environ.get("SENTRY_TRACES_SAMPLE_RATE","0.2"))</code>).</li>
+<li>Frontend define <code>tracesSampleRate</code> <strong>hardcoded por ambiente</strong> (prod 0.2 / dev 1.0), <strong>não</strong> por env: <code>AutoChecker_Frontend/instrumentation-client.ts:14-15</code>, <code>sentry.server.config.ts:12-13</code>, <code>sentry.edge.config.ts:13-14</code>. O Custos lê de env (<code>AutoChecker_Custos/src/instrument.ts:3-4</code>).</li>
+<li><strong>N+1 confirmado no código</strong> em <code>/api/tenants/all-tenants-switcher/</code> → <code>backend/apps/tenants/views.py:907-997</code>. Dois caminhos: (1) superadmin itera <code>Tenant.objects.exclude(...)</code> sem <code>prefetch</code> (<code>views.py:938-948</code>); (2) não-superadmin faz <code>TenantMembership.objects.get(...)</code> <strong>dentro</strong> do loop de tenants + <code>schema_context</code> por iteração (<code>views.py:956-971</code>) → uma query por tenant.</li>
+<li>Outro loop de risco: <code>backend/apps/portal/views.py:133-146</code> itera tenants chamando <code>get_usage_status(tenant)</code>.</li>
+<li><strong>Documentação:</strong> xlsx REV 10/06 e ESTÁTICO #10 (ajustado: tracing já lê env; N+1 ao vivo 09/06 no switcher).</li>
+<li><strong>Sentry ao vivo (17/06):</strong> issue <strong><code>AUTOCHECKER-BACKEND-5</code> "N+1 Query"</strong> (culprit <code>/api/tenants/all-tenants-switcher/</code>) está <strong>unresolved, 518 eventos</strong> — o xlsx registrava <strong>122</strong> (<strong>&gt;4×</strong>) —, 1ª vez 09/04, <strong>última há ~30 min</strong>, atribuída a Tarcisio. Além dela, <strong>+6 issues N+1</strong> que o xlsx não cita: <code>-7</code> <code>/api/entity/driver/</code> (21), <code>-6</code> <code>/api/entity/vehicle/</code> (20), <code>-1X</code> <code>/api/audit/logs/stats/</code> (16, recente), <code>-8</code> <code>/api/accounts/users/all_users/</code> (7), <code>-38</code> <code>/api/accounts/validate-invite/</code> (1), <code>-24</code> <code>/api/trial/admin/leads/</code> (1).</li>
+</ul>
+<h3 id="achado-o-n1-nao-e-um-sao-sete-e-o-principal-cresceu-4">🔎 Achado — o N+1 não é um, são sete (e o principal cresceu 4×)</h3>
+<p>O cronograma trata o N+1 como item único (switcher, 122 ev). Ao vivo há <strong>7 issues N+1 abertas</strong>; a principal saltou para <strong>518 ev</strong> e continua disparando. driver/vehicle/all_users casam com os loops de queryset do código. Vale resolver <strong>em lote</strong>, não só o switcher.</p>
+<h3 id="veredito_21">Veredito</h3>
+<p><strong>Parcial.</strong> A amostragem de performance <strong>já existe e funciona</strong> (env, default 0.2) — esse pedaço está cumprido. Mas (a) o <strong>N+1 não foi resolvido</strong> (518 ev e subindo) e (b) a amostragem <strong>não é diferenciada por ambiente</strong> no backend/worker (default fixo 0.2; só o frontend separa prod/dev).</p>
+<h3 id="plano-de-resolucao_21">Plano de resolução</h3>
+<ol>
+<li>Corrigir o N+1 do switcher: no caminho não-superadmin, trocar o <code>TenantMembership.objects.get()</code> por-tenant por um <code>filter(...).select_related('tenant','user')</code> único <strong>fora</strong> do loop; no superadmin, garantir que nada acesse FK lazy dentro do laço.</li>
+<li>Estender a correção às outras 6 rotas (driver, vehicle, all_users, audit/logs/stats, validate-invite, trial/admin/leads) com <code>select_related</code>/<code>prefetch_related</code>.</li>
+<li>Padronizar <code>traces_sample_rate</code> por ambiente também no backend/worker (ex.: prod 0.1–0.2, dev 1.0) via env por ambiente.</li>
+<li>Após corrigir, <strong>resolver</strong> as issues no Sentry e habilitar alerta de regressão (cruza item 18).</li>
+</ol>
+<h3 id="ressalva_11">Ressalva</h3>
+<p>O frontend <strong>hardcoda</strong> a taxa (não usa env) — se a decisão for "tudo por env", isso também muda. Confiança <strong>Sei</strong> (código + issue ao vivo).</p>
+<hr>
+<h2 id="item-23-tracing-distribuido-backend-worker-celery-servicos-auxiliares">Item 23 — Tracing distribuído Backend ↔ Worker (Celery) ↔ serviços auxiliares</h2>
+<p><code>Camada: AutoChecker · Esforço: G · Status: Não iniciado · Veredito: Não cumprida · Confiança: Sei</code></p>
+<h3 id="o-que-a-etapa-exige_22">O que a etapa exige</h3>
+<p>Propagar trace por toda a cadeia de tasks e nas chamadas HTTP ao scraping-server, ao OCR e a Textract/OpenAI como <strong>spans</strong>, para seguir um documento ponta a ponta. Pré-requisito: OCR e AIAgent precisam de Sentry primeiro (Onda 1, item 12).</p>
+<h3 id="o-que-cada-fonte-mostrou_22">O que cada fonte mostrou</h3>
+<ul>
+<li><strong>Código (CONFIRMADO):</strong></li>
+<li><strong>Cadeia de 5 estágios</strong> via <code>transaction.on_commit(...)</code> + <code>apply_async(...)</code>: entry <code>worker/apps/validation/tasks/entry.py:35-40</code> (→ <code>run_textract</code>, fila <code>ocr_heavy</code>) → ocr <code>.../ocr.py:445-449</code> (→ <code>classify_document</code>, <code>ai_processing</code>) → classification <code>.../classification.py:286-287</code> (→ <code>extract_data</code>) → extract <code>.../extract.py:409-410</code> (→ <code>authenticate_document</code>) → authenticate <code>.../authenticator.py</code> (estágio final).</li>
+<li><strong>Hop da INTEGRAÇÃO — DISCREPÂNCIA com o xlsx:</strong> a nota REV diz que a integração "sai por signal/dispatcher a partir de <code>authenticator.py</code>". No código <strong>não sai do authenticator</strong>: é um <strong><code>post_save</code> em <code>NodeDocument</code></strong> (<code>shared/models/signals.py:303-308</code>) que, via <code>on_commit</code> (<code>signals.py:202</code> e <code>:252</code>), chama <code>IntegrationDispatchService.dispatch_driver_event(...)</code> → <code>process_integration_event.delay(...)</code> (<code>shared/services/integration_dispatch.py:96</code>). O gatilho é o <strong>save da composição</strong>, não o authenticator.</li>
+<li><strong>Chamadas HTTP a auxiliares (viram spans):</strong> scraping <code>worker/apps/validation/tasks/utils/scraper_client.py:62</code> (<code>requests.post</code>, timeout 160); Textract boto3 <code>.../ocr.py:22-27</code> + <code>:301-306</code>/<code>:312-316</code>/<code>:341-342</code>; OpenAI <code>.../classification.py:86</code>; (AIAgent→Evolution <code>AutoChecker_AIAgent/agent/tasks/message_tasks.py:202</code>, httpx).</li>
+<li><strong>Cobertura ausente:</strong> <code>AutoChecker_OCR</code> e <code>AutoChecker_AIAgent</code> <strong>sem <code>sentry_sdk</code></strong> (grep recursivo = 0). Sem SDK, não há spans desses serviços.</li>
+<li><strong>Propagação de trace HOJE:</strong> <strong>NÃO ENCONTRADA</strong> — sem <code>continue_trace</code>/<code>sentry-trace</code>/<code>baggage</code>/<code>trace_propagation_targets</code> em lugar nenhum.</li>
+<li><strong>Documentação:</strong> xlsx (ponto cego central; depende da cobertura da Onda 1).</li>
+<li><strong>Sentry:</strong> trace distribuído entre serviços não verificável via MCP (sem spans de OCR/AIAgent hoje).</li>
+</ul>
+<h3 id="veredito_22">Veredito</h3>
+<p><strong>Não cumprida.</strong> O <code>CeleryIntegration</code> propaga trace backend→worker automaticamente, mas (a) os <strong>hops HTTP</strong> (scraping/OCR/Textract/OpenAI) não propagam contexto, (b) <strong>OCR e AIAgent não têm SDK</strong> e (c) o salto para a integração sai de um <strong>signal de composição</strong>, não do authenticator — instrumentar à parte.</p>
+<h3 id="plano-de-resolucao_22">Plano de resolução</h3>
+<ol>
+<li><strong>Pré-requisito:</strong> instrumentar OCR e AIAgent com Sentry (item 12) — sem isso não há spans.</li>
+<li>Propagar trace nos hops HTTP: enviar headers <code>sentry-trace</code>/<code>baggage</code> no <code>scraper_client.py:62</code> e nas chamadas ao OCR; criar spans manuais em torno de Textract/OpenAI.</li>
+<li>Instrumentar o hop da integração no ponto <strong>real</strong> (<code>signals.py:202/252</code> → <code>integration_dispatch.py:96</code>), propagando <code>trace_id</code> no <code>process_integration_event.delay</code>.</li>
+<li>Validar uma trace ponta-a-ponta (entry→…→authenticate→integração) no Sentry.</li>
+</ol>
+<h3 id="ressalva_12">Ressalva</h3>
+<p>Esforço <strong>G</strong>, dependente da Onda 1. A correção da atribuição "authenticator.py" → "post_save de <code>NodeDocument</code>" deve ir ao cronograma. Confiança <strong>Sei</strong>.</p>
+<hr>
+<h2 id="item-24-correlacionar-lokipromtail-com-sentry-trace_id">Item 24 — Correlacionar Loki/Promtail com Sentry (<code>trace_id</code>)</h2>
+<p><code>Camada: Worker · Esforço: M · Status: Não iniciado · Veredito: Parcial · Confiança: Sei</code></p>
+<h3 id="o-que-a-etapa-exige_23">O que a etapa exige</h3>
+<p>Os workers já emitem logs JSON para o Grafana Loki via Promtail. Incluir <code>trace_id</code>/<code>tenant_id</code> nos logs e linkar <strong>Sentry↔Loki</strong> para pular do erro ao log estruturado da mesma execução.</p>
+<h3 id="o-que-cada-fonte-mostrou_23">O que cada fonte mostrou</h3>
+<ul>
+<li><strong>Código (CONFIRMADO):</strong></li>
+<li><strong>Logs JSON existem:</strong> <code>python-json-logger</code> (<code>requirements</code>), formatter <code>jsonlogger.JsonFormatter</code> em <code>worker/config/settings/base.py:181-184</code>; logger <code>celery.tasks</code> → <code>/var/log/celery/tasks.log</code> (<code>base.py:222-226</code>); handlers de task emitem <code>extra={task_name,task_id,status,queue,duration_ms,tenant,...}</code> (<code>worker/config/celery_logging.py</code>); backend <code>api_logging.py:70</code> faz <code>json.dumps</code>.</li>
+<li><strong>Loki/Promtail existem:</strong> <code>worker/promtail-config-dev.yml</code> e <code>promtail-config-prod.yml</code> (push p/ <code>https://monitor.autochecker.cloud/loki/api/v1/push</code>, job <code>celery-tasks</code>, coleta <code>/var/log/celery/*.log</code>, extrai task_name/status/queue/tenant/env/duration_ms); serviço <code>grafana/promtail:3.5.0</code> em <code>docker-compose.dev.yml:125-134</code> / <code>docker-compose.prod.yml:144-157</code>.</li>
+<li><strong><code>tenant_id</code> JÁ está nos logs</strong> (<code>celery_logging.py:92/117/151/...</code>; backend payload <code>tenant</code>). <strong><code>trace_id</code> NÃO</strong> — nada de <code>trace_id</code>/<code>sentry_trace</code>/<code>traceparent</code> nos formatters.</li>
+<li><strong><code>LoggingIntegration</code> do Sentry NÃO ligada</strong> no init (<code>worker/config/celery.py:22-32</code>, <code>shared/observability/sentry.py</code>) — só Django/Celery/Redis.</li>
+<li><strong>Documentação:</strong> xlsx (Loki/Promtail já existem; falta amarrar aos traces).</li>
+<li><strong>Sentry:</strong> correlação não verificável via MCP.</li>
+</ul>
+<h3 id="veredito_23">Veredito</h3>
+<p><strong>Parcial.</strong> Metade do item <strong>já está pronta</strong> (logs JSON + Loki/Promtail + <code>tenant_id</code>); falta só o amarrador: <strong><code>trace_id</code> nos logs</strong> e o link Sentry↔Loki. O xlsx marca "não iniciado" — na prática a infra já existe.</p>
+<h3 id="plano-de-resolucao_23">Plano de resolução</h3>
+<ol>
+<li>Injetar <code>trace_id</code> (do scope Sentry, ex.: <code>get_traceparent</code>) e <code>schema_name</code> em todos os registros — via filter de logging que lê o scope do Sentry, alimentando o <code>extra</code> do <code>celery_logging.py</code> e o <code>api_logging.py</code>.</li>
+<li>Adicionar <code>trace_id</code>/<code>tenant</code> como labels extraídos no Promtail (<code>promtail-config-*.yml</code>) para filtrar no Loki.</li>
+<li>Configurar o link Sentry↔Loki (e, opcionalmente, <code>LoggingIntegration</code> para anexar breadcrumbs de log aos eventos).</li>
+</ol>
+<h3 id="ressalva_13">Ressalva</h3>
+<p>A correlação real depende de o <code>trace_id</code> ser o <strong>mesmo</strong> identificador nos dois lados — garantir que o valor logado seja o <code>trace_id</code> do evento Sentry (não um id interno). Confiança <strong>Sei</strong> no estado atual; o "como amarrar" é direto.</p>
+<hr>
+<h3 id="resumo-onda-4">Resumo — Onda 4</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Etapa</th>
+<th>Veredito (situação real)</th>
+<th>Confiança</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>22</td>
+<td>N+1 + amostragem de performance</td>
+<td><strong>Parcial</strong> — tracing/amostragem já ativos (env, 0.2); N+1 NÃO resolvido (<code>BACKEND-5</code> 518 ev + 6 issues); taxa não diferenciada por ambiente no back/worker</td>
+<td>Sei (live)</td>
+</tr>
+<tr>
+<td>23</td>
+<td>Tracing distribuído back↔worker↔auxiliares</td>
+<td><strong>Não cumprida</strong> — Celery propaga back→worker; hops HTTP sem propagação; OCR/AIAgent sem SDK; integração sai de <code>post_save</code>, não do authenticator</td>
+<td>Sei</td>
+</tr>
+<tr>
+<td>24</td>
+<td>Loki/Promtail ↔ Sentry (<code>trace_id</code>)</td>
+<td><strong>Parcial</strong> — JSON+Loki+Promtail+<code>tenant_id</code> já existem; falta <code>trace_id</code> nos logs e link Sentry↔Loki; <code>LoggingIntegration</code> off</td>
+<td>Sei</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="consolidado-o-que-ficou-parcial-nao-sei-a-confirmar">Consolidado — o que ficou Parcial / Não sei / a confirmar</h2>
+<ul>
+<li><strong>Item 1:</strong> distribuição de <code>environment</code> do frontend ("15% production") <strong>não reproduzida</strong> ao vivo via MCP (errors/30d ≠ all-events do snapshot).</li>
+<li><strong>Item 8:</strong> total exato de issues abertas <strong>hoje</strong> não recontado por API (o fato "0 resolvidas" foi confirmado).</li>
+<li><strong>Item 13:</strong> níveis exatos por ambiente dependem de <strong>decisão do time</strong>.</li>
+<li><strong>Item 14:</strong> a nota REV do xlsx ("auth = scraping, não SERPRO") é <strong>imprecisa</strong> — a <strong>CNH usa SERPRO OAuth2</strong> (<code>cnh.py:18</code>); os demais tipos usam scraping.</li>
+<li><strong>Item 17:</strong> a decisão N1/N2/N3 <strong>não existe</strong> (bloqueio organizacional, depende do time); "espelhar o AutoLoad" não ajuda — o AutoLoad também está pendente.</li>
+<li><strong>Itens 18/20/21:</strong> regras de alerta, Uptime/Cron Monitors e integrações de canal vivem <strong>só no painel Sentry</strong> e <strong>não são consultáveis pelo MCP</strong> disponível — estado baseado em doc/snapshot.</li>
+<li><strong>Item 19:</strong> nenhuma issue <code>SoftTimeLimitExceeded</code> ao vivo hoje — não dá para saber se não dispara ou se é absorvida no genérico "Task failed".</li>
+<li><strong>Item 22:</strong> a nota do xlsx ("N+1 = 122 ev no switcher") está <strong>defasada</strong> — ao vivo (17/06) são <strong>518 ev</strong> só no switcher e <strong>+6 issues N+1</strong> em outras rotas; amostragem <code>traces_sample_rate</code> não é diferenciada por ambiente no back/worker.</li>
+<li><strong>Item 23:</strong> o xlsx atribui o hop da integração a <code>authenticator.py</code>; o código mostra que sai de <strong><code>post_save</code> de <code>NodeDocument</code></strong> (<code>shared/models/signals.py:303-308</code>) — atribuição a corrigir no cronograma.</li>
+<li><strong>Item 24:</strong> infra Loki/Promtail + <code>tenant_id</code> <strong>já existem</strong> (xlsx subestima como "não iniciado"); o gap real é <code>trace_id</code> nos logs + link Sentry↔Loki.</li>
+<li><strong>Global:</strong> qual dos <strong>dois frontends</strong> é o produtivo — a confirmar com o time (afeta 1, 2, 7, 11).</li>
+<li><strong>Global:</strong> o doc <code>Auditoria_Cronograma_vs_Codigo_AutoChecker_2026-06-10</code> citado no xlsx <strong>não existe</strong> nos repositórios.</li>
+</ul>
+<h2 id="mapa-de-dependencias-entre-itens-para-ordenar-a-execucao">Mapa de dependências entre itens (para ordenar a execução)</h2>
+<ul>
+<li><strong>Item 5 (consolidar init)</strong> é base de <strong>9</strong> (dedup de captura), <strong>10</strong> (tags worker), <strong>2/item release</strong> e do <code>send_default_pii</code> do <strong>7</strong>.</li>
+<li><strong>Item 6 (corrigir health)</strong> alimenta <strong>20</strong> (readiness real + Uptime/Cron monitors).</li>
+<li><strong>Item 4 (migrate_schemas)</strong> e <strong>item 8 (excluir schema public)</strong> se cruzam nos alertas (<strong>18</strong>).</li>
+<li><strong>Item 10 (tags por task)</strong> habilita <strong>14</strong> (<code>document.id</code>/<code>stage</code>) e <strong>15</strong> (fingerprint por task+causa).</li>
+<li><strong>Item 9 (dedup)</strong> precisa ser combinado com <strong>16</strong> (novas capturas) para não dobrar eventos.</li>
+<li><strong>Item 2 (org/project + release)</strong> e <strong>item 11 (limpeza do frontend)</strong> dependem de decidir o <strong>frontend canônico</strong> (ressalva global #2).</li>
+<li><strong>Item 17 (N1/N2/N3)</strong> é gate de <strong>18</strong> (regras) e <strong>21</strong> (canal/CODEOWNERS) — sem o mapa de responsáveis, alerta não tem destinatário.</li>
+<li><strong>Item 1 (environment saneado)</strong> é pré-requisito de <strong>18</strong> (filtro <code>environment:production</code>).</li>
+<li><strong>Item 6 (health real)</strong> é pré-requisito de <strong>20</strong> (Uptime Monitor sobre readiness de verdade).</li>
+<li><strong>Item 12 (cobertura Sentry em OCR/AIAgent)</strong> é pré-requisito de <strong>23</strong> (sem SDK não há spans desses serviços no trace distribuído).</li>
+<li><strong>Item 22 (resolver N+1)</strong> alimenta <strong>18</strong> (alerta de regressão após resolver) e <strong>26</strong> (dashboard de latência por etapa).</li>
+<li><strong>Item 23 (trace_id ponta-a-ponta)</strong> é pré-requisito de <strong>24</strong> (correlação Loki↔Sentry só faz sentido com <code>trace_id</code> propagado).</li>
+</ul>
+<hr>
+<h2 id="fontes">Fontes</h2>
+<ul>
+<li><strong>Código real</strong> em <code>C:\Projetos\automind-obs\Produtos\Autochecker</code> (backend/worker/shared, frontend ×2, OCR, AIAgent, APP, Custos, Scrapping) — citações <code>arquivo:linha</code> verificadas em 12/06/2026 (Ondas 0–3) e <strong>17/06/2026 (Onda 4: tracing, N+1, Loki/Promtail)</strong>.</li>
+<li><strong>Documentação:</strong> <code>AutoChecker-documentacao.md</code>, <code>Oportunidades de Melhoria de Observabilidade - AutoChecker.md</code> (14/04), <code>Roadmap_Observabilidade_AutoChecker.md</code>, <code>Questionario_Sentry_Respostas_Dev_2026-05.md</code>, <code>Auditoria_Observabilidade_AutoChecker_2026-06-03.md</code>.</li>
+<li><strong>Sentry:</strong> org <code>automind-qd</code> (snapshot 04/05→03/06 do xlsx + verificação ao vivo via MCP em 12/06).</li>
+<li><strong>Análises por etapa:</strong> <code>Etapa2_Release_SetCommits_Pipelines_AutoChecker.md</code>, <code>Etapa3_PeriodicTask_Orfa_Beat_AutoChecker.md</code>.</li>
+</ul>
+<blockquote>
+<p><strong>Próximo:</strong> Onda 5 — Métricas de Negócio + Dashboard (itens 25–26). Depois Onda 6 — Endurecimento, Terceiros e Compliance (itens 27–31).</p>
+</blockquote>
+<footer class="rodape">Fonte: codigo real + documentacao + Sentry ao vivo (automind-qd) · Ondas 0–3 (12/06) + Onda 4 ao vivo (2026-06-17) · Eduardo / Observabilidade · Automind</footer></div></body></html>
