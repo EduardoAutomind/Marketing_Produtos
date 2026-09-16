@@ -1,0 +1,154 @@
+/* ============================================================
+   Tokens e base da identidade visual AutoMind — entregáveis HTML
+   Fonte: Id_visual/Identidade Visual AutoMind.md (seções 3 e 4)
+   Copiar para o <style> do arquivo. Fontes: ver scripts/embutir_ativos.py
+   ============================================================ */
+
+:root {
+  color-scheme: light; /* tema claro fixo: abre branco mesmo em sistema em modo escuro */
+
+  /* Paleta oficial */
+  --am-pink:    #FA094E;  /* rosa AutoMind — acento (métrica prioritária, série DT, botão principal) */
+  --am-magenta: #940755;  /* só dentro do gradiente */
+  --am-purple:  #44055A;  /* só dentro do gradiente — nunca título/fundo */
+  --am-navy:    #03045E;  /* só dentro do gradiente — nunca título/fundo */
+  --am-black:   #100F0F;  /* texto e títulos */
+  --am-ice:     #F3F3F0;  /* fundo de apoio (branco gelo) */
+  --am-white:   #FFFFFF;  /* fundo principal */
+
+  /* Tons de apoio (derivados) */
+  --am-pink-wash-1: #FFEEF3;  /* fundo de card/bloco em destaque */
+  --am-pink-wash-2: #FFF3F7;  /* fundo de linha/área em realce leve */
+  --am-pink-line:   #F9C6D6;  /* borda de card prioritário */
+  --am-pink-text:   #C9073F;  /* rosa para texto pequeno (5,9:1 sobre branco, AA) */
+  /* neutros = preto AutoMind diluído no branco gelo (mesma receita da LP Expopostos 2026) */
+  --am-gray-dark:   #3F3F45;  /* série HT, texto de apoio forte */
+  --am-gray-text:   #545353;  /* texto secundário · 70% preto · 6,9:1 */
+  --am-gray-mid:    #6F6F6E;  /* texto terciário, legendas · 58% preto · 4,5:1 (AA) */
+  --am-gray-line:   #E3E3E1;  /* borda de cartão · 7% preto */
+  --am-gray-strong: #D3D3D0;  /* borda em hover / controles · 14% preto */
+  --am-gray-hair:   #EAEAE8;  /* divisores finos, chips neutros · 4% preto */
+  --am-paper:       #FBFBFA;  /* fundo de cartão · 30% gelo sobre branco */
+  --am-error-text:  #8A0C30;  /* estado de erro: rosa + 48% preto · 8,7:1 */
+  --am-grid:        #ECEAEB;  /* grade de gráfico */
+  --am-axis:        #D3D0D2;  /* eixos de gráfico */
+
+  /* Gradientes */
+  /* 2 stops: magenta e roxo são a interpolação entre rosa e navy, não paradas — não adicionar stops */
+  --am-grad:        linear-gradient(45deg, #FA094E 0%, #03045E 100%);  /* acento: botão principal, barra de 4 px, texto recortado */
+  --am-grad-rule:   linear-gradient(90deg, #FA094E 0%, #03045E 100%);  /* régua fina horizontal */
+  --am-grad-v:      linear-gradient(180deg, #FA094E 0%, #03045E 100%); /* barra lateral de cartão */
+  --am-grad-hero:   linear-gradient(90deg, #FA094E, #940755);                                     /* texto com background-clip */
+  --am-hero-bg:     linear-gradient(180deg, #FFF3F7 0%, #FFFFFF 100%);                             /* fundo de card prioritário */
+
+  /* Séries de dados (par validado para daltonismo) */
+  --am-dt: #FA094E;
+  --am-ht: #3F3F45;
+  /* Rampa ordinal em rosa (funil, intensidade), clara → cheia */
+  --am-ramp-1: #FBD9E3; --am-ramp-2: #F4A0BB; --am-ramp-3: #EC5C88; --am-ramp-4: #C8104A;
+
+  /* Semântica de status — só em pílulas/badges/callouts pequenos */
+  --am-ok:      #0F8A5F; --am-ok-bg:      #E8F3EE;
+  --am-warn:    #A86300; --am-warn-bg:    #FBF1DC;
+  --am-crit:    #C31035; --am-crit-bg:    #FDE8EC;
+  --am-info:    #C9073F; --am-info-bg:    #FFEEF3;  /* info usa rosa lavado, não azul */
+
+  --am-focus: #03045E; /* anel de foco em navy (3 px), como na LP */
+
+  /* Tipografia */
+  --am-font-title: "Hando", "Manrope", "Red Hat Display", "Segoe UI", Arial, sans-serif;
+  --am-font-text:  "Red Hat Display", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  --am-font-mono:  Consolas, "Cascadia Code", "SFMono-Regular", monospace;
+}
+
+/* ---------- Base ---------- */
+* { box-sizing: border-box; }
+html { background: var(--am-white); }
+body {
+  margin: 0;
+  background: var(--am-white);
+  color: var(--am-black);
+  font-family: var(--am-font-text);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, h4 { font-family: var(--am-font-title); color: var(--am-black); font-weight: 700; margin: 0 0 .4em; letter-spacing: -.01em; }
+h1 { font-size: clamp(26px, 3.8vw, 38px); line-height: 1.1; }
+h2 { font-size: 21px; }
+h3 { font-size: 15px; }
+p  { margin: 0 0 .9em; }
+a  { color: var(--am-pink-text); text-decoration: underline; text-underline-offset: 2px; }
+a:hover { color: var(--am-pink); }
+code, pre { font-family: var(--am-font-mono); font-size: .92em; }
+pre { background: var(--am-ice); border: 1px solid var(--am-gray-line); padding: 12px 14px; overflow: auto; }
+:focus-visible { outline: 3px solid var(--am-focus); outline-offset: 2px; }
+
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 22px 70px; }
+@media (max-width: 480px) { .wrap { padding-inline: 16px; } }
+
+/* Rótulo em caixa alta com tracking aberto (ecoa o logotipo) */
+.eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--am-gray-text); }
+.muted { color: var(--am-gray-text); }
+
+/* ---------- Cabeçalho de marca: branco + logo positivo + régua em gradiente ---------- */
+.brandhead { background: var(--am-white); border-bottom: 1px solid var(--am-gray-line); }
+.brandhead::after { content: ""; display: block; height: 3px; background: var(--am-grad-rule); }
+/* cantos retos em todo componente (padrão consolidado na LP Expopostos 2026): nenhum border-radius */
+.brandhead .in { max-width: 1080px; margin: 0 auto; padding: 18px 22px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.brandhead .logo { height: 30px; width: auto; display: block; }
+.brandhead .tag { margin-left: auto; } /* usar .eyebrow junto */
+
+/* ---------- Cards ---------- */
+.card { background: var(--am-paper); border: 1px solid var(--am-gray-line); border-radius: 0; padding: 16px 18px 14px; min-width: 0; }
+.card.pri { border-color: var(--am-pink-line); background: var(--am-hero-bg); }
+.pri-label { display: inline-block; font-family: var(--am-font-title); font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--am-pink-text); background: var(--am-pink-wash-1); padding: 3px 8px; }
+/* eyebrow em gradiente recortado (LP): rótulo de seção sobre fundo claro */
+.eyebrow--grad { background-image: var(--am-grad); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; width: fit-content; }
+.kpi .v { font-family: var(--am-font-title); font-size: 32px; font-weight: 700; line-height: 1; letter-spacing: -.01em; }
+.kpi.hero .v { font-size: 52px; background: var(--am-grad-hero); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+/* ---------- Pílulas de status ---------- */
+.pill { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 8px; white-space: nowrap; }
+.pill.ok   { color: var(--am-ok);   background: var(--am-ok-bg); }
+.pill.warn { color: var(--am-warn); background: var(--am-warn-bg); }
+.pill.crit { color: var(--am-crit); background: var(--am-crit-bg); }
+.pill.flat { color: var(--am-gray-text); background: var(--am-gray-hair); }
+
+/* ---------- Tabelas ---------- */
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th { text-align: left; font-weight: 700; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--am-gray-text);
+  border-bottom: 2px solid var(--am-gray-line); padding: 8px 10px; }
+td { border-bottom: 1px solid var(--am-gray-hair); padding: 8px 10px; vertical-align: top; }
+tr:hover td { background: var(--am-pink-wash-2); }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* ---------- Callouts (pipeline Md → HTML: ⚠️ warn, ❌ bad, ✅ ok, ℹ️ info) ---------- */
+.callout { border-left: 4px solid; padding: 10px 14px; margin: 14px 0; }
+.callout.info { border-color: var(--am-pink);  background: var(--am-info-bg); }
+.callout.ok   { border-color: var(--am-ok);    background: var(--am-ok-bg); }
+.callout.warn { border-color: var(--am-warn);  background: var(--am-warn-bg); }
+.callout.bad  { border-color: var(--am-crit);  background: var(--am-crit-bg); }
+
+/* ---------- Gráficos (SVG inline) ---------- */
+svg.chart { width: 100%; height: auto; display: block; overflow: visible; }
+svg.chart text { font-family: inherit; font-size: 11px; fill: var(--am-gray-text); }
+svg.chart .grid { stroke: var(--am-grid); stroke-width: 1; }
+svg.chart .axis { stroke: var(--am-axis); stroke-width: 1; }
+.sw { display: inline-block; width: 10px; height: 10px; margin-right: 6px; vertical-align: baseline; }
+.sw.dt { background: var(--am-dt); } .sw.ht { background: var(--am-ht); }
+
+/* ---------- Rodapé ---------- */
+footer { margin-top: 40px; padding-top: 14px; border-top: 1px solid var(--am-gray-line); font-size: 12px; color: var(--am-gray-text); }
+
+/* ---------- Impressão (PDF via Edge headless) ---------- */
+@page { size: A4; margin: 14mm; }
+@media print {
+  html, body { background: #FFFFFF !important; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .wrap { max-width: none; padding: 0; }
+  .card, table, .callout, section { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+  a { color: var(--am-black); text-decoration: none; }
+}

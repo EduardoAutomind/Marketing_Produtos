@@ -48,6 +48,8 @@ Atenção: alguns scripts antigos têm caminhos absolutos para `C:\Projetos\Obse
 
 ## Identidade visual (obrigatória em HTML/PDF/XLSX)
 
+**Use a skill `identidade-visual-automind`** (`.claude/skills/identidade-visual-automind/`) ao criar ou revisar qualquer entregável: ela tem os tokens CSS prontos, o mapa de ativos de `Id_visual/`, o script que embute fontes/logo em base64 e o verificador `scripts/verificar_entregavel.py <arquivo.html>`, que deve passar sem erros antes da entrega. Briefing completo: `Id_visual/Identidade Visual AutoMind.md`. O resumo abaixo é o mínimo.
+
 Paleta oficial (`Id_visual/Resumo Identidade Visual AutoMind.png`):
 
 | Cor | Hex | Uso típico |
@@ -61,19 +63,24 @@ Paleta oficial (`Id_visual/Resumo Identidade Visual AutoMind.png`):
 
 Gradiente da marca: rosa → navy (`linear-gradient(90deg,#FA094E,#03045E)`). Ondas de cronograma usam a progressão `FA094E → CF1A66 → 940755 → 6F1170 → 44055A → 231A66 → 03045E`.
 
+**Leitura clara obrigatória em HTML novo:** abre branco por padrão (`color-scheme:light`, nunca `prefers-color-scheme: dark`; modo noturno só como botão opt-in com padrão claro), cinzas neutros, rosa em lavagens claras (`#FFEEF3`, `#FFF3F7`) nos destaques e rosa cheio só como acento. Não usar roxo/navy como cor dominante nem faixas pretas grandes no cabeçalho. Séries de dados: DT `#FA094E` / HT `#3F3F45` (par validado para daltonismo). Motivo: quem revisa usa o sistema em modo escuro e quer que o entregável abra branco.
+
 Fontes: **Hando** (principal, títulos) e **Red Hat Display** (secundária, corpo); arquivos em `Id_visual/Fontes/`. Nos HTML autocontidos a Red Hat Display é embutida em base64 com fallback `"Segoe UI", system-ui`.
 
 Os cronogramas `.xlsx` (AutoChecker/AutoLoad/AutoMed) compartilham o mesmo modelo: capa navy, coluna `#` colorida por onda, fills de esforço P/M/G (`DBEAFE`/`FEF9C3`/`FED7AA`), fills de status com dropdown, aba Legenda. Ao criar um novo, copie `AutoMed/_gerar_xlsx_cronograma_automed.py`.
 
-## Dashboard de Marketing (`Marketing/Html/Dashboard_Marketing_AutoMind_2026-09-15.html`)
+## Dashboard de Marketing (`Marketing/Html/Dashboard_Marketing_AutoMind_2026-09-16.html`)
 
-Protótipo single-file (~250 KB, boa parte é fonte base64). Estrutura interna:
+Protótipo single-file (~480 KB, boa parte é fonte base64) **gerado** por `Marketing/Py/_gerar_dashboard_marketing.py` a partir do template `Marketing/Py/_dashboard_marketing_src.html` (fonte canônica — edite o template, não o HTML). O gerador embute Hando/Red Hat Display e o logo via a skill `identidade-visual-automind`. Rodar: `python Marketing/Py/_gerar_dashboard_marketing.py --data AAAA-MM-DD`.
 
-- Bloco `DADOS` no final do `<script>`: objeto mês → `{producao, perf, acessos, funil, destaque}` com **dados ilustrativos**. É o único ponto a editar para trocar números; `MESES` e `CATS` derivam dele.
-- Funções `render*()` (KPIs, produção por mês/categoria, acessos, funil, performance) reconstruídas a cada troca de mês no `<select id="mes">`.
-- Funil segue as etapas do glossário: cadastros de trial vindos do DT → testaram → consideration. A métrica prioritária (definida pela liderança) é **cadastros de trial vindos do DT e quantos de fato testaram**.
-- `localStorage` (wrapper `LS` com try/catch) persiste mês selecionado, "destaque do mês" e checkboxes de pendências por navegador.
-- Suporta tema claro/escuro via `prefers-color-scheme`.
+Organização (herdada do dashboard de observabilidade Sentry, layout da LP Expopostos 2026):
+
+- **Cabeçalho fixo**: logo + título, à direita o seletor de mês segmentado (`#periodo`), comparação com o mês anterior, pílulas de status ("Ilustrativo", "2.5 s/ rastreio"), menu **Exportar** (CSV / Markdown / JSON do mês) e ajuda `?`.
+- **Abas fixas** (`.aba[data-view]`) = views: `geral` (banner de status, KPIs, cartões por frente DT/HT/Funil, destaque), `producao`, `performance` (busca, chips DT/HT, ordenação na tabela de indicador-chave), `funil` (métrica 2.5 + histórico), `pendencias`. Rota por `#hash`; atalhos `1`–`5`, `[`/`]` mudam o mês, `e` exporta, `/` busca, `?` ajuda.
+- Bloco `DADOS` no final do `<script>`: objeto mês → `{producao, perf, acessos, funil, destaque}` com **dados ilustrativos**. É o único ponto a editar para trocar números; `MESES` e `CATS` (com trilha `dt`/`ht`) derivam dele.
+- Funil segue as etapas do glossário: cadastros de trial vindos do DT → testaram → consideration → assinatura. A métrica prioritária (definida pela liderança) é **cadastros de trial vindos do DT e quantos de fato testaram**.
+- `localStorage` (wrapper `LS` com try/catch) persiste mês, view, "destaque do mês" e checkboxes de pendências por navegador.
+- Abre sempre em tema claro (`color-scheme:light`); **modo noturno** é opt-in pelo botão do cabeçalho (`t`), guardado em `localStorage`, nunca por `prefers-color-scheme`. No escuro: fundo `#100F0F`, logo Negativo, tokens semânticos (`--fundo`, `--ink`, `--papel`…) redefinidos em `:root[data-theme="dark"]`. Cantos retos, gradiente de 2 stops, sem emoji — `verificar_entregavel.py` deve passar sem erros.
 
 O contexto de negócio, glossário e pendências a cobrir (webinars, ações de comunidade) estão em `Marketing/Dashboard_Marketing_Contexto_2026-09-15.md` — leia antes de alterar o dashboard.
 

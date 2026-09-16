@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- <Assunto> — <Produto> — <AAAA-MM-DD> — autocontido: fontes e logo em base64, sem dependência externa -->
+<title>{{TITULO}}</title>
+{{FAVICON}}   <!-- python embutir_ativos.py favicon -->
+<style>
+{{FONTES}}    <!-- python embutir_ativos.py fontes  → @font-face Hando 700/500 + Red Hat Display 400/500/700 -->
+{{TOKENS}}    <!-- conteúdo de references/tokens.css -->
+/* estilos específicos do entregável abaixo — use só os tokens --am-* */
+</style>
+</head>
+<body>
+
+<div class="brandhead">
+  <div class="in">
+    {{LOGO}}    <!-- python embutir_ativos.py logo  (Positivo · Preenchido Gradiente · Sem Tagline, 30 px) -->
+    <span class="eyebrow tag">{{PRODUTO}} · {{AREA}}</span>
+  </div>
+</div>
+
+<div class="wrap">
+  <header style="padding:30px 0 8px">
+    <span class="eyebrow">{{CONTEXTO}}</span>
+    <h1>{{TITULO}}</h1>
+    <p class="muted">{{SUBTITULO}}</p>
+  </header>
+
+  <!-- conteúdo: seções com h2, cards (.card / .card.pri), tabelas, callouts (.callout.info|ok|warn|bad) -->
+
+  <footer>AutoMind · {{PRODUTO}} · {{DATA}} · Simple · Smart · Reliable</footer>
+</div>
+
+</body>
+</html>
