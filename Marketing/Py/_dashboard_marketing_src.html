@@ -1,0 +1,1096 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Dashboard de Marketing AutoMind — {{DATA}} — autocontido (fontes e logo em base64). Dados ilustrativos: edite o bloco DADOS no final do arquivo.
+     Gerado por Marketing/Py/_gerar_dashboard_marketing.py a partir de _dashboard_marketing_src.html. -->
+<title>Dashboard Marketing AutoMind</title>
+{{FAVICON}}
+<script>
+/* Tema: padrão CLARO. Só fica escuro se a pessoa escolheu antes neste navegador.
+   Não consulta prefers-color-scheme — o entregável abre branco em qualquer sistema. */
+(function(){ try{ if(localStorage.getItem('mkt-tema')==='dark') document.documentElement.setAttribute('data-theme','dark'); }catch(e){} })();
+</script>
+<style>
+{{FONTES}}
+
+/* ==========================================================================
+   Tokens — identidade visual AutoMind (skill identidade-visual-automind)
+   Organização herdada do dashboard de observabilidade (Sentry): cabeçalho fixo
+   com status à direita, abas fixas por view, seções com cabeçalho + controles.
+   Layout herdado da LP Expopostos 2026: cantos retos, eyebrow em gradiente
+   recortado, gradiente de 2 stops, neutros derivados da própria paleta, barra
+   de 4 px no cartão prioritário, sem emoji.
+   ========================================================================== */
+:root{
+  color-scheme:light; /* tema claro fixo: abre branco mesmo em sistema em modo escuro */
+
+  /* paleta oficial — únicos literais de cor de marca */
+  --rosa:#FA094E; --magenta:#940755; --roxo:#44055A; --marinho:#03045E; --preto:#100F0F; --off:#F3F3F0; --branco:#FFFFFF;
+
+  /* gradiente de 2 stops (magenta e roxo são a interpolação, não paradas) */
+  --grad:linear-gradient(45deg,#FA094E 0%,#03045E 100%);
+  --grad-h:linear-gradient(90deg,#FA094E 0%,#03045E 100%);
+  --grad-v:linear-gradient(180deg,#FA094E 0%,#03045E 100%);
+  --grad-realce:linear-gradient(45deg,#FA094E 0%,#940755 100%); /* metade clara: número-herói */
+
+  /* neutros: preto diluído no off-white (mesmas proporções da LP) */
+  --tinta:#545353;        /* texto secundário · 6,9:1 */
+  --tinta-fraca:#6F6F6E;  /* texto terciário  · 4,5:1 */
+  --linha:#E3E3E1;        /* borda de cartão */
+  --linha-forte:#D3D3D0;  /* borda em hover / controles */
+  --papel:#FBFBFA;        /* fundo de cartão */
+  --fumo:#EAEAE8;         /* chips neutros, divisores */
+
+  /* rosa em lavagem e rosa de texto (AA em texto pequeno) */
+  --rosa-fundo:#FFEEF3; --rosa-linha:#F9C6D6; --rosa-texto:#C9073F; --erro-tinta:#8A0C30;
+
+  /* séries (par validado para daltonismo) e rampa do funil */
+  --dt:#FA094E; --ht:#3F3F45; --grade:#ECEAEB; --eixo:#D3D3D0;
+  --f1:#FBD9E3; --f2:#F4A0BB; --f3:#EC5C88; --f4:#C8104A;
+  --serie2:#C8104A; /* segunda série ao lado do rosa DT (histórico do funil) */
+
+  /* status — só em pílulas, banner e callouts */
+  --ok:#0F8A5F; --ok-fundo:#E8F3EE; --aviso:#A86300; --aviso-fundo:#FBF1DC; --crit:#C31035; --crit-fundo:#FDE8EC;
+
+  /* sombras: sempre a partir do roxo/rosa, nunca cinza neutro */
+  --sombra-cartao:0 22px 48px rgba(68,5,90,.12);
+  --sombra-btn:0 4px 24px rgba(250,9,78,.28);
+  --sombra-btn-hover:0 6px 32px rgba(250,9,78,.40);
+
+  /* semânticos: o tema escuro só redefine estes */
+  --fundo:#FFFFFF;                /* fundo da página e das superfícies (= --branco) */
+  --ink:#100F0F;                  /* texto principal, títulos (= --preto) */
+  --inverso:var(--off);           /* texto sobre --ink (chip ativo, tooltip, toast) */
+  --trilho:var(--off);            /* trilho do seletor de período */
+  --sombra-tip:0 8px 24px rgba(68,5,90,.25);
+
+  --fonte:"Red Hat Display",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --display:"Hando","Red Hat Display",-apple-system,BlinkMacSystemFont,sans-serif;
+  --mono:Consolas,"Cascadia Code",monospace;
+
+  --int:1180px; --pad:22px;
+  --ease:cubic-bezier(.2,.7,.2,1); --dur:200ms;
+  --topo-h:62px; --abas-h:46px;
+}
+
+/* ---------- Modo noturno (opt-in manual, nunca automático) ---------------
+   Padrão é claro. Só entra por clique no botão, persistido em localStorage; não
+   lê prefers-color-scheme. Regras do briefing sobre fundo escuro: fundo #100F0F,
+   logotipo Negativo, texto em branco gelo, rosa chapado como acento (o gradiente
+   perde a metade navy sobre preto). Neutros = branco gelo diluído no preto. */
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --fundo:#100F0F;
+  --ink:#F3F3F0;
+  --inverso:#100F0F;
+  --papel:#181717;        /* gelo 3% sobre preto */
+  --fumo:#242323;         /* gelo 9% */
+  --trilho:#1C1B1B;
+  --linha:#2F2E2E;        /* gelo 14% (mesma proporção da LP) */
+  --linha-forte:#434242;  /* gelo 22% */
+  --tinta:#BDBDBB;        /* gelo 76% · 10,4:1 */
+  --tinta-fraca:#9C9C9A;  /* gelo 60% · 6,8:1 */
+  --rosa-texto:#FF3D72;   /* rosa levemente clareado · 6,1:1 sobre #100F0F */
+  --rosa-fundo:#2A1218;   /* rosa 12% sobre preto */
+  --rosa-linha:#5C1A31;   /* rosa 35% sobre preto */
+  --erro-tinta:#FF6B8F;
+  --dt:#FA094E; --ht:#C9C9C6;   /* HT vira gelo-cinza: #3F3F45 some no preto */
+  --grade:#232222; --eixo:#3A3939;
+  --f1:#4A1A2A; --f2:#7A1F3F; --f3:#B31A4F; --f4:#FA094E; /* rampa do funil, do escuro ao rosa cheio */
+  --serie2:#F4A0BB;       /* rosa claro: distingue de DT sobre o preto */
+  --ok:#3DC28B; --ok-fundo:#10271D; --aviso:#E8A93A; --aviso-fundo:#2A2010; --crit:#FF5C7A; --crit-fundo:#2E1218;
+  --sombra-cartao:0 22px 48px rgba(0,0,0,.45);
+  --sombra-tip:0 8px 24px rgba(0,0,0,.5);
+}
+/* sobre fundo escuro, eyebrow e realces recortados usam a metade clara do gradiente */
+:root[data-theme="dark"] .rotulo{background-image:var(--grad-realce);}
+:root[data-theme="dark"] .grad{background-image:var(--grad-realce);}
+:root[data-theme="dark"] .frente--ht{border-top-color:var(--ht);}
+:root[data-theme="dark"] .periodo__btn[aria-pressed="true"]{box-shadow:inset 0 0 0 1px var(--linha-forte);}
+:root[data-theme="dark"] .banner--aviso{border-color:rgba(232,169,58,.35);}
+:root[data-theme="dark"] .banner--crit{border-color:rgba(255,92,122,.35);}
+:root[data-theme="dark"] .banner--ok{border-color:rgba(61,194,139,.35);}
+:root[data-theme="dark"] .callout--aviso{background:var(--aviso-fundo);}
+:root[data-theme="dark"] .overlay{background:rgba(0,0,0,.7);}
+:root[data-theme="dark"] .exportar__menu button:hover{background:var(--fumo);}
+:root[data-theme="dark"] tbody tr:hover td{background:var(--fumo);}
+:root[data-theme="dark"] .topo__logo--pos{display:none;}
+:root:not([data-theme="dark"]) .topo__logo--neg{display:none;}
+:root:not([data-theme="dark"]) .tema__sol{display:none;}  /* no claro mostra a lua: "ativar modo noturno" */
+:root[data-theme="dark"] .tema__lua{display:none;}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{background:var(--fundo);scroll-padding-top:calc(var(--topo-h) + var(--abas-h) + 12px);}
+body{background:var(--fundo);color:var(--ink);font-family:var(--fonte);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100vh;}
+h1,h2,h3,h4{font-family:var(--display);color:var(--ink);font-weight:700;line-height:1.15;}
+a{color:var(--rosa-texto);text-decoration:underline;text-underline-offset:2px;}
+button,select,input,textarea{font:inherit;color:inherit;}
+button{cursor:pointer;background:none;border:0;}
+:focus-visible{outline:3px solid var(--marinho);outline-offset:2px;}
+.int{max-width:var(--int);margin:0 auto;padding:0 var(--pad);}
+.oculto{display:none !important;}
+.grad{display:inline-block;background-image:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;}
+
+/* eyebrow / rótulo: caixa alta, tracking aberto, gradiente recortado (LP) */
+.rotulo{font-family:var(--display);font-size:11px;letter-spacing:.22em;font-weight:700;text-transform:uppercase;display:block;width:fit-content;
+  background-image:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;}
+.rotulo--neutro{background:none;color:var(--tinta-fraca);-webkit-text-fill-color:currentColor;letter-spacing:.2em;font-size:10.5px;}
+
+/* ---------- Botões (LP): cantos retos, Hando ------------------------------ */
+.btn{display:inline-flex;align-items:center;gap:6px;font-family:var(--display);font-size:13px;font-weight:700;letter-spacing:.04em;text-decoration:none;text-align:center;
+  padding:11px 20px;border:0;cursor:pointer;transition:box-shadow var(--dur) var(--ease),background var(--dur) var(--ease),border-color var(--dur) var(--ease),transform 60ms ease;}
+.btn--principal{background:var(--grad);color:#FFFFFF;box-shadow:var(--sombra-btn);}
+.btn--principal:hover{box-shadow:var(--sombra-btn-hover);}
+.btn--principal:active{transform:translateY(1px);}
+.btn--contorno{color:var(--ink);background:var(--fundo);border:1.5px solid var(--linha-forte);padding:9.5px 18px;}
+.btn--contorno:hover{border-color:var(--ink);background:var(--papel);}
+.btn--mini{font-size:11.5px;padding:6px 12px;letter-spacing:.06em;}
+.btn--mini.btn--contorno{padding:5px 11px;}
+
+/* chips de filtro (Sentry env-tabs / severity-chips, em cantos retos) */
+.chips{display:flex;gap:6px;flex-wrap:wrap;}
+.chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--display);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--tinta);background:var(--fundo);border:1px solid var(--linha-forte);padding:5px 10px;transition:all var(--dur) var(--ease);}
+.chip:hover{color:var(--ink);border-color:var(--ink);}
+.chip[aria-pressed="true"],.chip.ativo{background:var(--ink);color:var(--inverso);border-color:var(--ink);}
+.chip .pt{width:8px;height:8px;flex:0 0 8px;}
+.chip .pt.dt{background:var(--dt);} .chip .pt.ht{background:var(--ht);}
+.chip .n{font-family:var(--fonte);font-weight:700;font-size:10.5px;letter-spacing:0;background:var(--fumo);color:var(--tinta);padding:0 5px;min-width:18px;text-align:center;}
+.chip[aria-pressed="true"] .n{background:rgba(128,128,128,.25);color:var(--inverso);}
+
+.campo{font-family:var(--fonte);font-size:13px;color:var(--ink);background:var(--fundo);border:1px solid var(--linha-forte);padding:5px 10px;min-height:30px;}
+.campo::placeholder{color:var(--tinta-fraca);}
+.campo:hover{border-color:var(--tinta-fraca);}
+.campo:focus{border-color:var(--marinho);outline:0;box-shadow:0 0 0 3px rgba(3,4,94,.12);}
+select.campo{appearance:none;-webkit-appearance:none;padding-right:28px;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23545353' stroke-width='1.6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;}
+
+/* ---------- Cabeçalho fixo (Sentry header) --------------------------------- */
+.topo{position:sticky;top:0;z-index:100;background:var(--fundo);border-bottom:1px solid var(--linha);}
+.topo::after{content:"";display:block;height:3px;background:var(--grad-h);}
+.topo__in{min-height:calc(var(--topo-h) - 3px);display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding-block:10px;}
+.topo__marca{display:flex;align-items:center;gap:14px;min-width:0;}
+.topo__logo{height:26px;width:auto;display:block;}
+.topo__titulo{font-size:14px;font-weight:700;letter-spacing:.02em;white-space:nowrap;}
+.topo__titulo span{color:var(--tinta-fraca);font-weight:500;}
+.status{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-left:auto;font-size:12px;color:var(--tinta);}
+.status__cmp{white-space:nowrap;}
+.status__cmp b{color:var(--ink);font-weight:700;}
+
+/* seletor de período (Sentry period-picker): segmentos quadrados */
+.periodo{display:flex;gap:2px;background:var(--trilho);border:1px solid var(--linha);padding:2px;}
+.periodo__btn{font-family:var(--display);font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--tinta);padding:4px 8px;transition:all var(--dur) var(--ease);white-space:nowrap;}
+.periodo__btn:hover{color:var(--ink);}
+.periodo__btn[aria-pressed="true"]{background:var(--fundo);color:var(--ink);box-shadow:inset 0 0 0 1px var(--linha-forte),0 1px 0 rgba(68,5,90,.06);}
+
+/* pílulas de saúde (Sentry health-pill) */
+.pilula{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;padding:4px 9px;border:1px solid var(--linha);background:var(--papel);color:var(--tinta);white-space:nowrap;cursor:default;}
+.pilula .dot{width:8px;height:8px;flex:0 0 8px;}
+.pilula--aviso{color:var(--aviso);background:var(--aviso-fundo);border-color:transparent;} .pilula--aviso .dot{background:var(--aviso);}
+.pilula--crit{color:var(--crit);background:var(--crit-fundo);border-color:transparent;} .pilula--crit .dot{background:var(--crit);}
+.pilula--ok{color:var(--ok);background:var(--ok-fundo);border-color:transparent;} .pilula--ok .dot{background:var(--ok);}
+.kbdbtn{font-family:var(--mono);font-size:11px;color:var(--tinta);border:1px solid var(--linha-forte);background:var(--fundo);padding:3px 7px;}
+.kbdbtn:hover{color:var(--ink);border-color:var(--ink);}
+.tema{display:inline-flex;align-items:center;justify-content:center;width:30px;height:26px;color:var(--tinta);border:1px solid var(--linha-forte);background:var(--fundo);transition:color var(--dur) var(--ease),border-color var(--dur) var(--ease);}
+.tema:hover{color:var(--ink);border-color:var(--ink);}
+.tema[aria-pressed="true"]{color:var(--rosa-texto);border-color:var(--rosa-linha);background:var(--rosa-fundo);}
+
+/* menu de exportação (Sentry export-menu) */
+.exportar{position:relative;}
+.exportar__menu{position:absolute;right:0;top:calc(100% + 6px);min-width:260px;background:var(--fundo);border:1px solid var(--linha-forte);box-shadow:var(--sombra-cartao);z-index:120;padding:4px;}
+.exportar__menu button{display:block;width:100%;text-align:left;padding:8px 10px;font-size:13px;font-weight:700;color:var(--ink);}
+.exportar__menu button small{display:block;font-weight:400;font-size:11.5px;color:var(--tinta-fraca);}
+.exportar__menu button:hover{background:var(--rosa-fundo);}
+
+/* ---------- Abas de view (Sentry product-nav) ------------------------------- */
+.abas{position:sticky;top:var(--topo-h);z-index:99;background:var(--fundo);border-bottom:1px solid var(--linha);}
+.abas__in{display:flex;gap:0;overflow-x:auto;scrollbar-width:none;}
+.abas__in::-webkit-scrollbar{display:none;}
+.aba{display:flex;align-items:center;gap:7px;font-family:var(--display);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tinta);
+  padding:13px 16px 11px;border-bottom:2px solid transparent;white-space:nowrap;transition:color var(--dur) var(--ease),border-color var(--dur) var(--ease);}
+.aba:hover{color:var(--ink);}
+.aba[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--rosa);}
+.aba .n{font-family:var(--fonte);font-size:10.5px;font-weight:700;letter-spacing:0;color:var(--tinta);background:var(--fumo);padding:1px 6px;min-width:20px;text-align:center;}
+.aba[aria-selected="true"] .n{background:var(--rosa-fundo);color:var(--rosa-texto);}
+.aba kbd{font-family:var(--mono);font-size:10px;color:var(--tinta-fraca);border:1px solid var(--linha);padding:0 4px;letter-spacing:0;}
+@media (max-width:640px){.aba kbd{display:none;} .aba{padding-inline:12px;}}
+
+/* ---------- Views e seções ------------------------------------------------- */
+main.int{padding:40px var(--pad) 70px;} /* main.int: precisa vencer .int{padding:0 var(--pad)} */
+@media (max-width:640px){main.int{padding-top:28px;}}
+.view{display:flex;flex-direction:column;gap:34px;}
+.view[hidden]{display:none;}
+.sec{display:flex;flex-direction:column;gap:14px;}
+.sec__cab{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-bottom:12px;border-bottom:1px solid var(--linha);}
+.sec__cab .rotulo{margin-bottom:8px;}
+.sec__titulo{font-family:var(--display);font-size:clamp(21px,3vw,26px);font-weight:800;letter-spacing:-.03em;line-height:1.08;}
+.sec__lead{color:var(--tinta);font-size:14px;max-width:76ch;margin-top:6px;}
+.sec__lead b{color:var(--ink);font-weight:700;}
+.sec__controles{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.sec__controles .chips{margin-left:auto;}
+
+/* banner de status (Sentry ops-banner) */
+.banner{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;border:1px solid;font-size:13.5px;}
+.banner::before{content:"";width:10px;height:10px;flex:0 0 10px;}
+.banner--aviso{background:var(--aviso-fundo);border-color:rgba(168,99,0,.3);color:var(--aviso);} .banner--aviso::before{background:var(--aviso);}
+.banner--crit{background:var(--crit-fundo);border-color:rgba(195,16,53,.3);color:var(--crit);} .banner--crit::before{background:var(--crit);}
+.banner--ok{background:var(--ok-fundo);border-color:rgba(15,138,95,.3);color:var(--ok);} .banner--ok::before{background:var(--ok);}
+.banner b{font-weight:700;}
+.banner__meta{margin-left:auto;font-size:12px;color:var(--tinta);font-weight:400;}
+.banner .btn{margin-left:4px;}
+
+/* ---------- Cartões (LP): papel, borda fina, cantos retos ------------------ */
+.grade2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grade3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+@media (max-width:860px){.grade2,.grade3{grid-template-columns:1fr;}}
+.cartao{position:relative;background:var(--papel);border:1px solid var(--linha);padding:18px 20px 16px;display:flex;flex-direction:column;gap:10px;min-width:0;}
+.cartao--prioridade{background:linear-gradient(180deg,var(--fundo) 0%,var(--papel) 100%);border-color:var(--rosa-linha);}
+.cartao--prioridade::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:var(--grad-h);}
+.cartao--lateral{border-left:4px solid;border-image:var(--grad-v) 1;}
+.cartao__cab{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+.cartao__cab h3{font-size:15px;font-weight:700;}
+.cartao__cab .sub{font-size:12px;color:var(--tinta-fraca);}
+.cartao__cab .dir{margin-left:auto;display:flex;gap:6px;align-items:center;}
+.cartao__rotulo{font-family:var(--display);font-size:10.5px;letter-spacing:.2em;font-weight:700;text-transform:uppercase;color:var(--tinta-fraca);}
+.tag-pri{display:inline-block;font-family:var(--display);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--rosa-texto);background:var(--rosa-fundo);padding:3px 8px;width:max-content;}
+
+/* KPIs */
+.kpis{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:16px;}
+@media (max-width:980px){.kpis{grid-template-columns:repeat(2,1fr);} .kpi--hero{grid-column:span 2;}}
+@media (max-width:520px){.kpis{grid-template-columns:1fr;} .kpi--hero{grid-column:span 1;}}
+.kpi .l{font-size:12.5px;color:var(--tinta);line-height:1.3;}
+.kpi .v{font-family:var(--display);font-size:34px;font-weight:800;letter-spacing:-.03em;line-height:1;color:var(--ink);}
+.kpi--hero .v{font-size:56px;background:var(--grad-realce);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;}
+.kpi .row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+.kpi .x{font-size:12.5px;color:var(--tinta);}
+.kpi .x b{color:var(--ink);font-weight:700;}
+.d{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 7px;white-space:nowrap;font-variant-numeric:tabular-nums;}
+.d.up{color:var(--ok);background:var(--ok-fundo);} .d.down{color:var(--crit);background:var(--crit-fundo);} .d.flat{color:var(--tinta);background:var(--fumo);}
+.spark{position:relative;height:34px;width:100%;margin-top:2px;}
+.spark svg{width:100%;height:100%;display:block;}
+.spark__pt{position:absolute;right:0;width:7px;height:7px;transform:translate(0,-50%);}
+
+/* cartões de frente (Sentry product-health-card) */
+.frente{border-top:4px solid var(--linha-forte);padding-top:16px;transition:border-color var(--dur) var(--ease),box-shadow var(--dur) var(--ease),transform var(--dur) var(--ease);cursor:pointer;}
+.frente:hover{border-color:var(--tinta-fraca);box-shadow:var(--sombra-cartao);transform:translateY(-2px);}
+.frente--dt{border-top-color:var(--dt);} .frente--ht{border-top-color:var(--ht);} .frente--funil{border-top:0;}
+.frente--funil::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:var(--grad-h);}
+.frente__nome{font-family:var(--display);font-size:17px;font-weight:800;letter-spacing:-.02em;}
+.frente__big{font-family:var(--display);font-size:30px;font-weight:800;letter-spacing:-.03em;line-height:1;}
+.frente__big small{font-family:var(--fonte);font-size:12.5px;font-weight:500;color:var(--tinta);letter-spacing:0;margin-left:6px;}
+.frente__linhas{display:flex;flex-direction:column;gap:5px;border-top:1px solid var(--linha);padding-top:10px;margin-top:2px;}
+.frente__linha{display:flex;justify-content:space-between;font-size:13px;}
+.frente__linha span{color:var(--tinta);} .frente__linha b{font-variant-numeric:tabular-nums;}
+.frente__rodape{font-size:12px;color:var(--tinta-fraca);margin-top:auto;}
+
+/* legenda e gráficos */
+.leg{display:flex;gap:16px;font-size:12.5px;color:var(--tinta);flex-wrap:wrap;}
+.sw{display:inline-block;width:10px;height:10px;margin-right:6px;vertical-align:baseline;}
+.sw.dt{background:var(--dt);} .sw.ht{background:var(--ht);}
+.lk{display:inline-block;width:14px;height:2px;margin-right:6px;vertical-align:middle;}
+svg.chart{width:100%;height:auto;display:block;overflow:visible;}
+svg.chart text{font-family:var(--fonte);font-size:11px;fill:var(--tinta);}
+svg.chart .grid{stroke:var(--grade);stroke-width:1;}
+svg.chart .axis{stroke:var(--eixo);stroke-width:1;}
+svg.chart .lbl{font-size:11.5px;font-weight:700;fill:var(--ink);}
+svg.chart .cross{stroke:var(--eixo);stroke-width:1;}
+.chartbox{position:relative;}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--inverso);font-size:12px;line-height:1.45;padding:7px 10px;box-shadow:var(--sombra-tip);white-space:nowrap;transform:translate(-50%,calc(-100% - 10px));opacity:0;transition:opacity .12s;z-index:2;}
+.tip.on{opacity:1;}
+.tip b{font-weight:700;}
+.tip .k{display:inline-block;width:8px;height:8px;margin-right:6px;}
+
+/* barras horizontais */
+.hb{display:grid;grid-template-columns:minmax(120px,38%) 1fr auto;gap:6px 10px;align-items:center;font-size:13px;}
+.hb .n{color:var(--ink);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.hb .tr{display:flex;height:16px;gap:2px;align-items:center;}
+.hb .seg{height:100%;min-width:0;}
+.hb .seg.dt{background:var(--dt);} .hb .seg.ht{background:var(--ht);}
+.hb .v{font-variant-numeric:tabular-nums;color:var(--tinta);font-size:12px;min-width:2.5em;text-align:right;}
+.hb .v b{color:var(--ink);font-weight:700;}
+.hb .row{display:contents;}
+.hb .row:hover .n{color:var(--rosa-texto);}
+
+/* funil */
+.fun{display:grid;grid-template-columns:minmax(130px,34%) 1fr auto;gap:4px 10px;align-items:center;font-size:13px;}
+.fun .n{font-weight:500;}
+.fun .n small{display:block;font-weight:400;color:var(--tinta-fraca);font-size:11.5px;}
+.fun .bar{height:18px;}
+.fun .v{font-variant-numeric:tabular-nums;font-weight:700;min-width:2.5em;text-align:right;}
+.fun .conv{grid-column:2/4;font-size:11.5px;color:var(--tinta);padding:0 0 2px;display:flex;align-items:center;gap:6px;}
+.fun .conv .arrow{width:1px;height:10px;background:var(--eixo);margin-left:8px;}
+.fun .conv b{color:var(--ink);font-weight:700;}
+.metasplit{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.meta{background:var(--fundo);border:1px solid var(--linha);padding:10px 12px;}
+.meta .l{font-size:11.5px;color:var(--tinta);}
+.meta .v{font-family:var(--display);font-size:22px;font-weight:800;letter-spacing:-.02em;line-height:1.1;}
+.meta .v small{font-family:var(--fonte);font-size:12px;font-weight:500;color:var(--tinta-fraca);margin-left:4px;letter-spacing:0;}
+
+/* callout (LP bloco) */
+.callout{border-left:4px solid;border-image:var(--grad-v) 1;background:var(--fundo);padding:12px 16px;font-size:13px;color:var(--tinta);line-height:1.55;}
+.callout--aviso{border-image:none;border-left-color:var(--aviso);background:var(--aviso-fundo);color:var(--aviso);}
+.callout b{color:var(--ink);font-weight:700;}
+.callout--aviso b{color:var(--aviso);}
+
+/* tabela */
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+th{text-align:left;font-family:var(--display);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-fraca);font-weight:700;padding:11px 8px 9px;border-bottom:1px solid var(--linha-forte);}
+th.num,td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}
+td{padding:9px 8px;border-bottom:1px solid var(--linha);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tbody tr:hover td{background:var(--rosa-fundo);}
+td.cat{font-weight:700;}
+td.cat small{display:block;font-weight:400;color:var(--tinta-fraca);font-size:11.5px;}
+td.best{color:var(--tinta);font-size:12.5px;}
+.star{display:inline-block;font-family:var(--display);font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ok);background:var(--ok-fundo);padding:2px 6px;margin-left:6px;white-space:nowrap;vertical-align:middle;}
+.tbl{overflow-x:auto;}
+.tbl table{min-width:420px;}
+.tbl.small table{font-size:12.5px;}
+.tbl.small th,.tbl.small td{padding:7px 8px;}
+.tk{display:inline-block;width:8px;height:8px;margin-right:6px;vertical-align:baseline;}
+.vazio{padding:22px;text-align:center;color:var(--tinta-fraca);font-size:13px;border:1px dashed var(--linha-forte);}
+
+/* textarea */
+textarea.campo{width:100%;font-size:13.5px;line-height:1.5;padding:10px 12px;resize:vertical;min-height:84px;background:var(--fundo);}
+.dica{font-size:11.5px;color:var(--tinta-fraca);}
+
+/* pendências e lista (LP .lista com marcador quadrado em gradiente) */
+.todo{list-style:none;display:flex;flex-direction:column;gap:10px;}
+.todo li{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;}
+.todo input{margin:4px 0 0;accent-color:var(--rosa);width:16px;height:16px;flex:0 0 16px;}
+.todo label{cursor:pointer;}
+.todo label small{display:block;color:var(--tinta);font-size:12px;}
+.todo li.done label{color:var(--tinta-fraca);text-decoration:line-through;}
+.todo li.done label small{text-decoration:none;}
+.lista{list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 18px;}
+.lista li{font-size:12.5px;color:var(--tinta);padding-left:18px;position:relative;line-height:1.5;}
+.lista li::before{content:"";position:absolute;left:0;top:7px;width:8px;height:8px;background:var(--grad);}
+.lista b{color:var(--ink);font-weight:700;display:block;}
+.box{background:var(--papel);border:1px solid var(--linha);padding:16px 18px;display:flex;flex-direction:column;gap:8px;}
+.box h4{font-size:14.5px;}
+.box p{font-size:13px;color:var(--tinta);}
+.box p b{color:var(--ink);font-weight:700;}
+.box .big{font-family:var(--display);font-size:20px;font-weight:800;letter-spacing:-.02em;color:var(--ink);}
+.box--ok{border-left:4px solid var(--ok);}
+
+/* rodapé */
+footer{margin-top:10px;padding-top:18px;border-top:1px solid var(--linha);font-size:12px;color:var(--tinta);line-height:1.65;}
+footer b{color:var(--ink);font-weight:700;}
+footer .marca{display:flex;align-items:center;gap:10px;margin-top:10px;font-family:var(--display);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--tinta-fraca);}
+
+/* toasts (Sentry toast-stack) */
+#toasts{position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:8px;z-index:200;}
+.toast{background:var(--ink);color:var(--inverso);font-size:13px;padding:10px 14px;border-left:3px solid var(--rosa);box-shadow:0 8px 24px rgba(68,5,90,.25);opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s;}
+.toast.show{opacity:1;transform:none;}
+.toast.ok{border-left-color:var(--ok);}
+
+/* overlay de atalhos (Sentry kbd-help) */
+.overlay{position:fixed;inset:0;background:rgba(16,15,15,.55);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;}
+.overlay[hidden]{display:none;}
+.painel{background:var(--fundo);border:1px solid var(--linha-forte);box-shadow:var(--sombra-cartao);width:min(440px,100%);padding:20px 22px;}
+.painel__titulo{display:flex;justify-content:space-between;align-items:center;font-family:var(--display);font-size:15px;font-weight:800;margin-bottom:12px;}
+.painel__fechar{font-size:16px;color:var(--tinta);padding:2px 6px;}
+.painel__grupo{font-family:var(--display);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--tinta-fraca);margin:12px 0 6px;}
+.painel__linha{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px solid var(--linha);}
+.painel__linha:last-child{border-bottom:0;}
+kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--linha-forte);background:var(--papel);padding:1px 6px;margin-left:4px;}
+
+@media (max-width:640px){
+  :root{--pad:16px;}
+  .topo__titulo span{display:none;}
+  .status{gap:6px;}
+  .status__cmp{display:none;}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none !important;}}
+@media print{
+  :root[data-theme="dark"]{--fundo:#FFFFFF;--ink:#100F0F;--papel:#FBFBFA;--linha:#E3E3E1;--linha-forte:#D3D3D0;--tinta:#545353;--tinta-fraca:#6F6F6E;--ht:#3F3F45;}
+  .topo__logo--neg,.tema{display:none !important;} .topo__logo--pos{display:block !important;}
+  .topo,.abas{position:static;}
+  .status,.periodo,.exportar,.kbdbtn,.sec__controles,#toasts{display:none !important;}
+  .view[hidden]{display:flex !important;}
+  .cartao,.box,table{break-inside:avoid;}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== Cabeçalho fixo: marca + status ===== -->
+<header class="topo">
+  <div class="int topo__in">
+    <div class="topo__marca">
+      <img class="topo__logo topo__logo--pos" src="{{LOGO_SRC}}" alt="AutoMind">
+      <img class="topo__logo topo__logo--neg" src="{{LOGO_NEG_SRC}}" alt="AutoMind">
+      <h1 class="topo__titulo">Marketing <span>/ Acompanhamento mensal</span></h1>
+    </div>
+    <div class="status">
+      <div class="periodo" id="periodo" role="group" aria-label="Mês de referência"></div>
+      <span class="status__cmp">vs <b id="mesAnt">&mdash;</b></span>
+      <span class="pilula pilula--aviso" title="Todos os números são ilustrativos. Edite o bloco DADOS no final do arquivo."><span class="dot"></span>Ilustrativo</span>
+      <span class="pilula pilula--crit" id="pilula-25" title="A métrica 2.5 depende do rastreio de origem do trial, que ainda não existe."><span class="dot"></span>2.5 s/ rastreio</span>
+      <div class="exportar">
+        <button class="btn btn--contorno btn--mini" id="btn-exportar" aria-haspopup="true" aria-expanded="false" title="Exportar os dados do mês selecionado">Exportar</button>
+        <div class="exportar__menu" id="menu-exportar" role="menu" hidden>
+          <button type="button" data-export="csv" role="menuitem">CSV<small>Produção, performance e funil do mês (separador ; e BOM)</small></button>
+          <button type="button" data-export="md" role="menuitem">Copiar Markdown<small>Tabela de performance pronta para o relatório</small></button>
+          <button type="button" data-export="json" role="menuitem">JSON<small>Bloco DADOS do mês</small></button>
+        </div>
+      </div>
+      <button class="kbdbtn" id="btn-ajuda" title="Atalhos de teclado">?</button>
+      <button class="tema" id="btn-tema" type="button" aria-pressed="false" title="Modo noturno (t)" aria-label="Alternar modo noturno">
+        <svg class="tema__lua" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="tema__sol" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="8" height="8"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ===== Abas de view ===== -->
+<nav class="abas" aria-label="Views do dashboard">
+  <div class="int abas__in" id="abas" role="tablist">
+    <button class="aba" role="tab" data-view="geral"><span>Visão geral</span><kbd>1</kbd></button>
+    <button class="aba" role="tab" data-view="producao"><span>Produtividade</span><span class="n" id="n-producao">0</span><kbd>2</kbd></button>
+    <button class="aba" role="tab" data-view="performance"><span>Performance</span><kbd>3</kbd></button>
+    <button class="aba" role="tab" data-view="funil"><span>Funil 2.5</span><span class="n" id="n-funil">0</span><kbd>4</kbd></button>
+    <button class="aba" role="tab" data-view="pendencias"><span>Pendências</span><span class="n" id="n-pend">0</span><kbd>5</kbd></button>
+  </div>
+</nav>
+
+<main class="int">
+
+  <!-- ===== 1 · Visão geral ===== -->
+  <div class="view" data-view="geral" role="tabpanel">
+    <div class="banner" id="banner"></div>
+
+    <div class="kpis" id="kpis"></div>
+
+    <section class="sec">
+      <div class="sec__cab">
+        <div><span class="rotulo">01 &middot; Resumo por frente</span><h2 class="sec__titulo">Como o mês se distribuiu</h2>
+          <p class="sec__lead">O marketing separa o que vai para o <b>Digital Track (DT)</b> &mdash; escala sem depender de vendedor &mdash; do que é apoio ao <b>Human Track (HT)</b>. A métrica que manda no painel é a <b>2.5</b>: cadastros de teste vindos do DT e quantos de fato testaram.</p></div>
+      </div>
+      <div class="grade3" id="frentes"></div>
+    </section>
+
+    <section class="sec">
+      <div class="sec__cab">
+        <div><span class="rotulo">02 &middot; Contexto</span><h2 class="sec__titulo">Destaque do mês</h2></div>
+        <div class="sec__controles"><button class="btn btn--contorno btn--mini" data-goto="producao">Editar na aba Produtividade</button></div>
+      </div>
+      <div class="callout" id="destaque-geral"></div>
+    </section>
+  </div>
+
+  <!-- ===== 2 · Produtividade ===== -->
+  <div class="view" data-view="producao" role="tabpanel" hidden>
+    <section class="sec">
+      <div class="sec__cab">
+        <div><span class="rotulo">01 &middot; Produtividade</span><h2 class="sec__titulo">O que o marketing produziu</h2>
+          <p class="sec__lead">Peças voltadas ao <b>DT</b> (site, LPs, conteúdo, campanhas) e peças de <b>apoio à HT</b> (materiais para o vendedor, ABM). Volume não é o objetivo &mdash; o destaque do mês existe para explicar quedas.</p></div>
+        <div class="sec__controles">
+          <div class="chips" role="group" aria-label="Modo de exibição">
+            <button class="chip" data-modo="grafico" aria-pressed="true">Gráfico</button>
+            <button class="chip" data-modo="tabela" aria-pressed="false">Tabela</button>
+          </div>
+        </div>
+      </div>
+      <div class="grade2">
+        <div class="cartao">
+          <div class="cartao__cab"><h3>Peças produzidas por mês</h3><span class="sub">últimos 6 meses</span></div>
+          <div class="leg"><span><i class="sw dt"></i>DT</span><span><i class="sw ht"></i>Apoio HT</span></div>
+          <div class="chartbox modo-grafico" id="c-prod-mes"></div>
+          <div class="tbl small modo-tabela" id="t-prod-mes" hidden></div>
+        </div>
+        <div class="cartao">
+          <div class="cartao__cab"><h3>Por categoria</h3><span class="sub" id="cat-mes"></span></div>
+          <div class="leg"><span><i class="sw dt"></i>DT</span><span><i class="sw ht"></i>Apoio HT</span></div>
+          <div class="hb modo-grafico" id="c-prod-cat"></div>
+          <div class="tbl small modo-tabela" id="t-prod-cat" hidden></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="sec__cab">
+        <div><span class="rotulo">02 &middot; Contexto</span><h2 class="sec__titulo">Destaque do mês</h2>
+          <p class="sec__lead">Evento, lançamento, equipe reduzida &mdash; o que justifica o volume do mês.</p></div>
+      </div>
+      <div class="cartao">
+        <textarea class="campo" id="destaque" placeholder="Ex.: Expopostos consumiu a capacidade da equipe na segunda quinzena."></textarea>
+        <span class="dica">O texto fica salvo neste navegador para o mês selecionado.</span>
+      </div>
+    </section>
+  </div>
+
+  <!-- ===== 3 · Performance ===== -->
+  <div class="view" data-view="performance" role="tabpanel" hidden>
+    <section class="sec">
+      <div class="sec__cab">
+        <div><span class="rotulo">01 &middot; Tráfego</span><h2 class="sec__titulo">Acessos ao site e às LPs</h2>
+          <p class="sec__lead">O site institucional foi remodelado em Next.js; as ações de marketing devem levar tráfego para ele e para as LPs de produto.</p></div>
+        <div class="sec__controles">
+          <div class="chips" role="group" aria-label="Modo de exibição">
+            <button class="chip" data-modo="grafico" aria-pressed="true">Gráfico</button>
+            <button class="chip" data-modo="tabela" aria-pressed="false">Tabela</button>
+          </div>
+        </div>
+      </div>
+      <div class="cartao">
+        <div class="cartao__cab"><h3>Sessões por mês</h3><span class="sub">últimos 6 meses</span></div>
+        <div class="leg"><span><i class="lk" style="background:var(--dt)"></i>LPs de produto</span><span><i class="lk" style="background:var(--ht)"></i>Site institucional</span></div>
+        <div class="chartbox modo-grafico" id="c-acessos"></div>
+        <div class="tbl small modo-tabela" id="t-acessos" hidden></div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="sec__cab">
+        <div><span class="rotulo">02 &middot; Indicador-chave</span><h2 class="sec__titulo">Resultado por categoria</h2>
+          <p class="sec__lead" id="perf-mes"></p></div>
+        <div class="sec__controles">
+          <input class="campo" id="perf-busca" type="search" placeholder="Buscar categoria..." autocomplete="off" aria-label="Buscar categoria">
+          <select class="campo" id="perf-ordem" aria-label="Ordenação">
+            <option value="var">Maior variação</option>
+            <option value="orig">Ordem do painel</option>
+            <option value="pecas">Mais peças</option>
+          </select>
+          <div class="chips" role="group" aria-label="Filtrar por trilha">
+            <button class="chip" data-track="dt" aria-pressed="false"><span class="pt dt"></span>DT<span class="n" id="n-dt">0</span></button>
+            <button class="chip" data-track="ht" aria-pressed="false"><span class="pt ht"></span>HT<span class="n" id="n-ht">0</span></button>
+          </div>
+        </div>
+      </div>
+      <div class="cartao">
+        <div class="tbl" id="t-perf"></div>
+      </div>
+      <div class="grade2" id="perf-boxes"></div>
+    </section>
+  </div>
+
+  <!-- ===== 4 · Funil 2.5 ===== -->
+  <div class="view" data-view="funil" role="tabpanel" hidden>
+    <section class="sec">
+      <div class="sec__cab">
+        <div><span class="rotulo">Métrica prioritária 2.5</span><h2 class="sec__titulo">Funil digital &mdash; do cadastro ao teste</h2>
+          <p class="sec__lead">Cadastros de trial <b>vindos do DT</b>, quantos de fato testaram o produto e quantos seguiram para <b>consideration</b>. É a métrica definida pela liderança para o marketing.</p></div>
+        <div class="sec__controles">
+          <div class="chips" role="group" aria-label="Modo de exibição">
+            <button class="chip" data-modo="grafico" aria-pressed="true">Funil</button>
+            <button class="chip" data-modo="tabela" aria-pressed="false">Tabela</button>
+          </div>
+        </div>
+      </div>
+      <div class="callout callout--aviso"><b>Status real:</b>&nbsp;hoje a métrica está zerada &mdash; não há rastreio de cadastros de trial por origem. Os valores abaixo são um alvo de leitura, não dados. Primeira ação: marcar a origem (UTM/LP) no formulário de trial.</div>
+      <div class="grade2">
+        <div class="cartao cartao--prioridade">
+          <div class="cartao__cab"><span class="tag-pri">Métrica 2.5</span><h3 id="funil-titulo">Etapas do mês</h3></div>
+          <div class="metasplit" id="funil-meta"></div>
+          <div class="fun modo-grafico" id="c-funil"></div>
+          <div class="tbl small modo-tabela" id="t-funil" hidden></div>
+        </div>
+        <div class="cartao">
+          <div class="cartao__cab"><h3>Cadastros e testes por mês</h3><span class="sub">últimos 6 meses</span></div>
+          <div class="leg"><span><i class="sw dt"></i>Cadastros de trial (DT)</span><span><i class="sw" style="background:var(--serie2)"></i>Testaram</span></div>
+          <div class="chartbox" id="c-funil-hist"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ===== 5 · Pendências ===== -->
+  <div class="view" data-view="pendencias" role="tabpanel" hidden>
+    <section class="sec">
+      <div class="sec__cab">
+        <div><span class="rotulo">01 &middot; Escopo</span><h2 class="sec__titulo">O que ainda falta cobrir</h2>
+          <p class="sec__lead">O rascunho original não fecha o escopo. Estes itens entraram como categorias, mas ainda precisam de dono, fonte de dado e indicador definidos. O estado das caixas fica salvo neste navegador.</p></div>
+        <div class="sec__controles"><button class="btn btn--contorno btn--mini" id="btn-limpar-todo">Desmarcar tudo</button></div>
+      </div>
+      <div class="grade2">
+        <div class="cartao">
+          <ul class="todo" id="todo">
+            <li><input type="checkbox" id="td1"><label for="td1">Webinars <small>Indicador sugerido: inscritos &rarr; presentes &rarr; cadastros de trial gerados.</small></label></li>
+            <li><input type="checkbox" id="td2"><label for="td2">Ações de comunidade <small>Indicador sugerido: participantes ativos e trials originados da comunidade.</small></label></li>
+            <li><input type="checkbox" id="td3"><label for="td3">Outras atividades sob a liderança de marketing <small>Levantar com o responsável o que hoje não está listado.</small></label></li>
+            <li><input type="checkbox" id="td4"><label for="td4">Rastreio de origem do trial <small>Pré-requisito da métrica 2.5. Sem isso, o funil digital continua zerado.</small></label></li>
+            <li><input type="checkbox" id="td5"><label for="td5">Fonte de acessos pós-remodelação do site <small>Definir a ferramenta de analytics do novo site Next.js e das LPs.</small></label></li>
+          </ul>
+        </div>
+        <div class="box">
+          <h4>Objetivo que orienta o painel</h4>
+          <p>Marketing não é área de <b>produção de posts</b>, e sim de conteúdo e ações estratégicas que conduzem o cliente pelo funil até o teste (<b>consideration</b>), pensando em escala &mdash; a escala do HT é limitada pelo número de vendedores; a do DT não.</p>
+          <ul class="lista">
+            <li><b>HT &middot; Human Track</b>Vendas conduzidas por pessoas, vendedor falando com o cliente.</li>
+            <li><b>DT &middot; Digital Track</b>Leads e vendas gerados por marketing digital: site, LPs, conteúdo.</li>
+            <li><b>Funil</b>contacted &rarr; accepted &rarr; tested &rarr; consideration &rarr; assinatura.</li>
+            <li><b>ABM</b>Prospecção mirando empresas específicas; entra como apoio à HT.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    <b>Escopo:</b> dashboard 3 de 4 da estrutura proposta (vendas donos de carga, vendas transportadora, marketing, backlog de inovação). Base Compartilhada não entra: é considerada vendida ao assinar contrato (1 assinatura / R$ 2.200 por mês).<br>
+    <b>Fontes previstas:</b> analytics do site e LPs, formulário de trial com origem, planilha de produção do marketing, plataformas de mídia e e-mail.<br>
+    <b>Este arquivo:</b> protótipo estático, sem integração. Os dados vivem no bloco <code>DADOS</code> no final do HTML e podem ser trocados mês a mês. Atalhos: <kbd>1</kbd>&ndash;<kbd>5</kbd> trocam de aba, <kbd>t</kbd> alterna o modo noturno, <kbd>?</kbd> mostra a ajuda. O painel abre sempre em modo claro; o noturno é escolha manual, guardada neste navegador.
+    <div class="marca">AutoMind &middot; Marketing &middot; {{DATA}} &middot; Simple &middot; Smart &middot; Reliable</div>
+  </footer>
+</main>
+
+<div id="toasts" aria-live="polite"></div>
+
+<div class="overlay" id="ajuda" hidden>
+  <div class="painel" role="dialog" aria-label="Atalhos de teclado">
+    <div class="painel__titulo">Atalhos de teclado<button class="painel__fechar" id="ajuda-fechar" aria-label="Fechar">&times;</button></div>
+    <div class="painel__grupo">Navegação</div>
+    <div class="painel__linha"><span>Visão geral</span><span><kbd>1</kbd></span></div>
+    <div class="painel__linha"><span>Produtividade</span><span><kbd>2</kbd></span></div>
+    <div class="painel__linha"><span>Performance</span><span><kbd>3</kbd></span></div>
+    <div class="painel__linha"><span>Funil 2.5</span><span><kbd>4</kbd></span></div>
+    <div class="painel__linha"><span>Pendências</span><span><kbd>5</kbd></span></div>
+    <div class="painel__linha"><span>Mês anterior / seguinte</span><span><kbd>[</kbd><kbd>]</kbd></span></div>
+    <div class="painel__grupo">Ações</div>
+    <div class="painel__linha"><span>Exportar</span><span><kbd>e</kbd></span></div>
+    <div class="painel__linha"><span>Modo noturno</span><span><kbd>t</kbd></span></div>
+    <div class="painel__linha"><span>Buscar categoria (Performance)</span><span><kbd>/</kbd></span></div>
+    <div class="painel__linha"><span>Esta ajuda</span><span><kbd>?</kbd></span></div>
+    <div class="painel__linha"><span>Fechar</span><span><kbd>Esc</kbd></span></div>
+  </div>
+</div>
+
+<script>
+/* =========================================================================
+   DADOS  (ilustrativos) - edite aqui. Um objeto por mes, chave AAAA-MM.
+   producao: pecas por categoria, separadas em dt / ht
+   acessos:  sessoes no site institucional e nas LPs de produto
+   funil:    cadastros de trial vindos do DT -> testaram -> consideration -> assinatura
+   perf:     indicador-chave por categoria (v) + melhor item do mes
+   ========================================================================= */
+const CATS = [
+  ['posts',   'Posts em redes sociais', 'dt'],
+  ['email',   'E-mail e newsletter',    'dt'],
+  ['camp',    'Campanhas de mídia',     'dt'],
+  ['lp',      'Landing pages e site',   'dt'],
+  ['webinar', 'Webinars',               'dt'],
+  ['comun',   'Ações de comunidade',    'dt'],
+  ['mat',     'Materiais de apoio (HT)','ht'],
+  ['abm',     'ABM (HT)',               'ht'],
+];
+const IND = { posts:'Alcance', email:'Taxa de abertura', camp:'Cliques', lp:'Conversão em cadastro', webinar:'Presentes', comun:'Participantes ativos', mat:'Usados em propostas', abm:'Reuniões geradas' };
+const FMT = { posts:'n', email:'%', camp:'n', lp:'%', webinar:'n', comun:'n', mat:'n', abm:'n' };
+
+const DADOS = {
+  '2026-04': {
+    producao:{ posts:{dt:10,ht:2}, email:{dt:2,ht:1}, camp:{dt:1,ht:0}, lp:{dt:1,ht:0}, webinar:{dt:0,ht:0}, comun:{dt:1,ht:0}, mat:{dt:0,ht:4}, abm:{dt:0,ht:3} },
+    acessos:{ site:2900, lps:640 },
+    funil:{ cadastros:6, testaram:2, consideration:1, assinatura:0 },
+    perf:{ posts:{v:29800,best:'Carrossel "Conferência de notas em 3 passos" — 6,1 mil'}, email:{v:27,best:'Newsletter #8 — 31%'}, camp:{v:410,best:'Meta Ads — LP AutoChecker'}, lp:{v:0.9,best:'LP AutoChecker — 0,9%'}, webinar:{v:0,best:'—'}, comun:{v:80,best:'Grupo de transportadoras — 80 ativos'}, mat:{v:6,best:'One-pager AutoLoad'}, abm:{v:3,best:'Sequência ABM distribuidoras — 3 reuniões'} },
+    destaque:'Primeiro mês com separação DT / HT na planilha de produção.'
+  },
+  '2026-05': {
+    producao:{ posts:{dt:12,ht:2}, email:{dt:3,ht:1}, camp:{dt:2,ht:0}, lp:{dt:1,ht:0}, webinar:{dt:1,ht:0}, comun:{dt:1,ht:0}, mat:{dt:1,ht:5}, abm:{dt:0,ht:3} },
+    acessos:{ site:3150, lps:820 },
+    funil:{ cadastros:9, testaram:3, consideration:1, assinatura:0 },
+    perf:{ posts:{v:33400,best:'Vídeo "Quanto custa um erro de frete" — 7,8 mil'}, email:{v:30,best:'Newsletter #9 — 34%'}, camp:{v:620,best:'Meta Ads — LP AutoLoad'}, lp:{v:1.1,best:'LP AutoLoad — 1,3%'}, webinar:{v:38,best:'"Custo real do frete" — 38 presentes / 71 inscritos'}, comun:{v:95,best:'Grupo de transportadoras — 95 ativos'}, mat:{v:8,best:'Deck comparativo AutoChecker'}, abm:{v:4,best:'Sequência ABM redes de postos — 4 reuniões'} },
+    destaque:'Primeiro webinar da série; produção de materiais HT cresceu com a demanda do time comercial.'
+  },
+  '2026-06': {
+    producao:{ posts:{dt:13,ht:2}, email:{dt:3,ht:1}, camp:{dt:2,ht:0}, lp:{dt:2,ht:0}, webinar:{dt:1,ht:0}, comun:{dt:2,ht:0}, mat:{dt:1,ht:4}, abm:{dt:0,ht:4} },
+    acessos:{ site:3400, lps:1010 },
+    funil:{ cadastros:12, testaram:5, consideration:2, assinatura:1 },
+    perf:{ posts:{v:36900,best:'Carrossel "5 erros na conferência de notas" — 8,2 mil'}, email:{v:32,best:'Newsletter #10 — 36%'}, camp:{v:840,best:'Google Ads — busca "conferência de nota fiscal"'}, lp:{v:1.2,best:'LP AutoChecker — 1,4%'}, webinar:{v:47,best:'"Conferindo notas na descarga" — 47 presentes / 90 inscritos'}, comun:{v:110,best:'Grupo de transportadoras — 110 ativos'}, mat:{v:9,best:'Case Copercana (uso da Base Compartilhada)'}, abm:{v:5,best:'Sequência ABM cooperativas — 5 reuniões'} },
+    destaque:'Primeira assinatura com origem rastreada no DT (LP AutoChecker).'
+  },
+  '2026-07': {
+    producao:{ posts:{dt:14,ht:3}, email:{dt:4,ht:1}, camp:{dt:3,ht:0}, lp:{dt:2,ht:0}, webinar:{dt:1,ht:1}, comun:{dt:2,ht:0}, mat:{dt:2,ht:5}, abm:{dt:0,ht:4} },
+    acessos:{ site:3700, lps:1240 },
+    funil:{ cadastros:16, testaram:7, consideration:3, assinatura:1 },
+    perf:{ posts:{v:41200,best:'Vídeo "AutoMed na prática" — 9,0 mil'}, email:{v:33,best:'Newsletter #11 — 38%'}, camp:{v:1050,best:'Meta Ads — LP AutoChecker (CTR 1,9%)'}, lp:{v:1.4,best:'LP AutoChecker — 1,7%'}, webinar:{v:55,best:'"Frota parada custa quanto?" — 55 presentes / 104 inscritos'}, comun:{v:125,best:'Grupo de transportadoras — 125 ativos'}, mat:{v:10,best:'Deck AutoMed para gestores de frota'}, abm:{v:5,best:'Sequência ABM cooperativas — 5 reuniões'} },
+    destaque:'Lançamento do conteúdo de AutoMed; webinar com o time comercial (apoio HT).'
+  },
+  '2026-08': {
+    producao:{ posts:{dt:8,ht:1}, email:{dt:2,ht:0}, camp:{dt:1,ht:0}, lp:{dt:1,ht:0}, webinar:{dt:0,ht:0}, comun:{dt:1,ht:0}, mat:{dt:1,ht:7}, abm:{dt:0,ht:2} },
+    acessos:{ site:3350, lps:1090 },
+    funil:{ cadastros:13, testaram:5, consideration:2, assinatura:0 },
+    perf:{ posts:{v:30100,best:'Cobertura Expopostos — 7,4 mil'}, email:{v:29,best:'Convite Expopostos — 33%'}, camp:{v:520,best:'Meta Ads — estande Expopostos'}, lp:{v:1.3,best:'LP AutoChecker — 1,5%'}, webinar:{v:0,best:'— (sem webinar no mês)'}, comun:{v:130,best:'Grupo de transportadoras — 130 ativos'}, mat:{v:14,best:'Kit de estande Expopostos (fol., banners, vídeo)'}, abm:{v:3,best:'Follow-up de contatos do evento — 3 reuniões'} },
+    destaque:'Expopostos consumiu a capacidade da equipe: produção DT caiu, materiais de apoio ao HT (estande) subiram. Sem webinar no mês.'
+  },
+  '2026-09': {
+    producao:{ posts:{dt:14,ht:2}, email:{dt:4,ht:1}, camp:{dt:3,ht:0}, lp:{dt:2,ht:0}, webinar:{dt:1,ht:1}, comun:{dt:2,ht:0}, mat:{dt:2,ht:5}, abm:{dt:0,ht:4} },
+    acessos:{ site:4120, lps:1380 },
+    funil:{ cadastros:21, testaram:9, consideration:4, assinatura:1 },
+    perf:{ posts:{v:48200,best:'Carrossel "Checklist de descarga" — 9,4 mil'}, email:{v:34,best:'Newsletter #12 — 41%'}, camp:{v:1240,best:'Meta Ads — LP AutoChecker (CTR 2,1%)'}, lp:{v:1.5,best:'LP AutoChecker — 1,9%'}, webinar:{v:63,best:'"Custo real do frete" (reprise) — 63 presentes / 118 inscritos'}, comun:{v:140,best:'Grupo de transportadoras — 140 ativos'}, mat:{v:11,best:'Deck comparativo AutoLoad'}, abm:{v:6,best:'Sequência ABM distribuidoras — 6 reuniões'} },
+    destaque:'Retomada pós-evento; site novo em Next.js entrou no ar em 08/09 e as LPs passaram a apontar para ele.'
+  },
+};
+/* ======================= fim dos dados ======================= */
+
+const MESES = Object.keys(DADOS).sort();
+const MN = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const mesLabel = k => { const [a,m]=k.split('-'); return MN[+m-1]+'/'+a.slice(2); };
+const mesLong  = k => { const [a,m]=k.split('-'); const L=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']; return L[+m-1]+' de '+a; };
+const fmtN = n => n.toLocaleString('pt-BR');
+const fmtK = n => n>=10000 ? (n/1000).toLocaleString('pt-BR',{maximumFractionDigits:1})+' mil' : fmtN(n);
+const fmtPct = n => n.toLocaleString('pt-BR',{maximumFractionDigits:1})+'%';
+const fmtV = (k,v) => FMT[k]==='%' ? fmtPct(v) : fmtN(v);
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+const totalProd = d => CATS.reduce((a,[k])=>a+d.producao[k].dt+d.producao[k].ht,0);
+const totalDT   = d => CATS.reduce((a,[k])=>a+d.producao[k].dt,0);
+const totalHT   = d => CATS.reduce((a,[k])=>a+d.producao[k].ht,0);
+const LS = { get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }, set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} } };
+const $ = id => document.getElementById(id);
+
+function delta(cur, prev, pct){
+  if(prev==null) return '<span class="d flat">sem base</span>';
+  if(prev===0 && cur===0) return '<span class="d flat">= 0</span>';
+  if(prev===0) return '<span class="d up">&#9650; novo</span>';
+  const df = cur-prev, r = df/prev*100;
+  if(Math.abs(r)<0.5) return '<span class="d flat">= estável</span>';
+  const cls = df>0?'up':'down', ar = df>0?'&#9650;':'&#9660;';
+  const txt = pct ? (df>0?'+':'')+df.toLocaleString('pt-BR',{maximumFractionDigits:1})+' p.p.' : (df>0?'+':'')+r.toLocaleString('pt-BR',{maximumFractionDigits:0})+'%';
+  return '<span class="d '+cls+'">'+ar+' '+txt+'</span>';
+}
+
+/* --------- sparkline --------- */
+function spark(vals, color){
+  const W=160,H=34,p=3; const mx=Math.max(...vals,1), mn=0;
+  const x=i=>p+i*(W-2*p)/(vals.length-1), y=v=>H-p-(v-mn)/(mx-mn||1)*(H-2*p);
+  const d=vals.map((v,i)=>(i?'L':'M')+x(i).toFixed(1)+' '+y(v).toFixed(1)).join(' ');
+  const li=vals.length-1;
+  return '<div class="spark"><svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" aria-hidden="true">'+
+    '<path d="'+d+'" fill="none" stroke="var(--eixo)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>'+
+    '<i class="spark__pt" style="top:'+(y(vals[li])/H*100).toFixed(1)+'%;background:'+color+'"></i></div>';
+}
+
+/* --------- banner de status --------- */
+function renderBanner(k, kp){
+  const d=DADOS[k], p=kp?DADOS[kp]:null;
+  const ativ = d.funil.cadastros? d.funil.testaram/d.funil.cadastros*100 : 0;
+  let cls='aviso', txt='<b>Métrica 2.5 sem rastreio de origem.</b> O funil digital abaixo é um alvo de leitura, não dado real.';
+  if(p && d.funil.cadastros<p.funil.cadastros){ cls='crit'; txt='<b>Cadastros de trial vindos do DT caíram</b> em relação a '+mesLabel(kp)+' ('+d.funil.cadastros+' vs '+p.funil.cadastros+'). Veja o destaque do mês.'; }
+  $('banner').className='banner banner--'+cls;
+  $('banner').innerHTML=txt+'<span class="banner__meta">'+mesLong(k)+' &middot; '+fmtN(d.funil.cadastros)+' cadastros &middot; '+fmtPct(ativ)+' de ativação</span><button class="btn btn--contorno btn--mini" data-goto="funil">Abrir funil</button>';
+}
+
+/* --------- KPIs --------- */
+function renderKpis(k, kp){
+  const d=DADOS[k], p=kp?DADOS[kp]:null;
+  const ativ = d.funil.cadastros? d.funil.testaram/d.funil.cadastros*100 : 0;
+  const ativP = p&&p.funil.cadastros? p.funil.testaram/p.funil.cadastros*100 : null;
+  const ac = d.acessos.site+d.acessos.lps, acP = p? p.acessos.site+p.acessos.lps : null;
+  const hist = key => MESES.filter(m=>m<=k).slice(-6).map(m=>key(DADOS[m]));
+  $('kpis').innerHTML =
+    '<div class="cartao cartao--prioridade kpi kpi--hero"><span class="tag-pri">Métrica prioritária 2.5</span><div class="l">Cadastros de teste vindos do DT</div>'+
+      '<div class="row"><div class="v">'+fmtN(d.funil.cadastros)+'</div>'+delta(d.funil.cadastros,p?p.funil.cadastros:null)+'</div>'+
+      '<div class="x"><b>'+fmtN(d.funil.testaram)+'</b> realizaram o teste do produto ('+fmtPct(ativ)+' de ativação)</div>'+spark(hist(x=>x.funil.cadastros),'var(--dt)')+'</div>'+
+    '<div class="cartao kpi"><div class="l">Ativação do trial</div><div class="row"><div class="v">'+fmtPct(ativ)+'</div>'+delta(ativ,ativP,true)+'</div>'+
+      '<div class="x">cadastrados que de fato testaram</div>'+spark(hist(x=>x.funil.cadastros?x.funil.testaram/x.funil.cadastros*100:0),'var(--ink)')+'</div>'+
+    '<div class="cartao kpi"><div class="l">Acessos ao site e LPs</div><div class="row"><div class="v">'+fmtK(ac)+'</div>'+delta(ac,acP)+'</div>'+
+      '<div class="x">'+fmtK(d.acessos.lps)+' em LPs de produto</div>'+spark(hist(x=>x.acessos.site+x.acessos.lps),'var(--ink)')+'</div>'+
+    '<div class="cartao kpi"><div class="l">Peças produzidas</div><div class="row"><div class="v">'+fmtN(totalProd(d))+'</div>'+delta(totalProd(d),p?totalProd(p):null)+'</div>'+
+      '<div class="x"><b>'+totalDT(d)+'</b> DT &middot; <b>'+totalHT(d)+'</b> apoio HT</div>'+spark(hist(totalProd),'var(--ink)')+'</div>';
+}
+
+/* --------- cartões por frente (visão geral) --------- */
+function renderFrentes(k, kp){
+  const d=DADOS[k], p=kp?DADOS[kp]:null;
+  const linhas = track => CATS.filter(c=>c[2]===track).map(([id,n])=>{ const v=d.producao[id].dt+d.producao[id].ht; return '<div class="frente__linha"><span>'+esc(n).replace(' (HT)','')+'</span><b>'+v+'</b></div>'; }).join('');
+  const dt=totalDT(d), ht=totalHT(d), f=d.funil;
+  $('frentes').innerHTML =
+    '<div class="cartao frente frente--dt" data-goto="producao"><div class="frente__nome">Digital Track</div><div class="frente__big">'+dt+'<small>peças '+(p?delta(dt,totalDT(p)):'')+'</small></div>'+
+      '<div class="frente__linhas">'+linhas('dt')+'</div><div class="frente__rodape">'+fmtK(d.acessos.lps)+' sessões em LPs de produto</div></div>'+
+    '<div class="cartao frente frente--ht" data-goto="performance"><div class="frente__nome">Apoio ao Human Track</div><div class="frente__big">'+ht+'<small>peças '+(p?delta(ht,totalHT(p)):'')+'</small></div>'+
+      '<div class="frente__linhas">'+linhas('ht')+'<div class="frente__linha"><span>Reuniões via ABM</span><b>'+d.perf.abm.v+'</b></div><div class="frente__linha"><span>Materiais usados em propostas</span><b>'+d.perf.mat.v+'</b></div></div>'+
+      '<div class="frente__rodape">escala limitada pelo número de vendedores</div></div>'+
+    '<div class="cartao frente frente--funil" data-goto="funil"><div class="frente__nome">Funil digital <span class="grad">2.5</span></div><div class="frente__big">'+f.cadastros+'<small>cadastros '+(p?delta(f.cadastros,p.funil.cadastros):'')+'</small></div>'+
+      '<div class="frente__linhas"><div class="frente__linha"><span>Testaram o produto</span><b>'+f.testaram+'</b></div><div class="frente__linha"><span>Consideration</span><b>'+f.consideration+'</b></div><div class="frente__linha"><span>Assinatura</span><b>'+f.assinatura+'</b></div></div>'+
+      '<div class="frente__rodape">alvo de leitura &mdash; sem rastreio real ainda</div></div>';
+}
+
+/* --------- helpers de tooltip --------- */
+function mkTip(box){ let t=box.querySelector('.tip'); if(!t){ t=document.createElement('div'); t.className='tip'; box.appendChild(t);} return t; }
+function showTip(box,t,html,px,py){ t.innerHTML=html; t.classList.add('on'); const r=box.getBoundingClientRect(); t.style.left=(px-r.left)+'px'; t.style.top=(py-r.top)+'px'; }
+function niceMax(v){ const p=Math.pow(10,Math.floor(Math.log10(v||1))); const f=v/p; const m=f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10; return m*p; }
+function ticks(max, n){ const st=niceMax(max/n); const out=[]; for(let v=0; v<=max+1e-9; v+=st) out.push(v); if(out[out.length-1]<max) out.push(out[out.length-1]+st); return out; }
+
+/* --------- colunas empilhadas: producao por mes --------- */
+function renderProdMes(k){
+  const ms = MESES.filter(m=>m<=k).slice(-6);
+  const W=520,H=230,L=36,R=12,T=14,B=30, pw=W-L-R, ph=H-T-B;
+  const tot = ms.map(m=>totalProd(DADOS[m]));
+  const tk = ticks(Math.max(...tot), 4), mx=tk[tk.length-1];
+  const y = v=>T+ph-v/mx*ph;
+  const slot = pw/ms.length, bw=Math.min(26, slot*0.5);
+  let s='<svg class="chart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Peças produzidas por mês, DT e apoio HT">';
+  tk.forEach(v=>{ s+='<line class="grid" x1="'+L+'" x2="'+(W-R)+'" y1="'+y(v)+'" y2="'+y(v)+'"/><text x="'+(L-6)+'" y="'+(y(v)+4)+'" text-anchor="end">'+fmtN(v)+'</text>'; });
+  s+='<line class="axis" x1="'+L+'" x2="'+(W-R)+'" y1="'+y(0)+'" y2="'+y(0)+'"/>';
+  ms.forEach((m,i)=>{
+    const d=DADOS[m], dt=totalDT(d), ht=totalHT(d), cx=L+slot*(i+.5), x=cx-bw/2;
+    const yd=y(dt), yh=y(dt+ht), gap = ht>0?2:0;
+    s+='<g class="col" data-i="'+i+'">';
+    s+='<rect x="'+x+'" y="'+yd+'" width="'+bw+'" height="'+(y(0)-yd)+'" fill="var(--dt)"/>';
+    if(ht) s+='<rect x="'+x+'" y="'+yh+'" width="'+bw+'" height="'+Math.max(0,yd-yh-gap)+'" fill="var(--ht)"/>';
+    if(m===k) s+='<text class="lbl" x="'+cx+'" y="'+(yh-6)+'" text-anchor="middle">'+fmtN(dt+ht)+'</text>';
+    s+='<text x="'+cx+'" y="'+(H-10)+'" text-anchor="middle"'+(m===k?' font-weight="700" fill="var(--ink)"':'')+'>'+mesLabel(m)+'</text>';
+    s+='<rect x="'+(cx-slot/2)+'" y="'+T+'" width="'+slot+'" height="'+ph+'" fill="transparent" class="hit"/>';
+    s+='</g>';
+  });
+  s+='</svg>';
+  const box=$('c-prod-mes'); box.innerHTML=s; const t=mkTip(box);
+  box.querySelectorAll('g.col').forEach(g=>{
+    const m=ms[+g.dataset.i], d=DADOS[m];
+    const html='<b>'+mesLong(m)+'</b><br><i class="k" style="background:var(--dt)"></i>DT: '+totalDT(d)+'<br><i class="k" style="background:var(--ht)"></i>Apoio HT: '+totalHT(d)+'<br>Total: '+totalProd(d);
+    g.addEventListener('mousemove',e=>showTip(box,t,html,e.clientX,e.clientY));
+    g.addEventListener('mouseleave',()=>t.classList.remove('on'));
+  });
+  $('t-prod-mes').innerHTML='<table><thead><tr><th>Mês</th><th class="num">DT</th><th class="num">Apoio HT</th><th class="num">Total</th></tr></thead><tbody>'+
+    ms.map(m=>'<tr><td>'+mesLabel(m)+'</td><td class="num">'+totalDT(DADOS[m])+'</td><td class="num">'+totalHT(DADOS[m])+'</td><td class="num"><b>'+totalProd(DADOS[m])+'</b></td></tr>').join('')+'</tbody></table>';
+}
+
+/* --------- barras horizontais: producao por categoria --------- */
+function renderProdCat(k){
+  const d=DADOS[k];
+  const rows=CATS.map(([id,n])=>({id,n,dt:d.producao[id].dt,ht:d.producao[id].ht})).sort((a,b)=>(b.dt+b.ht)-(a.dt+a.ht));
+  const mx=Math.max(...rows.map(r=>r.dt+r.ht),1);
+  $('cat-mes').textContent=mesLong(k);
+  $('c-prod-cat').innerHTML=rows.map(r=>{
+    const tot=r.dt+r.ht;
+    const seg=(cls,v)=>v?'<div class="seg '+cls+'" style="width:'+(v/mx*100)+'%" title="'+(cls==='dt'?'DT':'Apoio HT')+': '+v+'"></div>':'';
+    return '<div class="row"><span class="n" title="'+esc(r.n)+'">'+esc(r.n)+'</span><div class="tr">'+seg('dt',r.dt)+seg('ht',r.ht)+'</div><span class="v"><b>'+tot+'</b></span></div>';
+  }).join('');
+  $('t-prod-cat').innerHTML='<table><thead><tr><th>Categoria</th><th class="num">DT</th><th class="num">Apoio HT</th><th class="num">Total</th></tr></thead><tbody>'+
+    rows.map(r=>'<tr><td>'+esc(r.n)+'</td><td class="num">'+r.dt+'</td><td class="num">'+r.ht+'</td><td class="num"><b>'+(r.dt+r.ht)+'</b></td></tr>').join('')+'</tbody></table>';
+}
+
+/* --------- linhas: acessos --------- */
+function renderAcessos(k){
+  const ms = MESES.filter(m=>m<=k).slice(-6);
+  const W=1040,H=260,L=48,R=70,T=14,B=30, pw=W-L-R, ph=H-T-B;
+  const series=[{id:'lps',n:'LPs de produto',c:'var(--dt)'},{id:'site',n:'Site institucional',c:'var(--ht)'}];
+  const all=ms.flatMap(m=>[DADOS[m].acessos.site,DADOS[m].acessos.lps]);
+  const tk=ticks(Math.max(...all),4), mx=tk[tk.length-1];
+  const x=i=>L+(ms.length>1? i*pw/(ms.length-1):pw/2), y=v=>T+ph-v/mx*ph;
+  let s='<svg class="chart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Acessos mensais ao site institucional e às LPs de produto">';
+  tk.forEach(v=>{ s+='<line class="grid" x1="'+L+'" x2="'+(W-R)+'" y1="'+y(v)+'" y2="'+y(v)+'"/><text x="'+(L-6)+'" y="'+(y(v)+4)+'" text-anchor="end">'+fmtK(v)+'</text>'; });
+  s+='<line class="axis" x1="'+L+'" x2="'+(W-R)+'" y1="'+y(0)+'" y2="'+y(0)+'"/>';
+  ms.forEach((m,i)=>{ s+='<text x="'+x(i)+'" y="'+(H-10)+'" text-anchor="middle"'+(m===k?' font-weight="700" fill="var(--ink)"':'')+'>'+mesLabel(m)+'</text>'; });
+  s+='<line id="ac-cross" class="cross" x1="0" x2="0" y1="'+T+'" y2="'+(T+ph)+'" opacity="0"/>';
+  const ends=series.map(sr=>({sr,yv:y(DADOS[ms[ms.length-1]].acessos[sr.id])})).sort((a,b)=>a.yv-b.yv);
+  if(ends.length===2 && ends[1].yv-ends[0].yv<14){ ends[1].yv=ends[0].yv+14; }
+  series.forEach(sr=>{
+    const d=ms.map((m,i)=>(i?'L':'M')+x(i).toFixed(1)+' '+y(DADOS[m].acessos[sr.id]).toFixed(1)).join(' ');
+    s+='<path d="'+d+'" fill="none" stroke="'+sr.c+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
+    ms.forEach((m,i)=>{ s+='<rect class="pt" x="'+(x(i)-4)+'" y="'+(y(DADOS[m].acessos[sr.id])-4)+'" width="8" height="8" fill="'+sr.c+'" stroke="var(--papel)" stroke-width="2"/>'; });
+    const e=ends.find(z=>z.sr===sr);
+    s+='<text class="lbl" x="'+(x(ms.length-1)+10)+'" y="'+(e.yv+4)+'">'+fmtK(DADOS[ms[ms.length-1]].acessos[sr.id])+'</text>';
+  });
+  s+='<rect id="ac-hit" x="'+L+'" y="'+T+'" width="'+pw+'" height="'+ph+'" fill="transparent"/>';
+  s+='</svg>';
+  const box=$('c-acessos'); box.innerHTML=s; const t=mkTip(box);
+  const svg=box.querySelector('svg'), hit=box.querySelector('#ac-hit'), cross=box.querySelector('#ac-cross');
+  hit.addEventListener('mousemove',e=>{
+    const r=svg.getBoundingClientRect(); const sx=(e.clientX-r.left)/r.width*W;
+    let bi=0,bd=1e9; ms.forEach((m,i)=>{const dd=Math.abs(x(i)-sx); if(dd<bd){bd=dd;bi=i;}});
+    cross.setAttribute('x1',x(bi)); cross.setAttribute('x2',x(bi)); cross.setAttribute('opacity','1');
+    const d=DADOS[ms[bi]].acessos;
+    const html='<b>'+mesLong(ms[bi])+'</b><br><i class="k" style="background:var(--dt)"></i>LPs de produto: '+fmtN(d.lps)+'<br><i class="k" style="background:var(--ht)"></i>Site institucional: '+fmtN(d.site)+'<br>Total: '+fmtN(d.site+d.lps);
+    const px=r.left+x(bi)/W*r.width, py=r.top+Math.min(y(d.site),y(d.lps))/H*r.height;
+    showTip(box,t,html,px,py);
+  });
+  hit.addEventListener('mouseleave',()=>{t.classList.remove('on'); cross.setAttribute('opacity','0');});
+  $('t-acessos').innerHTML='<table><thead><tr><th>Mês</th><th class="num">LPs de produto</th><th class="num">Site institucional</th><th class="num">Total</th></tr></thead><tbody>'+
+    ms.map(m=>'<tr><td>'+mesLabel(m)+'</td><td class="num">'+fmtN(DADOS[m].acessos.lps)+'</td><td class="num">'+fmtN(DADOS[m].acessos.site)+'</td><td class="num"><b>'+fmtN(DADOS[m].acessos.site+DADOS[m].acessos.lps)+'</b></td></tr>').join('')+'</tbody></table>';
+}
+
+/* --------- funil digital --------- */
+const ETAPAS=[['cadastros','Cadastros de trial','vindos do DT','var(--f1)'],['testaram','Testaram o produto','tested','var(--f2)'],['consideration','Consideration','avaliando contratação','var(--f3)'],['assinatura','Assinatura','contrato fechado','var(--f4)']];
+function renderFunil(k, kp){
+  const d=DADOS[k], p=kp?DADOS[kp]:null, f=d.funil;
+  const mx=Math.max(f.cadastros,1);
+  const ac=d.acessos.site+d.acessos.lps;
+  $('funil-titulo').textContent='Etapas em '+mesLong(k);
+  $('funil-meta').innerHTML=
+    '<div class="meta"><div class="l">Acessos &rarr; cadastro</div><div class="v">'+fmtPct(f.cadastros/ac*100)+'<small>de '+fmtK(ac)+' acessos</small></div></div>'+
+    '<div class="meta"><div class="l">Cadastro &rarr; teste realizado</div><div class="v">'+fmtPct(f.cadastros?f.testaram/f.cadastros*100:0)+'<small>'+(p?'antes '+fmtPct(p.funil.cadastros?p.funil.testaram/p.funil.cadastros*100:0):'')+'</small></div></div>';
+  let h='';
+  ETAPAS.forEach(([id,n,sub,c],i)=>{
+    if(i>0){ const prev=f[ETAPAS[i-1][0]]; h+='<div class="conv"><span class="arrow"></span>'+(prev?'<b>'+fmtPct(f[id]/prev*100)+'</b> da etapa anterior':'&mdash;')+'</div>'; }
+    h+='<span class="n">'+n+'<small>'+sub+'</small></span><div><div class="bar" style="width:'+Math.max(f[id]/mx*100,f[id]?1.5:0)+'%;background:'+c+'" title="'+n+': '+f[id]+'"></div></div><span class="v">'+fmtN(f[id])+'</span>';
+  });
+  $('c-funil').innerHTML=h;
+  $('t-funil').innerHTML='<table><thead><tr><th>Etapa</th><th class="num">'+mesLabel(k)+'</th><th class="num">'+(kp?mesLabel(kp):'&mdash;')+'</th><th class="num">Conversão</th></tr></thead><tbody>'+
+    ETAPAS.map(([id,n],i)=>'<tr><td><i class="tk" style="background:'+ETAPAS[i][3]+'"></i>'+n+'</td><td class="num"><b>'+f[id]+'</b></td><td class="num">'+(p?p.funil[id]:'&mdash;')+'</td><td class="num">'+(i&&f[ETAPAS[i-1][0]]?fmtPct(f[id]/f[ETAPAS[i-1][0]]*100):'&mdash;')+'</td></tr>').join('')+'</tbody></table>';
+
+  // histórico: colunas agrupadas cadastros × testaram
+  const ms = MESES.filter(m=>m<=k).slice(-6);
+  const W=520,H=230,L=32,R=12,T=14,B=30, pw=W-L-R, ph=H-T-B;
+  const tk=ticks(Math.max(...ms.map(m=>DADOS[m].funil.cadastros),1),4), mxx=tk[tk.length-1];
+  const y=v=>T+ph-v/mxx*ph, slot=pw/ms.length, bw=Math.min(14,slot*0.28);
+  let s='<svg class="chart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Cadastros de trial e testes realizados por mês">';
+  tk.forEach(v=>{ s+='<line class="grid" x1="'+L+'" x2="'+(W-R)+'" y1="'+y(v)+'" y2="'+y(v)+'"/><text x="'+(L-6)+'" y="'+(y(v)+4)+'" text-anchor="end">'+fmtN(v)+'</text>'; });
+  s+='<line class="axis" x1="'+L+'" x2="'+(W-R)+'" y1="'+y(0)+'" y2="'+y(0)+'"/>';
+  ms.forEach((m,i)=>{
+    const fm=DADOS[m].funil, cx=L+slot*(i+.5);
+    s+='<g class="col" data-i="'+i+'"><rect x="'+(cx-bw-1)+'" y="'+y(fm.cadastros)+'" width="'+bw+'" height="'+(y(0)-y(fm.cadastros))+'" fill="var(--dt)"/>';
+    s+='<rect x="'+(cx+1)+'" y="'+y(fm.testaram)+'" width="'+bw+'" height="'+(y(0)-y(fm.testaram))+'" fill="var(--serie2)"/>';
+    if(m===k) s+='<text class="lbl" x="'+cx+'" y="'+(y(fm.cadastros)-6)+'" text-anchor="middle">'+fm.cadastros+' / '+fm.testaram+'</text>';
+    s+='<text x="'+cx+'" y="'+(H-10)+'" text-anchor="middle"'+(m===k?' font-weight="700" fill="var(--ink)"':'')+'>'+mesLabel(m)+'</text>';
+    s+='<rect x="'+(cx-slot/2)+'" y="'+T+'" width="'+slot+'" height="'+ph+'" fill="transparent"/></g>';
+  });
+  s+='</svg>';
+  const box=$('c-funil-hist'); box.innerHTML=s; const t=mkTip(box);
+  box.querySelectorAll('g.col').forEach(g=>{
+    const m=ms[+g.dataset.i], fm=DADOS[m].funil;
+    const html='<b>'+mesLong(m)+'</b><br><i class="k" style="background:var(--dt)"></i>Cadastros: '+fm.cadastros+'<br><i class="k" style="background:var(--serie2)"></i>Testaram: '+fm.testaram+' ('+fmtPct(fm.cadastros?fm.testaram/fm.cadastros*100:0)+')';
+    g.addEventListener('mousemove',e=>showTip(box,t,html,e.clientX,e.clientY));
+    g.addEventListener('mouseleave',()=>t.classList.remove('on'));
+  });
+}
+
+/* --------- tabela de performance por categoria (com filtros) --------- */
+const PERF = { busca:'', ordem:'var', tracks:new Set() };
+function perfRows(k, kp){
+  const d=DADOS[k], p=kp?DADOS[kp]:null;
+  let top=null, topR=-Infinity;
+  CATS.forEach(([id])=>{ const cur=d.perf[id].v, pv=p?p.perf[id].v:null; if(pv){ const r=(cur-pv)/pv; if(r>topR){topR=r; top=id;} } });
+  let rows=CATS.map(([id,n,track],i)=>{ const cur=d.perf[id].v, pv=p?p.perf[id].v:null; return {id,n,track,i,cur,pv,pecas:d.producao[id].dt+d.producao[id].ht,best:d.perf[id].best,top:id===top,r:pv?(cur-pv)/pv:-Infinity}; });
+  if(PERF.busca) rows=rows.filter(r=>(r.n+' '+IND[r.id]).toLowerCase().includes(PERF.busca));
+  if(PERF.tracks.size) rows=rows.filter(r=>PERF.tracks.has(r.track));
+  if(PERF.ordem==='var') rows.sort((a,b)=>b.r-a.r); else if(PERF.ordem==='pecas') rows.sort((a,b)=>b.pecas-a.pecas); else rows.sort((a,b)=>a.i-b.i);
+  return {rows, top, d, p};
+}
+function renderPerf(k, kp){
+  const {rows, top, d, p} = perfRows(k, kp);
+  $('perf-mes').textContent=mesLong(k)+(kp?', sempre contra '+mesLong(kp):'')+'. O selo marca o maior avanço relativo.';
+  $('n-dt').textContent=CATS.filter(c=>c[2]==='dt').length; $('n-ht').textContent=CATS.filter(c=>c[2]==='ht').length;
+  $('t-perf').innerHTML = rows.length ? '<table><thead><tr><th>Categoria</th><th>Indicador</th><th class="num">'+mesLabel(k)+'</th><th class="num">'+(kp?mesLabel(kp):'&mdash;')+'</th><th class="num">Variação</th><th>Melhor item do mês</th></tr></thead><tbody>'+
+    rows.map(r=>'<tr><td class="cat"><i class="tk" style="background:var(--'+r.track+')"></i>'+esc(r.n)+(r.top?'<span class="star">maior avanço</span>':'')+'<small>'+r.pecas+' peças</small></td><td>'+IND[r.id]+'</td><td class="num"><b>'+fmtV(r.id,r.cur)+'</b></td><td class="num">'+(r.pv==null?'&mdash;':fmtV(r.id,r.pv))+'</td><td class="num">'+delta(r.cur,r.pv,FMT[r.id]==='%')+'</td><td class="best">'+esc(r.best)+'</td></tr>').join('')+'</tbody></table>'
+    : '<div class="vazio">Nenhuma categoria corresponde ao filtro.</div>';
+  const bestCat = top? CATS.find(c=>c[0]===top) : null;
+  $('perf-boxes').innerHTML=
+    '<div class="box box--ok"><span class="cartao__rotulo">Melhor resultado do período</span>'+(bestCat?'<span class="big">'+esc(bestCat[1])+'</span><p>'+IND[top]+': <b>'+fmtV(top,d.perf[top].v)+'</b>'+(p?' (antes '+fmtV(top,p.perf[top].v)+')':'')+'. Item: <b>'+esc(d.perf[top].best)+'</b></p>':'<p>Sem mês anterior para comparar.</p>')+'</div>'+
+    '<div class="box"><span class="cartao__rotulo">Leitura DT &times; HT</span><p>Das <b>'+totalProd(d)+' peças</b> do mês, <b>'+fmtPct(totalDT(d)/totalProd(d)*100)+'</b> foram para o Digital Track. O funil digital gerou <b>'+d.funil.cadastros+' cadastros</b> e <b>'+d.funil.testaram+' testes</b>; o apoio ao HT rendeu <b>'+d.perf.abm.v+' reuniões</b> via ABM e <b>'+d.perf.mat.v+' materiais</b> usados em propostas.</p></div>';
+}
+$('perf-busca').addEventListener('input',e=>{ PERF.busca=e.target.value.trim().toLowerCase(); renderPerf(EST.k,EST.kp); });
+$('perf-ordem').addEventListener('change',e=>{ PERF.ordem=e.target.value; renderPerf(EST.k,EST.kp); });
+document.querySelectorAll('.chip[data-track]').forEach(b=>b.addEventListener('click',()=>{
+  const t=b.dataset.track; const on=b.getAttribute('aria-pressed')!=='true'; b.setAttribute('aria-pressed',on);
+  if(on) PERF.tracks.add(t); else PERF.tracks.delete(t); renderPerf(EST.k,EST.kp);
+}));
+
+/* --------- destaque e pendencias (persistidos por navegador) --------- */
+function renderDestaque(k){
+  const ta=$('destaque'); const saved=LS.get('mkt-destaque-'+k);
+  const txt = saved!=null ? saved : (DADOS[k].destaque||'');
+  ta.value=txt; ta.oninput=()=>{ LS.set('mkt-destaque-'+k, ta.value); pintaDestaque(k, ta.value); };
+  pintaDestaque(k, txt);
+}
+function pintaDestaque(k, txt){ $('destaque-geral').innerHTML = txt ? '<div><b>'+mesLong(k)+'.</b> '+esc(txt)+'</div>' : '<div>Sem destaque registrado para '+mesLong(k)+'.</div>'; }
+function contaPend(){ const abertos=[...document.querySelectorAll('#todo input')].filter(c=>!c.checked).length; $('n-pend').textContent=abertos; }
+document.querySelectorAll('#todo input').forEach(cb=>{
+  cb.checked = LS.get('mkt-todo-'+cb.id)==='1'; cb.closest('li').classList.toggle('done',cb.checked);
+  cb.addEventListener('change',()=>{ LS.set('mkt-todo-'+cb.id, cb.checked?'1':'0'); cb.closest('li').classList.toggle('done',cb.checked); contaPend(); });
+});
+$('btn-limpar-todo').addEventListener('click',()=>{ document.querySelectorAll('#todo input').forEach(cb=>{ cb.checked=false; LS.set('mkt-todo-'+cb.id,'0'); cb.closest('li').classList.remove('done'); }); contaPend(); toast('Pendências desmarcadas'); });
+contaPend();
+
+/* --------- modo gráfico / tabela por seção --------- */
+document.querySelectorAll('.chip[data-modo]').forEach(b=>b.addEventListener('click',()=>{
+  const sec=b.closest('.sec'), modo=b.dataset.modo;
+  sec.querySelectorAll('.chip[data-modo]').forEach(c=>c.setAttribute('aria-pressed',c===b));
+  sec.querySelectorAll('.modo-grafico').forEach(el=>el.hidden=modo!=='grafico');
+  sec.querySelectorAll('.modo-tabela').forEach(el=>el.hidden=modo!=='tabela');
+}));
+
+/* --------- views (abas) --------- */
+const VIEWS=['geral','producao','performance','funil','pendencias'];
+function mostraView(v){
+  if(!VIEWS.includes(v)) v='geral';
+  document.querySelectorAll('.aba').forEach(a=>a.setAttribute('aria-selected',a.dataset.view===v));
+  document.querySelectorAll('.view').forEach(p=>p.hidden=p.dataset.view!==v);
+  LS.set('mkt-view',v); history.replaceState(null,'','#'+v); window.scrollTo({top:0});
+}
+document.addEventListener('click',e=>{
+  const a=e.target.closest('.aba'); if(a){ mostraView(a.dataset.view); return; }
+  const g=e.target.closest('[data-goto]'); if(g){ mostraView(g.dataset.goto); }
+});
+
+/* --------- seletor de período --------- */
+const EST={k:null,kp:null};
+function renderPeriodo(){
+  $('periodo').innerHTML=MESES.slice(-6).map(m=>'<button class="periodo__btn" data-mes="'+m+'" aria-pressed="'+(m===EST.k)+'" title="'+mesLong(m)+'">'+MN[+m.split('-')[1]-1]+'</button>').join('');
+}
+$('periodo').addEventListener('click',e=>{ const b=e.target.closest('[data-mes]'); if(b) render(b.dataset.mes); });
+function render(k){
+  const i=MESES.indexOf(k), kp=i>0?MESES[i-1]:null; EST.k=k; EST.kp=kp; LS.set('mkt-mes',k);
+  $('mesAnt').textContent = kp? mesLabel(kp) : 'sem mês anterior';
+  $('n-producao').textContent=totalProd(DADOS[k]); $('n-funil').textContent=DADOS[k].funil.cadastros;
+  renderPeriodo(); renderBanner(k,kp); renderKpis(k,kp); renderFrentes(k,kp); renderProdMes(k); renderProdCat(k); renderAcessos(k); renderFunil(k,kp); renderPerf(k,kp); renderDestaque(k);
+}
+
+/* --------- exportação --------- */
+function toast(msg, cls){ const t=document.createElement('div'); t.className='toast '+(cls||''); t.textContent=msg; $('toasts').appendChild(t); requestAnimationFrame(()=>t.classList.add('show')); setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(),250); },2600); }
+function baixar(nome, conteudo, tipo){ const b=new Blob([conteudo],{type:tipo}); const u=URL.createObjectURL(b); const a=document.createElement('a'); a.href=u; a.download=nome; a.click(); setTimeout(()=>URL.revokeObjectURL(u),500); }
+function exportar(tipo){
+  const k=EST.k, kp=EST.kp, d=DADOS[k], p=kp?DADOS[kp]:null;
+  if(tipo==='csv'){
+    const L=[['secao','item','indicador',mesLabel(k),kp?mesLabel(kp):'']];
+    CATS.forEach(([id,n])=>{ L.push(['producao',n,'peças DT',d.producao[id].dt,p?p.producao[id].dt:'']); L.push(['producao',n,'peças HT',d.producao[id].ht,p?p.producao[id].ht:'']); L.push(['performance',n,IND[id],d.perf[id].v,p?p.perf[id].v:'']); });
+    L.push(['acessos','Site institucional','sessões',d.acessos.site,p?p.acessos.site:'']); L.push(['acessos','LPs de produto','sessões',d.acessos.lps,p?p.acessos.lps:'']);
+    ETAPAS.forEach(([id,n])=>L.push(['funil',n,'',d.funil[id],p?p.funil[id]:'']));
+    baixar('marketing_'+k+'.csv','﻿'+L.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';')).join('\r\n'),'text/csv;charset=utf-8');
+    toast('CSV de '+mesLabel(k)+' baixado','ok');
+  } else if(tipo==='json'){
+    baixar('marketing_'+k+'.json',JSON.stringify({mes:k,...d},null,2),'application/json'); toast('JSON de '+mesLabel(k)+' baixado','ok');
+  } else {
+    const {rows}=perfRows(k,kp);
+    const md=['| Categoria | Indicador | '+mesLabel(k)+' | '+(kp?mesLabel(kp):'—')+' | Melhor item |','|---|---|---:|---:|---|'].concat(rows.map(r=>'| '+r.n+(r.top?' (maior avanço)':'')+' | '+IND[r.id]+' | '+fmtV(r.id,r.cur)+' | '+(r.pv==null?'—':fmtV(r.id,r.pv))+' | '+r.best+' |')).join('\n');
+    (navigator.clipboard?navigator.clipboard.writeText(md):Promise.reject()).then(()=>toast('Tabela copiada em Markdown','ok')).catch(()=>{ baixar('marketing_'+k+'.md',md,'text/markdown'); toast('Markdown baixado','ok'); });
+  }
+}
+const menuExp=$('menu-exportar'), btnExp=$('btn-exportar');
+function abreMenu(on){ menuExp.hidden=!on; btnExp.setAttribute('aria-expanded',on); }
+btnExp.addEventListener('click',e=>{ e.stopPropagation(); abreMenu(menuExp.hidden); });
+menuExp.addEventListener('click',e=>{ const b=e.target.closest('[data-export]'); if(b){ exportar(b.dataset.export); abreMenu(false);} });
+document.addEventListener('click',e=>{ if(!e.target.closest('.exportar')) abreMenu(false); });
+
+/* --------- modo noturno (manual) --------- */
+function aplicaTema(escuro){
+  if(escuro) document.documentElement.setAttribute('data-theme','dark'); else document.documentElement.removeAttribute('data-theme');
+  $('btn-tema').setAttribute('aria-pressed', escuro);
+  LS.set('mkt-tema', escuro ? 'dark' : 'light');
+}
+$('btn-tema').addEventListener('click',()=>{ const on=document.documentElement.getAttribute('data-theme')!=='dark'; aplicaTema(on); toast(on?'Modo noturno ativado':'Modo claro ativado'); });
+$('btn-tema').setAttribute('aria-pressed', document.documentElement.getAttribute('data-theme')==='dark');
+
+/* --------- ajuda e atalhos --------- */
+function ajuda(on){ $('ajuda').hidden=!on; }
+$('btn-ajuda').addEventListener('click',()=>ajuda(true)); $('ajuda-fechar').addEventListener('click',()=>ajuda(false));
+$('ajuda').addEventListener('click',e=>{ if(e.target===$('ajuda')) ajuda(false); });
+document.addEventListener('keydown',e=>{
+  const tag=(e.target.tagName||'').toLowerCase(); const emCampo=tag==='input'||tag==='textarea'||tag==='select';
+  if(e.key==='Escape'){ ajuda(false); abreMenu(false); if(emCampo) e.target.blur(); return; }
+  if(emCampo||e.ctrlKey||e.metaKey||e.altKey) return;
+  const n=parseInt(e.key,10); if(n>=1&&n<=5){ mostraView(VIEWS[n-1]); return; }
+  if(e.key==='?'){ ajuda($('ajuda').hidden); return; }
+  if(e.key==='e'){ abreMenu(menuExp.hidden); return; }
+  if(e.key==='t'){ $('btn-tema').click(); return; }
+  if(e.key==='/'){ e.preventDefault(); mostraView('performance'); $('perf-busca').focus(); return; }
+  if(e.key==='['||e.key===']'){ const i=MESES.indexOf(EST.k)+(e.key===']'?1:-1); if(MESES[i]) render(MESES[i]); }
+});
+
+/* altura real do cabeçalho fixo (no celular ele ocupa mais de uma linha) */
+function medeTopo(){ document.documentElement.style.setProperty('--topo-h', document.querySelector('.topo').offsetHeight+'px'); }
+window.addEventListener('resize', medeTopo); window.addEventListener('load', medeTopo); medeTopo();
+
+/* --------- início --------- */
+const mesSalvo=LS.get('mkt-mes');
+render((mesSalvo&&DADOS[mesSalvo]) ? mesSalvo : MESES[MESES.length-1]);
+mostraView(location.hash.slice(1)||LS.get('mkt-view')||'geral');
+window.addEventListener('hashchange',()=>mostraView(location.hash.slice(1)));
+</script>
+</body>
+</html>
